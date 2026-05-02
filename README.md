@@ -2,9 +2,13 @@
 
 A hierarchical multi-agent research analysis system built for KiroHacks Cal Poly (May 2, 2026). A researcher submits a scientific abstract and a sequential pipeline of three specialized AI agents produces a structured final recommendation.
 
+Two pipelines are available depending on your setup.
+
 ---
 
 ## How It Works
+
+### Pipeline A — LangGraph + Claude (primary)
 
 ```
 Abstract Input
@@ -28,6 +32,21 @@ Abstract Input
 [Peer Review]
   Reproducibility score, strengths, issues, replication checklist
 ```
+
+### Pipeline B — PubMed + Ragie RAG (alternative)
+
+An alternative pipeline that uses PubMed (via Biopython/Entrez) for literature search and Ragie.ai for RAG indexing. Uses Gemini for extraction.
+
+```
+Abstract Input
+    ↓
+[Agent 1: PubMed Finder]       — Gemini term extraction + Entrez API → papers + PMIDs
+    ↓
+[Agent 2: Ragie RAG Builder]   — PMC full-text fetch + Ragie.ai upload (threaded, 3 workers)
+    + Results Extractor        — Gemini parallel extraction → structured findings (2 workers)
+```
+
+Entry point: `run_pipeline.py`
 
 ---
 
@@ -54,6 +73,8 @@ Abstract Input
 │   ├── graph.py               # LangGraph wiring — nodes, edges, run_research()
 │   ├── state.py               # Shared TypedDict schema (ResearchState)
 │   ├── supabase_client.py     # Supabase write integration (service role key)
+│   ├── literature.py          # PubMed literature finder (Pipeline B, Agent 1)
+│   ├── rag.py                 # Ragie RAG builder + results extractor (Pipeline B, Agent 2)
 │   ├── requirements.txt       # Pinned Python dependencies
 │   └── agents/
 │       ├── literature.py      # Agent 1 — paper discovery + synthesis
@@ -81,6 +102,9 @@ Abstract Input
 │   │       └── AnalysisView.jsx
 │   └── package.json
 │
+├── main.py                    # Standalone LangGraph prototype (Tavily search)
+├── run_pipeline.py            # Pipeline B runner (PubMed → Ragie)
+├── requirements_ragie.txt     # Dependencies for Pipeline B
 ├── .env.example               # Environment variable template (root)
 └── .kiro/specs/               # Feature specs (requirements, design, tasks)
 ```
@@ -103,14 +127,22 @@ cp .env.example .env
 # Fill in ANTHROPIC_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 ```
 
-### 2. Run the Streamlit dashboard
+### 2. Run the Streamlit dashboard (Pipeline A)
 
 ```bash
 pip install -r research_lab/requirements.txt
 streamlit run research_lab/app.py
 ```
 
-### 3. Run the React mockup
+### 3. Run Pipeline B (PubMed + Ragie)
+
+```bash
+pip install -r requirements_ragie.txt
+# Fill in GOOGLE_API_KEY, RAGIE_API_KEY, ENTREZ_EMAIL in .env
+python run_pipeline.py
+```
+
+### 4. Run the React mockup
 
 ```bash
 cd labos-mockup
@@ -147,7 +179,10 @@ menin inhibitors in NPM1-mutant acute myeloid leukemia patients?
 
 | Variable | Used by | Description |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | All agents | Claude API access |
+| `ANTHROPIC_API_KEY` | All agents (Pipeline A) | Claude API access |
+| `GOOGLE_API_KEY` | Pipeline B | Gemini API access |
+| `RAGIE_API_KEY` | Pipeline B (`rag.py`) | Ragie.ai RAG indexing |
+| `ENTREZ_EMAIL` | Pipeline B (`literature.py`) | PubMed/Entrez identification |
 | `SUPABASE_URL` | `supabase_client.py` | Supabase project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | `supabase_client.py` | Bypasses RLS — backend only, never expose in frontend |
 | `VITE_SUPABASE_URL` | `labos-mockup/` | Supabase project URL (Vite env) |
@@ -157,25 +192,21 @@ menin inhibitors in NPM1-mutant acute myeloid leukemia patients?
 
 ## Running the Pipeline (CLI)
 
-`graph.py` doubles as a CLI entry point. Run it directly to execute the full pipeline and get a formatted report printed to stdout:
+`graph.py` doubles as a CLI entry point:
 
 ```bash
 # Run with the built-in demo abstract
 python research_lab/graph.py
 
-# Run with a custom abstract (pass as arguments)
+# Run with a custom abstract
 python research_lab/graph.py "Your research abstract text here"
 ```
-
-The CLI output includes labelled sections for each pipeline stage: Literature Review, Hypothesis, Study Procedure, Peer Review, Review History, and Final Recommendation with confidence level, action items, and caveats.
 
 ---
 
 ## HTTP API Server
 
-`research_lab/server.py` exposes the pipeline as a FastAPI HTTP server, allowing the React mockup (or any HTTP client) to trigger pipeline runs without using Streamlit.
-
-### Start the server
+`research_lab/server.py` exposes the pipeline as a FastAPI HTTP server:
 
 ```bash
 pip install fastapi uvicorn
@@ -184,8 +215,6 @@ python3 research_lab/server.py
 # Set PORT env var to override: PORT=9000 python3 research_lab/server.py
 ```
 
-The server automatically loads the `.env` file from the repo root on startup, so environment variables (`ANTHROPIC_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, etc.) are picked up without any extra shell configuration. Variables already set in the environment take precedence over values in `.env`.
-
 ### Endpoints
 
 | Method | Path | Description |
@@ -193,29 +222,19 @@ The server automatically loads the `.env` file from the repo root on startup, so
 | `GET` | `/health` | Returns `{"status": "ok"}` — liveness check |
 | `POST` | `/api/analyze` | Runs the full pipeline; returns `ResearchState` as JSON |
 
-### `POST /api/analyze`
-
 **Request body:**
 ```json
 { "abstract": "Your research abstract (20–4000 characters)" }
 ```
 
-**Response:** The complete `ResearchState` dict as JSON, including all agent outputs, critic reviews, peer review, and final synthesis.
-
-**Error responses:**
-- `422` — abstract too short/long (validated by Pydantic)
-- `500` — unhandled pipeline exception
-
-### CORS
-
-The server allows requests from `localhost:5173`, `localhost:5174`, and `localhost:3000` — the default ports for the Vite dev server.
+CORS is configured for `localhost:5173`, `localhost:5174`, and `localhost:3000`.
 
 ---
 
 ## Running Tests
 
 ```bash
-# Python unit and property tests
+# Python unit tests
 python -m pytest research_lab/tests/
 
 # React build check

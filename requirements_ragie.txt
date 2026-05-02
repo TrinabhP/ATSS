@@ -1,0 +1,10 @@
+# Ragie.ai Version (SIMPLER SETUP!)
+# Only 3 dependencies vs 5 in ChromaDB version
+
+# Core LLM
+google-generativeai>=0.3.0
+python-dotenv>=1.0.0
+
+# PubMed access
+biopython>=1.81
+

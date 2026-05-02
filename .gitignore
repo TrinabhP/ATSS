@@ -3,6 +3,7 @@
 .env.local
 labos-mockup/.env
 labos-mockup/.env.local
+research_lab/.env
 
 # Python
 __pycache__/
