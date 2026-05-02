@@ -1,48 +1,49 @@
 """
-app.py — Streamlit dashboard for LabOS Research Analysis Engine.
-Imports run_research from graph.py. All styles are inline.
+app.py — Streamlit dashboard for LabOS Research Analysis Engine (hierarchical architecture).
 """
 
 import streamlit as st
 
-from state import ResearchState, empty_state
+from state import ResearchState
 
-# ---------------------------------------------------------------------------
-# Constants
-# ---------------------------------------------------------------------------
+# ── Constants ──────────────────────────────────────────────────────────────────
 
 MAX_ABSTRACT_LENGTH = 4000
 MIN_ABSTRACT_LENGTH = 20
 
+DEMO_ABSTRACT = (
+    "We're investigating menin inhibitors for NPM1-mutant AML. "
+    "Key question: Does HOX gene expression predict treatment response to "
+    "menin inhibitors in NPM1-mutant acute myeloid leukemia patients?"
+)
+
 STAGE_IDS = [
-    "literature_finder",
-    "results_extractor",
-    "initial_analysis",
-    "debate_round_1",
-    "debate_round_2",
-    "debate_round_3",
-    "final_recommendation",
+    "literature_running",
+    "literature_review",
+    "hypothesis_running",
+    "hypothesis_review",
+    "procedure_running",
+    "procedure_review",
+    "synthesizing",
 ]
 
 STAGE_LABELS = [
-    "📚 Literature",
-    "🔬 Extraction",
-    "🧠 Analysis",
-    "⚔️ Debate 1",
-    "⚔️ Debate 2",
-    "⚔️ Debate 3",
-    "🏆 Final",
+    "📚 Literature*",
+    "🔴 Critic: Lit*",
+    "💡 Hypothesis",
+    "🔴 Critic: Hyp",
+    "🧪 Procedure",
+    "🔴 Critic: Proc",
+    "✅ Final Synth",
 ]
 
-# ---------------------------------------------------------------------------
-# Page config & global CSS
-# ---------------------------------------------------------------------------
+# ── Page config & CSS ──────────────────────────────────────────────────────────
 
 st.set_page_config(
     page_title="LabOS — Research Analysis Engine",
     page_icon="🧬",
     layout="wide",
-    initial_sidebar_state="collapsed",
+    initial_sidebar_state="expanded",
 )
 
 st.markdown(
@@ -71,7 +72,6 @@ st.markdown(
         font-family: 'IBM Plex Mono', monospace !important;
     }
 
-    /* Cards */
     .lab-card {
         background: var(--card-bg);
         border-radius: 10px;
@@ -80,14 +80,13 @@ st.markdown(
         border: 1px solid #1f2937;
     }
 
-    /* Pipeline stage cards */
     .stage-card {
         background: var(--card-bg);
         border-radius: 8px;
         padding: 0.6rem 0.4rem;
         text-align: center;
         font-family: 'IBM Plex Mono', monospace;
-        font-size: 0.72rem;
+        font-size: 0.70rem;
         border: 1px solid #1f2937;
         color: var(--muted);
         transition: all 0.3s;
@@ -101,18 +100,20 @@ st.markdown(
         border-color: var(--success);
         color: var(--success);
     }
+    .stage-card.pending {
+        border-color: var(--warning);
+        color: var(--warning);
+    }
 
-    /* Confidence badges */
     .badge-high     { background:#064e3b; color:#10b981; padding:3px 10px; border-radius:20px; font-family:'IBM Plex Mono',monospace; font-size:0.85rem; }
     .badge-moderate { background:#451a03; color:#f59e0b; padding:3px 10px; border-radius:20px; font-family:'IBM Plex Mono',monospace; font-size:0.85rem; }
     .badge-low      { background:#450a0a; color:#ef4444; padding:3px 10px; border-radius:20px; font-family:'IBM Plex Mono',monospace; font-size:0.85rem; }
 
-    /* Debate color bands */
-    .critic-band   { border-left: 4px solid #ef4444; padding-left: 0.8rem; margin-bottom: 0.8rem; }
-    .results-band  { border-left: 4px solid #3b82f6; padding-left: 0.8rem; margin-bottom: 0.8rem; }
-    .analysis-band { border-left: 4px solid #10b981; padding-left: 0.8rem; margin-bottom: 0.8rem; }
+    .badge-revised  { background:#1e3a5f; color:#60a5fa; padding:2px 8px; border-radius:12px; font-family:'IBM Plex Mono',monospace; font-size:0.75rem; margin-left:8px; }
 
-    /* Final recommendation card */
+    .review-pass { border-left: 4px solid #10b981; padding-left: 0.8rem; margin-bottom: 0.8rem; }
+    .review-fail { border-left: 4px solid #ef4444; padding-left: 0.8rem; margin-bottom: 0.8rem; }
+
     .final-card {
         background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
         border: 1px solid var(--accent);
@@ -121,7 +122,14 @@ st.markdown(
         margin-top: 1rem;
     }
 
-    /* Streamlit overrides */
+    .pending-card {
+        background: #1a1400;
+        border: 1px solid var(--warning);
+        border-radius: 10px;
+        padding: 1rem 1.4rem;
+        margin-bottom: 1rem;
+    }
+
     .stTextArea textarea {
         background: var(--card-bg) !important;
         color: var(--text) !important;
@@ -137,11 +145,6 @@ st.markdown(
         font-weight: 600 !important;
         padding: 0.5rem 1.5rem !important;
     }
-    .stButton > button:disabled {
-        background: #374151 !important;
-        color: var(--muted) !important;
-        cursor: not-allowed !important;
-    }
     div[data-testid="stExpander"] {
         background: var(--card-bg) !important;
         border: 1px solid #1f2937 !important;
@@ -152,28 +155,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-
-# ---------------------------------------------------------------------------
-# Session state initialization
-# ---------------------------------------------------------------------------
-
-def _init_session():
-    if "result" not in st.session_state:
-        st.session_state.result = None
-    if "running" not in st.session_state:
-        st.session_state.running = False
-    if "error_msg" not in st.session_state:
-        st.session_state.error_msg = None
-    if "abstract" not in st.session_state:
-        st.session_state.abstract = ""
-
-
-_init_session()
-
-
-# ---------------------------------------------------------------------------
-# Header
-# ---------------------------------------------------------------------------
+# ── Header ─────────────────────────────────────────────────────────────────────
 
 st.markdown(
     """
@@ -182,7 +164,7 @@ st.markdown(
             🧬 LabOS
         </h1>
         <p style="color:#6b7280; font-family:'IBM Plex Mono',monospace; font-size:0.9rem; margin:0.3rem 0 0 0;">
-            Multi-Agent Research Analysis Engine · Powered by Claude
+            Hierarchical Multi-Agent Research Engine · Powered by Claude
         </p>
     </div>
     <hr style="border-color:#1f2937; margin: 1rem 0;">
@@ -190,13 +172,11 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-
-# ---------------------------------------------------------------------------
-# Input section
-# ---------------------------------------------------------------------------
+# ── Input ──────────────────────────────────────────────────────────────────────
 
 abstract_input = st.text_area(
     "Research Abstract or Question",
+    value=DEMO_ABSTRACT,
     placeholder=(
         "Paste a research abstract or question here.\n\n"
         "Example: 'Does HOX gene expression predict treatment response to menin inhibitors "
@@ -204,7 +184,6 @@ abstract_input = st.text_area(
     ),
     height=140,
     max_chars=MAX_ABSTRACT_LENGTH,
-    disabled=st.session_state.running,
     key="abstract_input",
 )
 
@@ -219,44 +198,32 @@ with col_char:
             f"{char_count}/{MAX_ABSTRACT_LENGTH} characters</p>",
             unsafe_allow_html=True,
         )
-    if char_count >= MAX_ABSTRACT_LENGTH:
-        st.warning(f"Abstract truncated to {MAX_ABSTRACT_LENGTH} characters.")
 
 with col_btn:
-    launch_disabled = (
-        char_count < MIN_ABSTRACT_LENGTH or st.session_state.running
-    )
     launch_clicked = st.button(
-        "🚀 Launch Analysis" if not st.session_state.running else "⏳ Running...",
-        disabled=launch_disabled,
+        "🚀 Launch Analysis",
+        disabled=char_count < MIN_ABSTRACT_LENGTH,
         use_container_width=True,
     )
 
-# ---------------------------------------------------------------------------
-# Placeholders for live updates
-# ---------------------------------------------------------------------------
+# ── Sidebar: orchestrator log ──────────────────────────────────────────────────
 
-pipeline_status_placeholder = st.empty()
-st.markdown("<br>", unsafe_allow_html=True)
-results_placeholder = st.empty()
+with st.sidebar:
+    st.markdown(
+        '<p style="font-family:\'IBM Plex Mono\',monospace; font-size:0.85rem; color:#6b7280;">ORCHESTRATOR LOG</p>',
+        unsafe_allow_html=True,
+    )
+    log_placeholder = st.empty()
+    st.markdown("---")
+    st.markdown(
+        '<p style="font-size:0.75rem; color:#6b7280;">* Stages marked with * depend on Agent 1 (in development by separate developer).</p>',
+        unsafe_allow_html=True,
+    )
 
 
-# ---------------------------------------------------------------------------
-# Pipeline status bar
-# ---------------------------------------------------------------------------
+# ── Pipeline status bar ────────────────────────────────────────────────────────
 
-def render_pipeline_status(current_stage: str, result: ResearchState | None):
-    """Render the 7-stage pipeline status bar."""
-    completed_stages = set()
-    if result:
-        # All stages are done if we have a final result
-        completed_stages = set(STAGE_IDS)
-    elif current_stage:
-        # Mark stages before current as done
-        if current_stage in STAGE_IDS:
-            idx = STAGE_IDS.index(current_stage)
-            completed_stages = set(STAGE_IDS[:idx])
-
+def render_pipeline_status(current_stage: str, is_complete: bool, is_pending: bool):
     st.markdown(
         '<p style="font-family:\'IBM Plex Mono\',monospace; font-size:0.8rem; color:#6b7280; margin-bottom:0.4rem;">PIPELINE STATUS</p>',
         unsafe_allow_html=True,
@@ -264,227 +231,294 @@ def render_pipeline_status(current_stage: str, result: ResearchState | None):
     cols = st.columns(7)
     for i, (stage_id, label) in enumerate(zip(STAGE_IDS, STAGE_LABELS)):
         with cols[i]:
-            if result:
-                css_class = "stage-card done"
+            if is_complete:
+                css = "stage-card done"
+            elif is_pending and i < 2:
+                css = "stage-card pending"
             elif stage_id == current_stage:
-                css_class = "stage-card active"
-            elif stage_id in completed_stages:
-                css_class = "stage-card done"
+                css = "stage-card active"
             else:
-                css_class = "stage-card"
-            st.markdown(
-                f'<div class="{css_class}">{label}</div>',
-                unsafe_allow_html=True,
-            )
+                css = "stage-card"
+            st.markdown(f'<div class="{css}">{label}</div>', unsafe_allow_html=True)
 
 
-# Render initial pipeline status (updated live during streaming)
-with pipeline_status_placeholder.container():
-    render_pipeline_status("", st.session_state.result if not st.session_state.running else None)
+# ── Results renderers ──────────────────────────────────────────────────────────
+
+def _revision_badge(revision_count: int) -> str:
+    if revision_count and revision_count > 0:
+        return f'<span class="badge-revised">Revised {revision_count}x</span>'
+    return ""
 
 
-# ---------------------------------------------------------------------------
-# Results rendering
-# ---------------------------------------------------------------------------
+def render_literature_pending():
+    st.markdown(
+        """
+        <div class="pending-card">
+            <p style="font-family:'IBM Plex Mono',monospace; color:#f59e0b; margin:0;">
+                ⏳ Agent 1 not yet integrated
+            </p>
+            <p style="font-size:0.82rem; color:#9ca3af; margin:0.4rem 0 0 0;">
+                The Literature Review agent is being developed by a separate team member.
+                Hypothesis and Procedure agents will run with placeholder inputs until Agent 1 is merged.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-def render_papers(papers: list, search_terms: list = None):
-    with st.expander(f"📚 Papers Found ({len(papers)})", expanded=False):
+
+def render_papers(literature):
+    papers = literature.get("papers") or []
+    search_terms = literature.get("search_terms") or []
+    rev = _revision_badge(literature.get("revision_count", 0))
+
+    with st.expander(
+        f"📚 Papers Found ({len(papers)})" + (" — Revised" if literature.get("revision_count", 0) > 0 else ""),
+        expanded=False,
+    ):
+        st.markdown(f'<span>{rev}</span>', unsafe_allow_html=True)
         if search_terms:
             terms_str = "  ".join(f"`{t}`" for t in search_terms)
             st.markdown(f"**Search terms:** {terms_str}")
             st.markdown("---")
+        if not papers:
+            st.markdown("*No papers found — Agent 1 not yet integrated.*")
+            return
         for i, paper in enumerate(papers, 1):
             score = paper.get("relevance_score")
             score_str = f" · relevance {score:.2f}" if score is not None else ""
-            st.markdown(
-                f"**{i}. [{paper['title']}]({paper['url']})**{score_str}",
-                unsafe_allow_html=False,
-            )
+            st.markdown(f"**{i}. [{paper['title']}]({paper['url']})**{score_str}")
             if paper.get("abstract"):
                 st.markdown(
-                    f'<p style="color:#9ca3af; font-size:0.85rem;">{paper["abstract"][:300]}{"..." if len(paper["abstract"]) > 300 else ""}</p>',
+                    f'<p style="color:#9ca3af; font-size:0.85rem;">{paper["abstract"][:300]}</p>',
                     unsafe_allow_html=True,
                 )
             st.markdown("---")
 
 
-def render_extracted_results(results: list):
-    with st.expander(f"🔬 Extracted Results ({len(results)} papers)", expanded=False):
-        for result in results:
-            st.markdown(f"**{result['paper_title']}**")
+def render_analyses(literature):
+    analyses = literature.get("analyses") or []
+    with st.expander(f"🔬 Paper Analyses ({len(analyses)} papers)", expanded=False):
+        if not analyses:
+            st.markdown("*No analyses — Agent 1 not yet integrated.*")
+            return
+        for a in analyses:
+            st.markdown(f"**{a.get('paper_title', 'Unknown')}**")
             col_meta, col_findings = st.columns([1, 2])
             with col_meta:
-                if result.get("sample_size"):
-                    st.markdown(f"**Sample size:** `{result['sample_size']}`")
-                if result.get("methods"):
+                if a.get("sample_size"):
+                    st.markdown(f"**Sample size:** `{a['sample_size']}`")
+                if a.get("methodology"):
                     st.markdown(
-                        f'<p style="font-size:0.83rem; color:#9ca3af;">{result["methods"][:200]}</p>',
+                        f'<p style="font-size:0.83rem; color:#9ca3af;">{a["methodology"][:200]}</p>',
                         unsafe_allow_html=True,
                     )
-                if result.get("datasets"):
+                if a.get("limitations"):
                     st.markdown(
-                        f'<p style="font-size:0.83rem; color:#9ca3af;"><em>Data: {result["datasets"][:120]}</em></p>',
+                        f'<p style="font-size:0.80rem; color:#6b7280;"><em>⚠ {a["limitations"][:200]}</em></p>',
                         unsafe_allow_html=True,
                     )
             with col_findings:
-                if result.get("key_findings"):
+                findings = a.get("key_findings") or []
+                if findings:
                     st.markdown("**Key findings:**")
-                    for finding in result["key_findings"][:6]:
-                        st.markdown(f"- {finding}")
-            if result.get("limitations"):
-                st.markdown(
-                    f'<p style="color:#6b7280; font-size:0.8rem; margin-top:0.2rem;"><em>⚠ Limitations: {result["limitations"][:240]}</em></p>',
-                    unsafe_allow_html=True,
-                )
+                    for f in findings[:5]:
+                        st.markdown(f"- {f}")
+                if a.get("relevance_to_question"):
+                    st.markdown(
+                        f'<p style="font-size:0.80rem; color:#60a5fa;"><em>Relevance: {a["relevance_to_question"][:200]}</em></p>',
+                        unsafe_allow_html=True,
+                    )
             st.markdown("---")
 
 
-def render_initial_analysis(synthesis: str, gaps: list):
-    with st.expander("🧠 Initial Analysis", expanded=False):
-        st.markdown(synthesis)
-        if gaps:
-            st.markdown("**Identified Gaps & Inconsistencies:**")
-            for gap in gaps:
-                st.markdown(f"- {gap}")
+def render_lit_synthesis(literature):
+    synthesis = literature.get("synthesis") or ""
+    with st.expander("🧠 Literature Synthesis", expanded=False):
+        if not synthesis:
+            st.markdown("*No synthesis — Agent 1 not yet integrated.*")
+        else:
+            st.markdown(synthesis)
 
 
-def render_debate_round(round_data: dict):
-    rn = round_data["round_number"]
-    with st.expander(f"⚔️ Debate Round {rn}", expanded=False):
-        st.markdown(
-            '<div class="critic-band"><strong style="color:#ef4444;">🔴 Critic</strong></div>',
-            unsafe_allow_html=True,
-        )
-        st.markdown(round_data["critic_feedback"])
+def render_critic_review(reviews, agent_name: str, label: str):
+    agent_reviews = [r for r in (reviews or []) if r["agent_name"] == agent_name]
+    if not agent_reviews:
+        return
+    with st.expander(f"{label} ({len(agent_reviews)} review(s))", expanded=False):
+        for r in agent_reviews:
+            css = "review-pass" if r["passed"] else "review-fail"
+            icon = "✅ PASSED" if r["passed"] else "❌ FAILED"
+            st.markdown(
+                f'<div class="{css}"><strong>{icon}</strong> — Submission #{r["revision_number"]}'
+                + (f'<br><small style="color:#9ca3af;">{r.get("timestamp","")}</small>' if r.get("timestamp") else "")
+                + "</div>",
+                unsafe_allow_html=True,
+            )
+            if not r["passed"] and r.get("feedback"):
+                st.markdown(
+                    f'<p style="font-size:0.85rem; color:#fca5a5;">{r["feedback"]}</p>',
+                    unsafe_allow_html=True,
+                )
 
-        st.markdown(
-            '<div class="results-band"><strong style="color:#3b82f6;">🔵 Results Re-evaluator</strong></div>',
-            unsafe_allow_html=True,
-        )
-        st.markdown(round_data["results_refinement"])
 
-        st.markdown(
-            '<div class="analysis-band"><strong style="color:#10b981;">🟢 Analysis Refiner</strong></div>',
-            unsafe_allow_html=True,
-        )
-        st.markdown(round_data["analysis_update"])
+def render_hypothesis(hypothesis):
+    if not hypothesis:
+        return
+    rev = _revision_badge(hypothesis.get("revision_count", 0))
+    with st.expander(
+        "💡 Hypothesis" + (" — Revised" if hypothesis.get("revision_count", 0) > 0 else ""),
+        expanded=True,
+    ):
+        st.markdown(f'<span>{rev}</span>', unsafe_allow_html=True)
+        st.markdown(f"**Primary Hypothesis:**\n\n{hypothesis.get('hypothesis', '')}")
+        st.markdown(f"**Null Hypothesis (H₀):**\n\n{hypothesis.get('null_hypothesis', '')}")
+        st.markdown("---")
+        st.markdown(f"**Rationale:**\n\n{hypothesis.get('rationale', '')}")
+        st.markdown(f"**Design Approach:** {hypothesis.get('design_approach', '')}")
+        outcomes = hypothesis.get("expected_outcomes") or []
+        if outcomes:
+            st.markdown("**Expected Outcomes:**")
+            for o in outcomes:
+                st.markdown(f"- {o}")
+
+
+def render_procedure(procedure):
+    if not procedure:
+        return
+    rev = _revision_badge(procedure.get("revision_count", 0))
+    with st.expander(
+        "🧪 Procedure Design" + (" — Revised" if procedure.get("revision_count", 0) > 0 else ""),
+        expanded=False,
+    ):
+        st.markdown(f'<span>{rev}</span>', unsafe_allow_html=True)
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("**Population Size & Power:**")
+            st.markdown(procedure.get("population_size", ""))
+            st.markdown("**Population Criteria:**")
+            st.markdown(procedure.get("population_criteria", ""))
+            st.markdown("**Timeline:**")
+            st.markdown(procedure.get("timeline_estimate", ""))
+        with col2:
+            st.markdown("**Research Design:**")
+            st.markdown(procedure.get("research_design", ""))
+            st.markdown("**Data Collection:**")
+            st.markdown(procedure.get("data_collection", ""))
+            st.markdown("**Statistical Approach:**")
+            st.markdown(procedure.get("statistical_approach", ""))
 
 
 def render_final_recommendation(state: ResearchState):
-    confidence = state.get("confidence_level", "Low")
-    badge_class = {
-        "High": "badge-high",
-        "Moderate": "badge-moderate",
-        "Low": "badge-low",
-    }.get(confidence, "badge-low")
-
+    confidence = state.get("confidence_level") or "Low"
+    badge_class = {"High": "badge-high", "Moderate": "badge-moderate", "Low": "badge-low"}.get(
+        confidence, "badge-low"
+    )
     st.markdown(
         f"""
         <div class="final-card">
             <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem;">
-                <h2 style="font-family:'IBM Plex Mono',monospace; margin:0; color:#e0e6f0;">🏆 Final Recommendation</h2>
+                <h2 style="font-family:'IBM Plex Mono',monospace; margin:0; color:#e0e6f0;">✅ Final Recommendation</h2>
                 <span class="{badge_class}">{confidence} Confidence</span>
             </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
-
-    st.markdown(state.get("final_recommendation", ""))
+    st.markdown(state.get("final_recommendation") or "")
 
     col_left, col_right = st.columns(2)
     with col_left:
-        st.markdown("**✅ Action Items**")
-        for item in state.get("action_items", []):
+        st.markdown("**Action Items**")
+        for item in (state.get("action_items") or []):
             st.markdown(f"- {item}")
     with col_right:
-        st.markdown("**⚠️ Caveats**")
-        for caveat in state.get("caveats", []):
+        st.markdown("**Caveats**")
+        for caveat in (state.get("caveats") or []):
             st.markdown(f"- {caveat}")
 
 
 def render_results(state: ResearchState):
-    """Render all result sections from the pipeline state."""
-    if state.get("papers"):
-        render_papers(state["papers"], state.get("search_terms", []))
+    literature = state.get("literature")
+    hypothesis = state.get("hypothesis")
+    procedure = state.get("procedure")
+    reviews = state.get("reviews") or []
 
-    if state.get("extracted_results"):
-        render_extracted_results(state["extracted_results"])
-
-    if state.get("initial_synthesis"):
-        render_initial_analysis(
-            state["initial_synthesis"], state.get("identified_gaps", [])
+    # Agent 1 pending or implemented
+    if literature is not None:
+        is_pending = (
+            state.get("error") == "Agent 1 not yet integrated"
+            or (not literature.get("papers") and not literature.get("synthesis"))
         )
+        if is_pending:
+            render_literature_pending()
+        else:
+            render_papers(literature)
+            render_analyses(literature)
+            render_lit_synthesis(literature)
 
-    for round_data in state.get("debate_rounds", []):
-        render_debate_round(round_data)
+        render_critic_review(reviews, "literature", "🔴 Critic Review: Literature")
+
+    if hypothesis is not None:
+        render_hypothesis(hypothesis)
+        render_critic_review(reviews, "hypothesis", "🔴 Critic Review: Hypothesis")
+
+    if procedure is not None:
+        render_procedure(procedure)
+        render_critic_review(reviews, "procedure", "🔴 Critic Review: Procedure")
 
     if state.get("final_recommendation"):
         render_final_recommendation(state)
 
 
-# ---------------------------------------------------------------------------
-# Pipeline execution
-# ---------------------------------------------------------------------------
+# ── Pipeline execution ─────────────────────────────────────────────────────────
 
-if launch_clicked and not st.session_state.running:
-    st.session_state.running = True
-    st.session_state.abstract = abstract_input  # save before rerun locks the input
-    st.session_state.result = None
-    st.session_state.error_msg = None
-    st.rerun()
+if launch_clicked and char_count >= MIN_ABSTRACT_LENGTH:
+    from graph import run_research
 
-if st.session_state.running and st.session_state.result is None:
-    from graph import stream_research
+    pipeline_status_area = st.empty()
+    results_area = st.empty()
 
-    last_state = None
-    try:
-        for state_snapshot in stream_research(st.session_state.abstract):
-            last_state = state_snapshot
-            stage = state_snapshot.get("current_stage", "")
+    with st.spinner("Running multi-agent pipeline... (this takes 1-3 minutes)"):
+        try:
+            final_state = run_research(abstract_input)
+        except Exception as exc:
+            st.error(f"Pipeline error: {exc}")
+            final_state = None
 
-            with pipeline_status_placeholder.container():
-                render_pipeline_status(stage, None)
+    if final_state:
+        is_complete = final_state.get("current_stage") == "complete"
+        is_pending = final_state.get("error") == "Agent 1 not yet integrated"
 
-            with results_placeholder.container():
-                render_results(state_snapshot)
+        with pipeline_status_area.container():
+            render_pipeline_status(final_state.get("current_stage", ""), is_complete, is_pending)
 
-        st.session_state.result = last_state
-        if last_state and last_state.get("error"):
-            st.session_state.error_msg = last_state["error"]
+        if final_state.get("error") and not is_pending:
+            st.warning(f"Pipeline note: {final_state['error']}")
 
-    except Exception as e:
-        st.session_state.error_msg = str(e)
+        # Orchestrator log in sidebar
+        msgs = final_state.get("orchestrator_messages") or []
+        with log_placeholder.container():
+            if msgs:
+                for msg in msgs:
+                    st.markdown(
+                        f'<p style="font-size:0.75rem; font-family:\'IBM Plex Mono\',monospace; color:#9ca3af; margin:2px 0;">{msg}</p>',
+                        unsafe_allow_html=True,
+                    )
+            else:
+                st.markdown(
+                    '<p style="font-size:0.75rem; color:#6b7280;">No log entries.</p>',
+                    unsafe_allow_html=True,
+                )
 
-    st.session_state.running = False
-    st.rerun()
+        with results_area.container():
+            render_results(final_state)
 
-
-# ---------------------------------------------------------------------------
-# Display results or errors
-# ---------------------------------------------------------------------------
-
-if st.session_state.error_msg:
-    st.error(f"Pipeline error: {st.session_state.error_msg}")
-
-if st.session_state.result:
-    with pipeline_status_placeholder.container():
-        render_pipeline_status("", st.session_state.result)
-
-    with results_placeholder.container():
-        render_results(st.session_state.result)
-
-    # Partial results warning
-    result = st.session_state.result
-    if result.get("error") and (result.get("papers") or result.get("initial_synthesis")):
-        st.warning(
-            "The pipeline encountered an error but partial results are shown above."
+else:
+    # Idle state — show empty pipeline
+    render_pipeline_status("", False, False)
+    with log_placeholder.container():
+        st.markdown(
+            '<p style="font-size:0.75rem; color:#6b7280;">Pipeline not yet started.</p>',
+            unsafe_allow_html=True,
         )
-
-    # Reset button
-    st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("🔄 Run New Analysis", use_container_width=False):
-        st.session_state.result = None
-        st.session_state.running = False
-        st.session_state.error_msg = None
-        st.rerun()
