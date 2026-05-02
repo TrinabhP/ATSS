@@ -25,6 +25,7 @@ STAGE_IDS = [
     "procedure_running",
     "procedure_review",
     "synthesizing",
+    "peer_review",
 ]
 
 STAGE_LABELS = [
@@ -35,6 +36,7 @@ STAGE_LABELS = [
     "🧪 Procedure",
     "🔴 Critic: Proc",
     "✅ Final Synth",
+    "🔬 Peer Review",
 ]
 
 # ── Page config & CSS ──────────────────────────────────────────────────────────
@@ -228,7 +230,7 @@ def render_pipeline_status(current_stage: str, is_complete: bool, is_pending: bo
         '<p style="font-family:\'IBM Plex Mono\',monospace; font-size:0.8rem; color:#6b7280; margin-bottom:0.4rem;">PIPELINE STATUS</p>',
         unsafe_allow_html=True,
     )
-    cols = st.columns(7)
+    cols = st.columns(8)
     for i, (stage_id, label) in enumerate(zip(STAGE_IDS, STAGE_LABELS)):
         with cols[i]:
             if is_complete:
@@ -438,6 +440,98 @@ def render_final_recommendation(state: ResearchState):
             st.markdown(f"- {caveat}")
 
 
+def render_peer_review(peer_review):
+    if not peer_review:
+        return
+
+    verdict = peer_review.get("overall_verdict", "")
+    score = peer_review.get("reproducibility_score", 0)
+
+    verdict_colors = {
+        "Accept": ("#064e3b", "#10b981"),
+        "Minor Revision": ("#1e3a5f", "#60a5fa"),
+        "Major Revision": ("#451a03", "#f59e0b"),
+        "Reject": ("#450a0a", "#ef4444"),
+    }
+    bg, fg = verdict_colors.get(verdict, ("#1f2937", "#9ca3af"))
+
+    score_color = "#10b981" if score >= 8 else "#f59e0b" if score >= 5 else "#ef4444"
+
+    st.markdown(
+        f"""
+        <div style="background:#111827; border:1px solid #1f2937; border-radius:10px; padding:1.2rem 1.4rem; margin-bottom:1rem;">
+            <div style="display:flex; align-items:center; gap:1rem; margin-bottom:0.8rem;">
+                <h3 style="font-family:'IBM Plex Mono',monospace; margin:0; color:#e0e6f0;">🔬 Peer Review Report</h3>
+                <span style="background:{bg}; color:{fg}; padding:3px 12px; border-radius:20px; font-family:'IBM Plex Mono',monospace; font-size:0.85rem;">{verdict}</span>
+                <span style="background:#1f2937; color:{score_color}; padding:3px 10px; border-radius:20px; font-family:'IBM Plex Mono',monospace; font-size:0.85rem;">Reproducibility: {score}/10</span>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(peer_review.get("summary", ""))
+
+    col_left, col_right = st.columns(2)
+    with col_left:
+        strengths = peer_review.get("strengths") or []
+        if strengths:
+            with st.expander(f"✅ Strengths ({len(strengths)})", expanded=True):
+                for s in strengths:
+                    st.markdown(f"- {s}")
+
+    with col_right:
+        missing = peer_review.get("missing_details") or []
+        if missing:
+            with st.expander(f"⚠️ Missing Details ({len(missing)})", expanded=True):
+                for m in missing:
+                    st.markdown(f"- {m}")
+
+    issues = peer_review.get("issues") or []
+    if issues:
+        critical = [i for i in issues if i.get("severity") == "Critical"]
+        major = [i for i in issues if i.get("severity") == "Major"]
+        minor = [i for i in issues if i.get("severity") == "Minor"]
+
+        with st.expander(
+            f"🚨 Reproducibility Issues ({len(issues)} total — "
+            f"{len(critical)} critical, {len(major)} major, {len(minor)} minor)",
+            expanded=True,
+        ):
+            severity_styles = {
+                "Critical": ("#450a0a", "#ef4444", "🔴"),
+                "Major": ("#451a03", "#f59e0b", "🟡"),
+                "Minor": ("#1e3a5f", "#60a5fa", "🔵"),
+            }
+            for issue in issues:
+                sev = issue.get("severity", "Minor")
+                bg_c, fg_c, icon = severity_styles.get(sev, ("#1f2937", "#9ca3af", "⚪"))
+                st.markdown(
+                    f'<div style="background:{bg_c}; border-radius:6px; padding:0.6rem 0.8rem; margin-bottom:0.6rem;">'
+                    f'<span style="color:{fg_c}; font-family:\'IBM Plex Mono\',monospace; font-size:0.8rem;">{icon} {sev.upper()} — {issue.get("section","")}</span><br>'
+                    f'<span style="color:#e0e6f0; font-size:0.88rem;">{issue.get("description","")}</span><br>'
+                    f'<span style="color:#9ca3af; font-size:0.82rem;"><em>Suggestion: {issue.get("suggestion","")}</em></span>'
+                    f'</div>',
+                    unsafe_allow_html=True,
+                )
+
+    changes = peer_review.get("suggested_changes") or []
+    if changes:
+        with st.expander(f"📋 Suggested Changes ({len(changes)}, priority order)", expanded=False):
+            for i, change in enumerate(changes, 1):
+                st.markdown(f"**{i}.** {change}")
+
+    checklist = peer_review.get("replication_checklist") or []
+    if checklist:
+        with st.expander("☑️ Replication Checklist", expanded=False):
+            for item in checklist:
+                color = "#10b981" if item.upper().endswith("YES") else "#ef4444" if item.upper().endswith("NO") else "#9ca3af"
+                st.markdown(
+                    f'<p style="font-family:\'IBM Plex Mono\',monospace; font-size:0.82rem; color:{color}; margin:4px 0;">{item}</p>',
+                    unsafe_allow_html=True,
+                )
+
+
 def render_results(state: ResearchState):
     literature = state.get("literature")
     hypothesis = state.get("hypothesis")
@@ -469,6 +563,10 @@ def render_results(state: ResearchState):
 
     if state.get("final_recommendation"):
         render_final_recommendation(state)
+
+    if state.get("peer_review"):
+        st.markdown("---")
+        render_peer_review(state["peer_review"])
 
 
 # ── Pipeline execution ─────────────────────────────────────────────────────────

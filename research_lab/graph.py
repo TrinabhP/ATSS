@@ -18,6 +18,7 @@ from agents.orchestrator import (
     review_procedure,
     synthesize_final,
 )
+from agents.peer_reviewer import run_peer_review_agent
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -228,6 +229,26 @@ def synthesize_node(state: ResearchState) -> ResearchState:
     except Exception as e:
         state["error"] = f"Synthesis error: {e}"
         state["orchestrator_messages"].append(f"[{_now()}] Synthesis failed: {e}")
+    return state
+
+
+def peer_review_node(state: ResearchState) -> ResearchState:
+    state["current_stage"] = "peer_review"
+    try:
+        result = run_peer_review_agent(
+            state["literature"],
+            state["hypothesis"],
+            state["procedure"],
+            state["abstract"],
+        )
+        state["peer_review"] = result
+        state["orchestrator_messages"].append(
+            f"[{_now()}] Peer review complete — verdict: {result['overall_verdict']} "
+            f"(reproducibility score: {result['reproducibility_score']}/10)"
+        )
+    except Exception as e:
+        state["error"] = f"Peer review error: {e}"
+        state["orchestrator_messages"].append(f"[{_now()}] Peer review failed: {e}")
     state["current_stage"] = "complete"
     return state
 
@@ -270,6 +291,7 @@ def _build_graph():
     graph.add_node("dispatch_procedure", dispatch_procedure)
     graph.add_node("review_procedure_node", review_procedure_node)
     graph.add_node("synthesize_node", synthesize_node)
+    graph.add_node("peer_review_node", peer_review_node)
 
     graph.set_entry_point("dispatch_literature")
 
@@ -303,7 +325,8 @@ def _build_graph():
         },
     )
 
-    graph.add_edge("synthesize_node", END)
+    graph.add_edge("synthesize_node", "peer_review_node")
+    graph.add_edge("peer_review_node", END)
 
     return graph.compile()
 
@@ -321,6 +344,7 @@ def run_research(abstract: str) -> ResearchState:
         "literature": None,
         "hypothesis": None,
         "procedure": None,
+        "peer_review": None,
         "reviews": [],
         "final_recommendation": None,
         "confidence_level": None,
