@@ -1,121 +1,193 @@
-# ATSS
+# LabOS — Research Analysis Engine
 
-YES! This is WAY better for a hackathon. Much cleaner demo, shows LangGraph strengths. Here's the streamlined version:
-Research Analysis Dashboard - 4 Agent System
-The Flow:
-User Abstract 
+A multi-agent system for automated biomedical literature review and analysis. Two pipelines are available depending on your setup.
+
+---
+
+## Architecture
+
+### Pipeline A — LangGraph + Claude (primary)
+
+The main pipeline uses LangGraph for orchestration and Claude (via the Anthropic API) for all agent logic.
+
+```
+Abstract Input
     ↓
-[Agent 1: Literature Finder] → finds 5-10 relevant papers
+[Agent 1: Literature Finder]   — Claude + web_search → 5–10 papers
     ↓
-[Agent 2: Results Extractor] → pulls key findings/data from papers
+[Agent 2: Results Extractor]   — Claude + web_fetch → key findings per paper
     ↓
-[Agent 3: Analysis Agent] → synthesizes insights
+[Agent 3: Initial Analysis]    — Claude → synthesis + identified gaps
     ↓
-[Multi-Agent Debate Loop - 3 cycles]
-    Critic Agent ↔ Results Agent ↔ Analysis Agent
+[Multi-Agent Debate Loop × 3]
+    Critic Agent ↔ Results Re-evaluator ↔ Analysis Refiner
     ↓
-[Final Decision/Recommendation]
+[Final Recommendation]         — confidence level + action items + caveats
+```
 
-4-Person Split (MUCH simpler):
-Person 1: Agent 1 (Literature Finder)
-Tools: Claude API + web_search tool
-Input: Abstract text
-Output: List of 5-10 papers with titles, abstracts, URLs
-python# Pseudocode
-def literature_finder(abstract):
-    search_query = extract_key_terms(abstract)
-    papers = web_search(search_query)
-    return {"papers": papers, "search_terms": [...]}
+Entry points:
+- `research_lab/app.py` — Streamlit dashboard (live streaming UI)
+- `research_lab/graph.py` — programmatic entry (`run_research`, `stream_research`)
 
-Person 2: Agent 2 (Results Extractor)
-Tools: Claude API + web_fetch
-Input: Paper list from Agent 1
-Output: Extracted key results, methods, datasets
-pythondef results_extractor(papers):
-    results = []
-    for paper in papers:
-        content = fetch_paper(paper.url)
-        extracted = extract_results_section(content)
-        results.append(extracted)
-    return {"results": results}
+### Pipeline B — PubMed + Ragie RAG
 
-Person 3: LangGraph + Multi-Agent Debate
-Tools: LangGraph orchestration
-Agents: Critic, Results Re-evaluator, Analysis Refiner
-Does: 3-cycle debate loop → convergence
-python# LangGraph cycle
-for i in range(3):
-    critic_feedback = critic_agent(current_analysis)
-    refined_results = results_agent(critic_feedback)
-    updated_analysis = analysis_agent(refined_results)
+An alternative Phase 1 pipeline that uses PubMed (via Biopython/Entrez) for literature search and Ragie.ai for RAG indexing. Uses Gemini for extraction.
 
-Person 4: UI + Agent 3 (Initial Analysis)
-Part A: Build initial analysis agent
-Part B: Streamlit dashboard showing each step
-pythondef analysis_agent(results):
-    synthesis = synthesize_findings(results)
-    gaps = identify_gaps(results)
-    return {"synthesis": synthesis, "gaps": gaps}
+```
+Abstract Input
+    ↓
+[Agent 1: PubMed Finder]       — Gemini term extraction + Entrez API → papers + PMIDs
+    ↓
+[Agent 2: Ragie RAG Builder]   — PMC full-text fetch + Ragie.ai upload (threaded, 3 workers)
+    + Results Extractor        — Gemini parallel extraction → structured findings (2 workers)
+```
 
-Example Demo Flow (X-Menin focused):
-User Input:
+Agent 2 runs two stages concurrently:
+- **RAG build**: fetches PMC full-text where available (falls back to abstract), then uploads all documents to Ragie.ai in parallel.
+- **Extraction**: calls Gemini on each paper in parallel to produce structured `key_findings`, `methods`, `sample_size`, `limitations`, and `relevance` fields.
 
-"We're investigating menin inhibitors for NPM1-mutant AML. Key question: Does HOX gene expression predict treatment response?"
+Entry point: `run_pipeline.py`
 
-Agent 1 Output:
+---
 
-Found 8 papers on menin inhibitors + NPM1-AML
-Search terms: "menin inhibitor", "NPM1 mutation", "HOX genes", "AML response"
+## Project Structure
 
-Agent 2 Output:
+```
+.
+├── main.py                    # Standalone LangGraph prototype (Tavily search)
+├── run_pipeline.py            # Pipeline B runner (PubMed → Ragie)
+├── requirements.txt           # Dependencies for Pipeline A
+├── requirements_ragie.txt     # Dependencies for Pipeline B
+└── research_lab/
+    ├── agents.py              # All Claude agent functions (Pipeline A)
+    ├── graph.py               # LangGraph graph definition + stream_research
+    ├── app.py                 # Streamlit dashboard
+    ├── state.py               # Shared TypedDicts (ResearchState, Paper, etc.)
+    ├── literature.py          # PubMed literature finder (Pipeline B, Agent 1)
+    ├── rag.py                 # Ragie RAG builder + results extractor (Pipeline B, Agent 2)
+    └── .env                   # API keys (gitignored)
+```
 
-Paper 1: HOXA9/MEIS1 overexpression in responders (p<0.001)
-Paper 2: 65% response rate in NPM1+ patients
-Paper 3: FLT3-ITD may reduce efficacy
+---
 
-Agent 3 (Initial Analysis):
+## Setup
 
-"Strong correlation between HOX signature and response. Suggests predictive biomarker potential."
+### Pipeline A (LangGraph + Claude)
 
-Debate Cycle 1:
+```bash
+pip install -r requirements.txt
+```
 
-Critic: "But sample sizes are small (n=45 in Paper 1). Need validation."
-Results: "Paper 3 had n=156, confirms HOXA9 signal"
-Analysis: "Updating: Consistent across studies despite size variance"
+Required keys in `research_lab/.env`:
+```
+ANTHROPIC_API_KEY=...
+```
 
-Debate Cycle 2:
+Run the Streamlit dashboard:
+```bash
+streamlit run research_lab/app.py
+```
 
-Critic: "What about FLT3-ITD confounding?"
-Results: "Paper 3 shows FLT3-ITD reduces response even with high HOX"
-Analysis: "Refinement: HOX predicts response in FLT3-WT, unclear in FLT3-ITD"
+Run headless:
+```python
+from research_lab.graph import run_research
+result = run_research("Your research abstract here")
+```
 
-Debate Cycle 3:
+### Pipeline B (PubMed + Ragie)
 
-Critic: "Can we recommend clinical use?"
-Analysis: "Conclusion: HOX signature is promising biomarker, needs prospective trial"
+```bash
+pip install -r requirements_ragie.txt
+```
 
-Final Output:
+Required keys in `research_lab/.env`:
+```
+GOOGLE_API_KEY=...
+RAGIE_API_KEY=...
+ENTREZ_EMAIL=your.email@example.com
+```
 
-"✅ Recommendation: HOX/MEIS signature shows strong predictive potential for menin inhibitor response in NPM1+ AML. Validated across 3 independent studies (n=45, n=156, n=89). Action: Design prospective biomarker trial. Caveat: FLT3-ITD patients need separate analysis."
+Run the pipeline:
+```bash
+python run_pipeline.py
+```
 
+`run_pipeline.py` validates all dependencies and API keys before starting and exits with a clear error message if anything is missing.
 
-Tech Stack (Keep it Simple):
+Outputs are saved to:
+- `agent1_output.json` — papers found by PubMed search
+- `agent2_output.json` — extracted results and stats
 
-Claude API for all agents (no local models!)
-LangGraph for orchestration + debate cycles
-Streamlit for UI (1 file, fast)
-Simple JSON for state passing
+After the pipeline completes, the returned `ragie_client` object can be used to query the indexed documents:
 
+```python
+from research_lab.rag import extract_and_build_rag
 
-6-Hour Timeline:
-Hour 1: Setup + interface contracts
-Hour 2-3: Build 4 agents in parallel
-Hour 4: Person 3 wires LangGraph
-Hour 5: Integration + testing
-Hour 6: UI polish + demo prep
+result = extract_and_build_rag(papers)
+ragie_client = result["ragie_client"]
 
-This is MUCH better. Want me to:
+hits = ragie_client.query("HOXA9 expression and treatment response", top_k=3)
+for hit in hits:
+    print(hit["score"], hit["metadata"]["title"])
+    print(hit["text"][:200])
+```
 
-Write the LangGraph skeleton for Person 3?
-Generate example abstract + expected outputs?
-Create the agent prompt templates?
+`query()` returns a list of scored chunks from Ragie.ai, each with `score`, `text`, and `metadata` (pmid, title, authors, journal, year, has_fulltext).
+
+---
+
+## Agents (Pipeline A)
+
+| Agent | File | Description |
+|---|---|---|
+| Literature Finder | `agents.py` | Finds 5–10 relevant papers via Claude web_search |
+| Results Extractor | `agents.py` | Extracts findings, methods, sample sizes from each paper |
+| Initial Analysis | `agents.py` | Synthesizes findings; identifies gaps and contradictions |
+| Critic | `agents.py` | Challenges the analysis (sample sizes, confounders, stats) |
+| Results Re-evaluator | `agents.py` | Responds to critic with CONFIRMED / REFUTED / PARTIALLY VALIDATED |
+| Analysis Refiner | `agents.py` | Updates synthesis based on debate; states what changed and why |
+| Final Recommendation | `agents.py` | Produces structured recommendation with confidence level |
+
+Confidence levels: `High` (≥3 consistent papers), `Moderate` (consistent but limited), `Low` (contradictory or weak evidence).
+
+---
+
+## State Schema
+
+Defined in `research_lab/state.py`. Key fields:
+
+```python
+class ResearchState(TypedDict):
+    abstract: str
+    papers: List[Paper]                  # title, url, abstract, relevance_score
+    extracted_results: List[ExtractedResult]  # findings, methods, sample_size
+    initial_synthesis: str
+    identified_gaps: List[str]
+    debate_rounds: List[DebateRound]     # critic / re-evaluator / refiner per round
+    current_round: int
+    final_recommendation: str
+    confidence_level: str                # "High" | "Moderate" | "Low"
+    action_items: List[str]
+    caveats: List[str]
+    current_stage: str                   # used by Streamlit status bar
+    error: Optional[str]
+```
+
+---
+
+## Example
+
+```python
+from research_lab.graph import run_research
+
+abstract = """
+Does HOX gene expression predict treatment response to menin inhibitors
+in NPM1-mutant acute myeloid leukemia patients?
+"""
+
+result = run_research(abstract)
+print(result["confidence_level"])       # "High" | "Moderate" | "Low"
+print(result["final_recommendation"])
+for item in result["action_items"]:
+    print("-", item)
+```
