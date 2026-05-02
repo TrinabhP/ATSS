@@ -152,12 +152,14 @@ export default function ProjectDashboard() {
       {pipelineState?.final_recommendation && (
         <div className="card p-6 mt-6">
           <div className="flex items-center gap-3 mb-2">
-            <h3 className="font-mono text-sm text-muted uppercase">Final Recommendation</h3>
+            <h3 className="font-mono text-sm text-muted uppercase mb-0">Final Recommendation</h3>
             {pipelineState.confidence_level && (
-              <span className="text-xs px-2 py-0.5 rounded-full" style={{
-                background: pipelineState.confidence_level === 'High' ? '#064e3b' : pipelineState.confidence_level === 'Moderate' ? '#451a03' : '#450a0a',
+              <span className="badge" style={{
+                backgroundColor: pipelineState.confidence_level === 'High' ? 'rgba(16, 185, 129, 0.15)' : pipelineState.confidence_level === 'Moderate' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(239, 68, 68, 0.15)',
                 color: pipelineState.confidence_level === 'High' ? '#10b981' : pipelineState.confidence_level === 'Moderate' ? '#f59e0b' : '#ef4444',
+                border: `1px solid ${pipelineState.confidence_level === 'High' ? 'rgba(16, 185, 129, 0.3)' : pipelineState.confidence_level === 'Moderate' ? 'rgba(245, 158, 11, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`
               }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'currentColor' }}></span>
                 {pipelineState.confidence_level} Confidence
               </span>
             )}
@@ -178,8 +180,13 @@ export default function ProjectDashboard() {
       {peer && (
         <div className="card p-6 mt-6">
           <div className="flex items-center gap-3 mb-2">
-            <h3 className="font-mono text-sm text-muted uppercase">Peer Review</h3>
-            <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: '#1e3a5f', color: '#60a5fa' }}>
+            <h3 className="font-mono text-sm text-muted uppercase mb-0">Peer Review</h3>
+            <span className="badge" style={{ 
+              backgroundColor: 'rgba(96, 165, 250, 0.15)', 
+              color: '#60a5fa',
+              border: '1px solid rgba(96, 165, 250, 0.3)'
+            }}>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'currentColor' }}></span>
               {peer.overall_verdict} · Reproducibility {peer.reproducibility_score}/10
             </span>
           </div>
