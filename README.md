@@ -29,22 +29,22 @@ Entry points:
 - `research_lab/app.py` — Streamlit dashboard (live streaming UI)
 - `research_lab/graph.py` — programmatic entry (`run_research`, `stream_research`)
 
-### Pipeline B — PubMed + Ragie RAG
+### Pipeline B — PubMed + Ragie RAG (Groq-Powered)
 
-An alternative Phase 1 pipeline that uses PubMed (via Biopython/Entrez) for literature search and Ragie.ai for RAG indexing. Uses Gemini for extraction.
+An alternative Phase 1 pipeline that uses PubMed (via Biopython/Entrez) for literature search and Ragie.ai for RAG indexing. Uses Groq (`llama-3.3-70b-versatile`) for term extraction and result extraction — 14,400 free requests/day with no quota issues.
 
 ```
 Abstract Input
     ↓
-[Agent 1: PubMed Finder]       — Gemini term extraction + Entrez API → papers + PMIDs
+[Agent 1: PubMed Finder]       — Groq term extraction + Entrez API → papers + PMIDs
     ↓
-[Agent 2: Ragie RAG Builder]   — PMC full-text fetch + Ragie.ai upload (threaded, 3 workers)
-    + Results Extractor        — Gemini parallel extraction → structured findings (2 workers)
+[Agent 2: Ragie RAG Builder]   — PMC full-text fetch (1 worker) + Ragie.ai upload (2 workers, threaded)
+    + Results Extractor        — Groq parallel extraction → structured findings (2 workers, threaded)
 ```
 
 Agent 2 runs two stages concurrently:
-- **RAG build**: fetches PMC full-text where available (falls back to abstract), then uploads all documents to Ragie.ai in parallel.
-- **Extraction**: calls Gemini on each paper in parallel to produce structured `key_findings`, `methods`, `sample_size`, `limitations`, and `relevance` fields.
+- **RAG build**: fetches PMC full-text where available (1 parallel worker, NCBI rate limit), falls back to abstract, then uploads all documents to Ragie.ai in parallel (2 workers). Documents are uploaded with string-coerced metadata and a `"data"` payload field; a 415 fallback automatically retries with `"content"` for older Ragie API versions.
+- **Extraction**: calls Groq in parallel (2 workers) to produce structured `key_findings`, `methods`, `sample_size`, `limitations`, and `relevance` fields.
 
 Entry point: `run_pipeline.py`
 
@@ -102,7 +102,7 @@ pip install -r requirements_ragie.txt
 
 Required keys in `research_lab/.env`:
 ```
-GOOGLE_API_KEY=...
+GROQ_API_KEY=...
 RAGIE_API_KEY=...
 ENTREZ_EMAIL=your.email@example.com
 ```
@@ -112,7 +112,10 @@ Run the pipeline:
 python run_pipeline.py
 ```
 
-`run_pipeline.py` validates all dependencies and API keys before starting and exits with a clear error message if anything is missing.
+The default demo abstract in `run_pipeline.py` is:
+> "I am researching how NPM1 mutations in Acute Myeloid Leukemia (AML) respond to menin inhibitors. I specifically want to know if high expression of the HOXA9 and MEIS1 genes can predict if a patient will have a good treatment response. Additionally, I am looking for data on combining menin inhibitors with CAR-T cell therapy."
+
+`run_pipeline.py` loads environment variables from `research_lab/.env` at startup and exits with a clear error message if the file is missing, if required packages (`groq`, `biopython`, `requests`) are not installed, or if any API keys are absent.
 
 Outputs are saved to:
 - `agent1_output.json` — papers found by PubMed search

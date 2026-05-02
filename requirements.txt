@@ -3,3 +3,19 @@ langchain-anthropic>=0.3.0
 langchain-community>=0.3.0
 tavily-python>=0.3.0
 python-dotenv>=1.0.0
+
+# GROQ-POWERED VERSION
+# Uses Groq instead of Gemini (14,400 free requests/day!)
+ 
+# LLM - Groq (FREE, generous limits!)
+groq>=0.4.0
+python-dotenv>=1.0.0
+ 
+# PubMed access
+biopython>=1.81
+ 
+# HTTP requests
+requests>=2.31.0
+ 
+# RAG handled by Ragie.ai (cloud, no local dependencies!)
+
