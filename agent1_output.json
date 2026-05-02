@@ -1,0 +1,483 @@
+{
+  "papers": [
+    {
+      "pmid": "36376832",
+      "title": "Role of HOXA9 in solid tumors: mechanistic insights and therapeutic potential.",
+      "abstract": "HOXA9 functioning as a transcription factor is one of the members of HOX gene family, which governs multiple cellular activities by facilitating cellular signal transduction. In addition to be a driver in AML which has been widely studied, the role of HOXA9 in solid tumor progression has also received increasing attention in recent years, where the aberrant expression of HOXA9 is closely associated with the prognosis of patient. This review details the signaling pathways, binding partners, post-transcriptional regulation of HOXA9, and possible inhibitors of HOXA9 in solid tumors, which provides a reference basis for further study on the role of HOXA9 in solid tumors.",
+      "authors": [
+        "Tang L",
+        "Peng L",
+        "Tan C"
+      ],
+      "journal": "Cancer cell international",
+      "year": "2022",
+      "pmc_id": "PMC9664671",
+      "has_fulltext": true
+    },
+    {
+      "pmid": "38635250",
+      "title": "HOXA9 and \u03b2-catenin safeguard HSC integrity.",
+      "abstract": "",
+      "authors": [
+        "Mapperley C",
+        "Kranc KR"
+      ],
+      "journal": "Blood",
+      "year": "2024",
+      "pmc_id": null,
+      "has_fulltext": false
+    },
+    {
+      "pmid": "39017854",
+      "title": "HOXA9 Regulome and Pharmacological Interventions in Leukemia.",
+      "abstract": "HOXA9, an important transcription factor (TF) in hematopoiesis, is aberrantly expressed in numerous cases of both acute myeloid leukemia (AML) and acute lymphoblastic leukemia (ALL) and is a strong indicator of poor prognosis in patients. HOXA9 is a proto-oncogene which is both sufficient and necessary for leukemia transformation. HOXA9 expression in leukemia correlates with patient survival outcomes and response to therapy. Chromosomal transformations (such as NUP98-HOXA9), mutations, epigenetic dysregulation (e.g., MLL- MENIN -LEDGF complex or DOT1L/KMT4), transcription factors (such as USF1/USF2), and noncoding RNA (such as HOTTIP and HOTAIR) regulate HOXA9 mRNA and protein during leukemia. HOXA9 regulates survival, self-renewal, and progenitor cell cycle through several of its downstream target TFs including LMO2, antiapoptotic BCL2, SOX4, and receptor tyrosine kinase FLT3 and STAT5. This dynamic and multilayered HOXA9 regulome provides new therapeutic opportunities, including inhibitors targeting DOT1L/KMT4, MENIN, NPM1, and ENL proteins. Recent findings also suggest that HOXA9 maintains leukemia by actively repressing myeloid differentiation genes. This chapter summarizes the recent advances understanding biochemical mechanisms underlying HOXA9-mediated leukemogenesis, the clinical significance of its abnormal expression, and pharmacological approaches to treat HOXA9-driven leukemia.",
+      "authors": [
+        "Aryal S",
+        "Lu R"
+      ],
+      "journal": "Advances in experimental medicine and biology",
+      "year": "2024",
+      "pmc_id": null,
+      "has_fulltext": false
+    },
+    {
+      "pmid": "38062297",
+      "title": "HOXA9 transcription factor is a double-edged sword: from development to cancer progression.",
+      "abstract": "The HOXA9 transcription factor serves as a molecular orchestrator in cancer stemness, epithelial-mesenchymal transition (EMT), metastasis, and generation of the tumor microenvironment in hematological and solid malignancies. However, the multiple modes of regulation, multifaceted functions, and context-dependent interactions responsible for the dual role of HOXA9 as an oncogene or tumor suppressor in cancer remain obscure. Hence, unravelling its molecular complexities, binding partners, and interacting signaling molecules enables us to comprehend HOXA9-mediated transcriptional programs and molecular crosstalk. However, it is imperative to understand its central role in fundamental biological processes such as embryogenesis, foetus implantation, hematopoiesis, endothelial cell proliferation, and tissue homeostasis before designing targeted therapies. Indeed, it presents an enormous challenge for clinicians to selectively target its oncogenic functions or restore tumor-suppressive role without altering normal cellular functions. In addition to its implications in cancer, the present review also focuses on the clinical applications of HOXA9 in recurrence and drug resistance, which may provide a broader understanding beyond oncology, open new avenues for clinicians for accurate diagnoses, and develop personalized treatment strategies. Furthermore, we have also discussed the existing therapeutic options and accompanying challenges in HOXA9-targeted therapies in different cancer types.",
+      "authors": [
+        "Shenoy US",
+        "Adiga D",
+        "Alhedyan F"
+      ],
+      "journal": "Cancer metastasis reviews",
+      "year": "2024",
+      "pmc_id": "PMC11156722",
+      "has_fulltext": true
+    },
+    {
+      "pmid": "39292289",
+      "title": "HOXA9 promotes proliferation, metastasis and prevents apoptosis in hepatocellular carcinoma.",
+      "abstract": "This research aimed to evaluate the expression level of Homeobox A9 (HOXA9) and its role in tumorigenesis of hepatocellular carcinoma (HCC). Bioinformatic analysis, qPCR and Western blot analysis of clinical samples were employed to evaluate mRNA and protein levels of HOXA9 in HCC patients and cell lines. In vitro cell proliferation, migration and invasion, cloning formation, xenograft tumor model, wound healing and apoptosis assays, RNA sequencing analysis of RPL38-silenced HCC-LM3 cells and qPCR, Western blot analysis were performed for validation. Analysis of HOXA9-related genes were conducted to identify their relationships between HOXA9. HOXA9 is dramatically upregulated in HCC. Upregulation of HOXA9 in HCC predicts poor survival of patients. Besides, HOXA9 promotes proliferation, metastasis and prevents apoptosis in HCC in vitro. In addition, HOXA9 controlled by Ribosomal protein RPL38 is upregulated in HCC. Bioinformatic analysis also indicated that HOXA9 is involved in the regulation of DNA methylation and immune infiltration in HCC. HOXA9 is dramatically upregulated in hepatocellular carcinoma and predicts poor prognosis. Besides, HOXA9 promoted proliferation and metastasis and prevented apoptosis in vitro, which is regulated by Ribosomal protein RPL38 in HCC.",
+      "authors": [
+        "Bao G",
+        "Wei H",
+        "Yan J"
+      ],
+      "journal": "Journal of cancer research and clinical oncology",
+      "year": "2024",
+      "pmc_id": "PMC11410850",
+      "has_fulltext": true
+    },
+    {
+      "pmid": "31821784",
+      "title": "A Menin-MLL Inhibitor Induces Specific Chromatin Changes and Eradicates Disease in Models of MLL-Rearranged Leukemia.",
+      "abstract": "Inhibition of the Menin (MEN1) and MLL (MLL1, KMT2A) interaction is a potential therapeutic strategy for MLL-rearranged (MLL-r) leukemia. Structure-based design yielded the potent, highly selective, and orally bioavailable small-molecule inhibitor VTP50469. Cell lines carrying MLL rearrangements were selectively responsive to VTP50469. VTP50469 displaced Menin from protein complexes and inhibited chromatin occupancy of MLL at select genes. Loss of MLL binding led to changes in gene expression, differentiation, and apoptosis. Patient-derived xenograft (PDX) models derived from patients with either MLL-r acute myeloid leukemia or MLL-r acute lymphoblastic leukemia (ALL) showed dramatic reductions of leukemia burden when treated with VTP50469. Multiple mice engrafted with MLL-r ALL remained disease free for more than 1 year after treatment. These data support rapid translation of this approach to clinical trials.",
+      "authors": [
+        "Krivtsov AV",
+        "Evans K",
+        "Gadrey JY"
+      ],
+      "journal": "Cancer cell",
+      "year": "2019",
+      "pmc_id": "PMC7227117",
+      "has_fulltext": true
+    },
+    {
+      "pmid": "39121437",
+      "title": "Menin Inhibition With Revumenib for <i>KMT2A</i>-Rearranged Relapsed or Refractory Acute Leukemia (AUGMENT-101).",
+      "abstract": "Revumenib, an oral, small molecule inhibitor of the menin-lysine methyltransferase 2A (KMT2A) interaction, showed promising efficacy and safety in a phase I study of heavily pretreated patients with <i>KMT2A</i>-rearranged (<i>KMT2Ar</i>) acute leukemia. Here, we evaluated the activity of revumenib in individuals with relapsed/refractory (R/R) <i>KMT2Ar</i> acute leukemia. AUGMENT-101 is a phase I/II, open-label, dose-escalation and expansion study of revumenib conducted across 22 clinical sites in five countries (ClinicalTrials.gov identifier: NCT04065399). We report results from the phase II, registration-enabling portion. Individuals age \u226530 days with R/R <i>KMT2Ar</i> acute leukemia or with AML and nucleophosmin 1 (<i>NPM1</i>) mutation were enrolled. Revumenib was administered once every 12 hours, at 163 mg (95 mg/m<sup>2</sup> if weight <40 kg) with a strong cytochrome P450 inhibitor, in 28-day cycles. The primary end points were the rate of complete remission (CR) or CR with partial hematologic recovery (CR + CRh) and safety. At a prespecified interim analysis, safety was assessed in all <i>KMT2Ar</i> treated patients; efficacy was assessed in those with centrally confirmed <i>KMT2Ar</i>. The separate <i>NPM1</i> cohort of the trial is ongoing. From October 1, 2021, to July 24, 2023, N = 94 patients (median [range] age, 37 [1.3-75] years) were treated. Grade\u2009\u22653 adverse events included febrile neutropenia (37.2%), differentiation syndrome (16.0%), and QTc prolongation (13.8%). In the efficacy-evaluable patients (n = 57), the CR + CRh rate was 22.8% (95% CI, 12.7 to 35.8), exceeding the null hypothesis of 10% (<i>P</i> = .0036). Overall response rate was 63.2% (95% CI, 49.3 to 75.6), with 15 of 22 patients (68.2%) having no detectable residual disease. Revumenib led to high remission rates with a predictable safety profile in R/R <i>KMT2Ar</i> acute leukemia. To our knowledge, this trial represents the largest evaluation of a targeted therapy for these patients.",
+      "authors": [
+        "Issa GC",
+        "Aldoss I",
+        "Thirman MJ"
+      ],
+      "journal": "Journal of clinical oncology : official journal of the American Society of Clinical Oncology",
+      "year": "2025",
+      "pmc_id": "PMC11687943",
+      "has_fulltext": true
+    },
+    {
+      "pmid": "34527579",
+      "title": "Comparison of Multiple Clinical Testing Modalities for Assessment of NPM1-Mutant AML.",
+      "abstract": "<i>NPM1</i> mutation status can influence prognosis and management in AML. Accordingly, clinical testing (i.e., RT-PCR, NGS and IHC) for mutant <i>NPM1</i> is increasing in order to detect residual disease in AML, alongside flow cytometry (FC). However, the relationship of the results from RT-PCR to traditional NGS, IHC and FC is not widely known among many practitioners. Herein, we aim to: i) describe the performance of RT-PCR compared to traditional NGS and IHC for the detection of mutant <i>NPM1</i> in clinical practice, and also compare it to FC, and ii) provide our observations regarding the advantages and disadvantages of each approach in order to inform future clinical testing algorithms. Peripheral blood and bone marrow samples collected for clinical testing at variable time points during patient management were tested by quantitative, real-time, RT-PCR and results were compared to findings from a Myeloid NGS panel, mutant NPM1 IHC and FC. RT-PCR showed superior sensitivity compared to NGS, IHC and FC with the main challenge of NGS, IHC and FC being the ability to identify a low disease burden (<0.5% NCN by RT-PCR). Nevertheless, the positive predictive value of NGS, IHC and FC were each \u2265 80% indicating that positive results by those assays are typically associated with RT-PCR positivity. IHC, unlike bulk methods (RT-PCR, NGS and FC), is able provide information regarding cellular/architectural context of disease in biopsies. FC did not identify any <i>NPM1</i>-mutated residual disease not already detected by RT-PCR, NGS or IHC. Overall, our findings demonstrate that RT-PCR shows superior sensitivity compared to a traditional Myeloid NGS, suggesting the need for \"deep-sequencing\" NGS panels for NGS-based monitoring of residual disease in <i>NPM1</i>-mutant AML. IHC provides complementary cytomorphologic information to RT-PCR. Lastly, FC may not be necessary in the setting of post-therapy follow up for <i>NPM1</i>-mutated AML. Together, these findings can help inform future clinical testing algorithms.",
+      "authors": [
+        "Lopez A",
+        "Patel S",
+        "Geyer JT"
+      ],
+      "journal": "Frontiers in oncology",
+      "year": "2021",
+      "pmc_id": "PMC8435844",
+      "has_fulltext": true
+    },
+    {
+      "pmid": "39656142",
+      "title": "Acute myeloid leukemia management and research in 2025.",
+      "abstract": "The first 5 decades of research in acute myeloid leukemia (AML) were dominated by the cytarabine plus anthracyclines backbone, with advances in strategies including allogeneic hematopoietic stem cell transplantation, high-dose cytarabine, supportive care measures, and targeted therapies for the subset of patients with acute promyelocytic leukemia. Since 2017, a turning point in AML research, 12 agents have received regulatory approval for AML in the United States: venetoclax (BCL2 inhibitor); gemtuzumab ozogamicin (CD33 antibody-drug conjugate); midostaurin, gilteritinib, and quizartinib (fms-like tyrosine kinase 3 inhibitors); ivosidenib, olutasidenib, and enasidenib (isocitrate dehydrogenase 1 and 2 inhibitors); oral azacitidine (a partially absorbable formulation); CPX351 (liposomal encapsulation of cytarabine:daunorubicin at a molar ratio of 5:1); glasdegib (hedgehog inhibitor); and recently revumenib (menin inhibitor; approved November 2024). Oral decitabine-cedazuridine, which is approved as a bioequivalent alternative to parenteral hypomethylating agents in myelodysplastic syndrome, can be used for the same purpose in AML. Menin inhibitors, CD123 antibody-drug conjugates, and other antibodies targeting CD123, CD33, and other surface markers are showing promising results. Herein, the authors review the frontline and later line therapies in AML and discuss important research directions.",
+      "authors": [
+        "Kantarjian HM",
+        "DiNardo CD",
+        "Kadia TM"
+      ],
+      "journal": "CA: a cancer journal for clinicians",
+      "year": "2025",
+      "pmc_id": "PMC11745214",
+      "has_fulltext": true
+    },
+    {
+      "pmid": "39158067",
+      "title": "Epigenetic regulation of noncanonical menin targets modulates menin inhibitor response in acute myeloid leukemia.",
+      "abstract": "Menin inhibitors that disrupt the menin-MLL interaction hold promise for treating specific acute myeloid leukemia (AML) subtypes, including those with KMT2A rearrangements (KMT2A-r), yet resistance remains a challenge. Here, through systematic chromatin-focused CRISPR screens, along with genetic, epigenetic, and pharmacologic studies in a variety of human and mouse KMT2A-r AML models, we uncovered a potential resistance mechanism independent of canonical menin-MLL targets. We show that a group of noncanonical menin targets, which are bivalently cooccupied by active menin and repressive H2AK119ub marks, are typically downregulated after menin inhibition. Loss of polycomb repressive complex 1.1 (PRC1.1) subunits, such as polycomb group ring finger 1 (PCGF1) or BCL6 corepressor (BCOR), leads to menin inhibitor resistance by epigenetic reactivation of these noncanonical targets, including MYC. Genetic and pharmacological inhibition of MYC can resensitize PRC1.1-deficient leukemia cells to menin inhibition. Moreover, we demonstrate that leukemia cells with the loss of PRC1.1 subunits exhibit reduced monocytic gene signatures and are susceptible to BCL2 inhibition, and that combinational treatment with venetoclax overcomes the resistance to menin inhibition in PRC1.1-deficient leukemia cells. These findings highlight the important roles of PRC1.1 and its regulated noncanonical menin targets in modulating the menin inhibitor response and provide potential strategies to treat leukemia with compromised PRC1.1 function.",
+      "authors": [
+        "Zhou X",
+        "Zhang L",
+        "Aryal S"
+      ],
+      "journal": "Blood",
+      "year": "2024",
+      "pmc_id": "PMC11561541",
+      "has_fulltext": true
+    },
+    {
+      "pmid": "34131281",
+      "title": "Therapeutic implications of menin inhibition in acute leukemias.",
+      "abstract": "Menin inhibitors are novel targeted agents currently in clinical development for the treatment of genetically defined subsets of acute leukemia. Menin has a tumor suppressor function in endocrine glands. Germline mutations in the gene encoding menin cause the multiple endocrine neoplasia type 1 (MEN1) syndrome, a hereditary condition associated with tumors of the endocrine glands. However, menin is also critical for leukemogenesis in subsets driven by rearrangement of the Lysine Methyltransferase 2A (KMT2A) gene, previously known as mixed-lineage leukemia (MLL), which encodes an epigenetic modifier. These seemingly opposing functions of menin can be explained by its various roles in gene regulation. Therefore, leukemias with rearrangement of KMT2A are predicted to respond to menin inhibition with early clinical data validating this proof-of-concept. These leukemias affect infants, children and adults, and lead to adverse outcomes with current standard therapies. Recent studies have identified novel targets in acute leukemia that are susceptible to menin inhibition, such as mutated Nucleophosmin 1 (NPM1), the most common genetic alteration in adult acute myeloid leukemia (AML). In addition to these alterations, other leukemia subsets with similar transcriptional dependency could be targeted through menin inhibition. This led to rationally designed clinical studies, investigating small-molecule oral menin inhibitors in relapsed acute leukemias with promising early results. Herein, we discuss the physiologic and malignant biology of menin, the mechanisms of leukemia in these susceptible subsets, and future therapeutic strategies using these inhibitors in acute leukemia.",
+      "authors": [
+        "Issa GC",
+        "Ravandi F",
+        "DiNardo CD"
+      ],
+      "journal": "Leukemia",
+      "year": "2021",
+      "pmc_id": null,
+      "has_fulltext": false
+    },
+    {
+      "pmid": "40081214",
+      "title": "O-GlcNAc-modified HOXA9 suppresses ferroptosis via promoting UBR5-mediated SIRT6 degradation in nasopharyngeal carcinoma.",
+      "abstract": "Nasopharyngeal carcinoma (NPC) is the most common malignancy of the nasopharynx. Ferroptosis induction shows anti-tumor activities in cancers including NPC. Elucidating the regulatory mechanism of ferroptosis is crucial for developing targeted therapeutic strategies for NPC. The GEO dataset (GSE68799) was used to analyze HOXA9 expression in NPC. Cell viability, levels of MDA, total iron, Fe<sup>2+</sup> and GSH, and lipid peroxidation were examined for ferroptosis evaluation. O-GlcNAcylation levels on HOXA9 and ubiquitination levels on SIRT6 were detected by immunoprecipitation. ChIP and luciferase assays were applied for determining the interaction of HOXA9 and UBR5. The interaction between UBR5 and SIRT6, OGT and HOXA9 were evaluated by Co-IP assays. A subcutaneous NPC mouse model was established to explore whether knockdown of HOXA9 or UBR5 regulates tumor growth in vivo. HOXA9 was highly expressed in NPC, and knockdown of HOXA9 elevated total iron, Fe<sup>2+</sup> and lipid peroxidation and reduced GSH and NPC cell viability. O-GlcNAcylation stabilized HOXA9 and facilitated its nuclear translocation in NPC cells. HOXA9 directly bound to UBR5 promoter to increase its expression, thus accelerating ubiquitination and degradation of SIRT6. HOXA9 restrained ferroptosis via promoting UBR5 expression, and UBR5 suppressed ferroptosis through promotion of SIRT6 ubiquitination and degradation. Knockdown of HOXA9 or UBR5 promoted ferroptosis and inhibited NPC growth in mice. O-GlcNAc-modified HOXA9 inhibits ferroptosis by enhancing UBR5 expression and ubiquitination and degradation of SIRT6 in NPC cells, thus accelerating NPC progression. Our study provides potential therapeutic targets for NPC treatment.",
+      "authors": [
+        "Liu H",
+        "Fu Y",
+        "Tang L"
+      ],
+      "journal": "Neoplasia (New York, N.Y.)",
+      "year": "2025",
+      "pmc_id": "PMC11932873",
+      "has_fulltext": true
+    },
+    {
+      "pmid": "38905635",
+      "title": "Preclinical efficacy of the potent, selective menin-KMT2A inhibitor JNJ-75276617 (bleximenib) in KMT2A- and NPM1-altered leukemias.",
+      "abstract": "The interaction between menin and histone-lysine N-methyltransferase 2A (KMT2A) is a critical dependency for KMT2A- or nucleophosmin 1 (NPM1)-altered leukemias and an emerging opportunity for therapeutic development. JNJ-75276617 (bleximenib) is a novel, orally bioavailable, potent, and selective protein-protein interaction inhibitor of the binding between menin and KMT2A. In KMT2A-rearranged (KMT2A-r) and NPM1-mutant (NPM1c) acute myeloid leukemia (AML) cells, JNJ-75276617 inhibited the association of the menin-KMT2A complex with chromatin at target gene promoters, resulting in reduced expression of several menin-KMT2A target genes, including MEIS1 and FLT3. JNJ-75276617 displayed potent antiproliferative activity across several AML and acute lymphoblastic leukemia (ALL) cell lines and patient samples harboring KMT2A or NPM1 alterations in\u00a0vitro. In xenograft models of AML and ALL, JNJ-75276617 reduced leukemic burden and provided a significant dose-dependent survival benefit accompanied by expression changes of menin-KMT2A target genes. JNJ-75276617 demonstrated synergistic effects with gilteritinib in\u00a0vitro in AML cells harboring KMT2A-r. JNJ-75276617 further exhibited synergistic effects with venetoclax and azacitidine in AML cells bearing KMT2A-r in\u00a0vitro, and significantly increased survival in mice. Interestingly, JNJ-75276617 showed potent antiproliferative activity in cell lines engineered with recently discovered mutations (MEN1M327I or MEN1T349M) that developed in patients refractory to the menin-KMT2A inhibitor revumenib. A cocrystal structure of menin in complex with JNJ-75276617 indicates a unique binding mode distinct from other menin-KMT2A inhibitors, including revumenib. JNJ-75276617 is being clinically investigated for acute leukemias harboring KMT2A or NPM1 alterations, as a monotherapy for relapsed/refractory acute leukemia (NCT04811560), or in combination with AML-directed therapies (NCT05453903).",
+      "authors": [
+        "Kwon MC",
+        "Thuring JW",
+        "Querolle O"
+      ],
+      "journal": "Blood",
+      "year": "2024",
+      "pmc_id": "PMC11419783",
+      "has_fulltext": true
+    },
+    {
+      "pmid": "38941537",
+      "title": "Intensive induction chemotherapy vs hypomethylating agents in\u00a0combination with venetoclax in NPM1-mutant AML.",
+      "abstract": "Although intensive induction chemotherapy (IC) remains the standard of care for younger patients with acute myeloid leukemia (AML), hypomethylating agents\u00a0+ venetoclax (HMA/VEN) can lead to durable remission among older patients with nucleophosmin 1 (NPM1) mutations. Whether IC or HMA/VEN is superior in patients aged \u226560 years with NPM1-mutant AML is unknown. We performed an international, multicenter retrospective cohort study of 221 patients (147 IC and 74 HMA/VEN) with previously untreated NPM1-mutant AML. Composite complete remission (cCR) (defined as CR\u00a0+ CR with incomplete count recovery) rate was similar for IC and HMA/VEN (cCR, 85% vs 74%; P\u00a0=\u00a0.067). Although overall survival (OS) was favorable with IC in unselected patients compared with HMA/VEN (24-month OS, 59% [95% confidence interval (CI), 52-69%] vs 38% [95%\u00a0CI, 27-55%]; P\u00a0=\u00a0.013), it was not statistically different among patients aged 60-75 years (60% [95%\u00a0CI, 52-70%] vs 44% [95%\u00a0CI, 29-66%]; P\u00a0=\u00a0.069) and patients who received an allogeneic stem cell transplant (70% [95%\u00a0CI, 58-85%] vs 66% [95%\u00a0CI, 44-100%]; P\u00a0=\u00a0.56). Subgroup analyses suggested that patients with normal cytogenetics (24-month OS, 65% [95%\u00a0CI, 56-74%] with IC vs 40% [95%\u00a0CI, 26-60%] with HMA/VEN; P\u00a0=\u00a0.009) and without FLT3 internal tandem duplication mutations might benefit from IC compared with HMA/VEN (24-month OS, 68% [95%\u00a0CI, 59-79%] vs 43% [95%\u00a0CI, 29-63%]; P\u00a0=\u00a0.008). In multivariable analysis, OS was not statistically different between patients treated with IC and HMA/VEN (hazard ratio for death with HMA/VEN vs IC, 0.71; 95%\u00a0CI, 0.40-1.27; P\u00a0=\u00a0.25).",
+      "authors": [
+        "Bewersdorf JP",
+        "Shimony S",
+        "Shallis RM"
+      ],
+      "journal": "Blood advances",
+      "year": "2024",
+      "pmc_id": "PMC11416634",
+      "has_fulltext": true
+    },
+    {
+      "pmid": "38753266",
+      "title": "HOXA9 versus HOXB9; particular focus on their controversial role in tumor pathogenesis.",
+      "abstract": "The Homeobox (HOX) gene family is essential to regulating cellular processes because it maintains the exact coordination required for tissue homeostasis, cellular differentiation, and embryonic development. The most distinctive feature of this class of genes is the presence of the highly conserved DNA region known as the homeobox, which is essential for controlling their regulatory activities. Important players in the intricate process of genetic regulation are the HOX genes. Many diseases, especially in the area of cancer, are linked to their aberrant functioning. Due to their distinctive functions in biomedical research-particularly in the complex process of tumor advancement-HOXA9 and HOXB9 have drawn particular attention. HOXA9 and HOXB9 are more significant than what is usually connected with HOX genes since they have roles in the intricate field of cancer and beyond embryonic processes. The framework for a focused study of the different effects of HOXA9 and HOXB9 in the context of tumor biology is established in this study.",
+      "authors": [
+        "Hjazi A",
+        "Jasim SA",
+        "Al-Dhalimy AMB"
+      ],
+      "journal": "Journal of applied genetics",
+      "year": "2024",
+      "pmc_id": null,
+      "has_fulltext": false
+    },
+    {
+      "pmid": "34514844",
+      "title": "HOXA9-methylated DNA as a diagnostic biomarker of ovarian malignancy.",
+      "abstract": "<b>Aim:</b> In ovarian cancer, methylated HOXA9 (meth-HOXA9) has been proposed as a relevant biomarker, however, its role in the carcinogenic development remains unknown. This study aimed at evaluating meth-HOXA9 as a diagnostic biomarker in ovarian cancer. <b>Materials & methods:</b> The meth-HOXA9 status was examined in 138 tissue specimens encompassing normal ovaries, benign- and borderline tumors, and ovarian cancer using droplet digital PCR. <b>Results:</b> Meth-HOXA9 was detected in 93% (82/88) and 88% (14/16) of ovarian cancer and borderline tumors, respectively. In patients with benign ovarian tumors meth-HOXA9 was detected in 17% (3/18). Using receiver operating characteristic (ROC) analysis meth-HOXA9 had a diagnostic accuracy of 98%. <b>Conclusion:</b> Meth-HOXA9 is highly cancer specific and could serve as a general diagnostic marker of ovarian malignancy.",
+      "authors": [
+        "Faaborg L",
+        "Jakobsen A",
+        "Waldstr\u00f8m M"
+      ],
+      "journal": "Biomarkers in medicine",
+      "year": "2021",
+      "pmc_id": null,
+      "has_fulltext": false
+    },
+    {
+      "pmid": "40196700",
+      "title": "<i>TP53</i> Inactivation Confers Resistance to the Menin Inhibitor Revumenib in Acute Myeloid Leukemia.",
+      "abstract": "Acute myeloid leukemia (AML) is a heterogeneous cancer that is associated with poor outcomes. Revumenib and other menin inhibitors have shown promising activity against AMLs with <i>KMT2A</i> -rearrangements or <i>NPM1</i> mutations. However, mechanisms of <i>de novo</i> resistance have not yet been elucidated. We analyzed a panel of cell lines and generated an isogenic model to assess the impact of <i>TP53</i> mutations on the response of AML cells to revumenib. <i>TP53</i> mutations are associated with <i>de novo</i> resistance to revumenib, impaired induction of <i>TP53</i> transcriptional targets, and deregulated expression of the BH3 proteins BCL-2 and MCL-1. The MCL-1 inhibitor MIK665, but not venetoclax, preferentially sensitized <i>TP53</i> -mutant AML cells to revumenib. These data identify mutant <i>TP53</i> as a potential biomarker for <i>de novo</i> resistance to revumenib, and provide a rationale to evaluate MCL-1 and menin inhibitor combinations in patients <i>KMT2A</i> -rearranged leukemias with <i>TP53</i> mutations.",
+      "authors": [
+        "D'Souza J",
+        "Leung CJ",
+        "Ballapuram AC"
+      ],
+      "journal": "bioRxiv : the preprint server for biology",
+      "year": "2025",
+      "pmc_id": "PMC11974743",
+      "has_fulltext": true
+    },
+    {
+      "pmid": "35017466",
+      "title": "Effective Menin inhibitor-based combinations against AML with MLL rearrangement or NPM1 mutation (NPM1c).",
+      "abstract": "Treatment with Menin inhibitor (MI) disrupts the interaction between Menin and MLL1 or MLL1-fusion protein (FP), inhibits HOXA9/MEIS1, induces differentiation and loss of survival of AML harboring MLL1 re-arrangement (r) and FP, or expressing mutant (mt)-NPM1. Following MI treatment, although clinical responses are common, the majority of patients with AML with MLL1-r or mt-NPM1 succumb to their disease. Pre-clinical studies presented here demonstrate that genetic knockout or degradation of Menin or treatment with the MI SNDX-50469 reduces MLL1/MLL1-FP targets, associated with MI-induced differentiation and loss of viability. MI treatment also attenuates BCL2 and CDK6 levels. Co-treatment with SNDX-50469 and BCL2 inhibitor (venetoclax), or CDK6 inhibitor (abemaciclib) induces synergistic lethality in cell lines and patient-derived AML cells harboring MLL1-r or mtNPM1. Combined therapy with SNDX-5613 and venetoclax exerts superior in vivo efficacy in a cell line or PD AML cell xenografts harboring MLL1-r or mt-NPM1. Synergy with the MI-based combinations is preserved against MLL1-r AML cells expressing FLT3 mutation, also CRISPR-edited to introduce mtTP53. These findings highlight the promise of clinically testing these MI-based combinations against AML harboring MLL1-r or mtNPM1.",
+      "authors": [
+        "Fiskus W",
+        "Boettcher S",
+        "Daver N"
+      ],
+      "journal": "Blood cancer journal",
+      "year": "2022",
+      "pmc_id": "PMC8752621",
+      "has_fulltext": true
+    },
+    {
+      "pmid": "36922589",
+      "title": "MEN1 mutations mediate clinical resistance to menin inhibition.",
+      "abstract": "Chromatin-binding proteins are critical regulators of cell state in haematopoiesis<sup>1,2</sup>. Acute leukaemias driven by rearrangement of the mixed lineage leukaemia 1 gene (KMT2Ar) or mutation\u00a0of the\u00a0nucleophosmin gene (NPM1) require the chromatin adapter protein menin, encoded by the MEN1 gene, to sustain aberrant leukaemogenic gene expression programs<sup>3-5</sup>. In a phase 1 first-in-human clinical trial, the menin inhibitor revumenib, which is designed to disrupt the menin-MLL1 interaction, induced clinical responses in patients with leukaemia with KMT2Ar or mutated NPM1 (ref. <sup>6</sup>). Here we identified somatic mutations in MEN1 at the revumenib-menin interface in patients with acquired resistance to menin inhibition. Consistent with the genetic data in patients, inhibitor-menin interface mutations represent a conserved mechanism of therapeutic resistance in xenograft models and in an unbiased base-editor screen. These mutants attenuate drug-target binding by generating structural perturbations that impact small-molecule binding but not the interaction with the natural ligand MLL1, and prevent inhibitor-induced eviction of menin and MLL1 from chromatin. To our knowledge, this study is the first to demonstrate that a chromatin-targeting therapeutic drug exerts sufficient selection pressure in patients\u00a0to drive the\u00a0evolution of escape mutants that lead to sustained chromatin occupancy, suggesting a common mechanism of therapeutic resistance.",
+      "authors": [
+        "Perner F",
+        "Stein EM",
+        "Wenge DV"
+      ],
+      "journal": "Nature",
+      "year": "2023",
+      "pmc_id": "PMC10157896",
+      "has_fulltext": true
+    },
+    {
+      "pmid": "40561247",
+      "title": "Posttranscriptional depletion of ribosome biogenesis factors engenders therapeutic vulnerabilities in NPM1-mutant AML.",
+      "abstract": "NPM1 is a multifunctional phosphoprotein with key roles in ribosome biogenesis among its many functions. NPM1 gene mutations drive 30% of acute myeloid leukemia (AML) cases. The mutations disrupt a nucleolar localization signal and create a novel nuclear export signal, leading to cytoplasmic displacement of the protein (NPM1c). NPM1c mutations prime hematopoietic progenitors to leukemic transformation, but their precise molecular consequences remain elusive. Here, we first evaluate the effects of isolated NPM1c mutations on the global proteome of preleukemic hematopoietic stem and progenitor cells (HSPCs) using conditional knockin Npm1cA/+ mice. We discover that many proteins involved in ribosome biogenesis are significantly depleted in these murine HSPCs, but also importantly in human NPM1-mutant AMLs. In line with this, we found that preleukemic Npm1cA/+ HSPCs display higher sensitivity to RNA polymerase I inhibitors, including actinomycin D (ActD), compared with Npm1+/+ cells. Combination treatment with ActD and venetoclax inhibited the growth and colony-forming ability of preleukemic and leukemic NPM1c+ cells, whereas low-dose ActD treatment was able to resensitize resistant NPM1c+ cells to venetoclax. Furthermore, using data from CRISPR dropout screens, we identified and validated TSR3, a 40S ribosomal maturation factor whose knockout preferentially inhibited the proliferation of NPM1c+ AML cells by activating a p53-dependent apoptotic response. Similarly, to low-dose ActD treatment, TSR3 depletion could partially restore sensitivity to venetoclax in therapy-resistant NPM1c+ AML models. Our findings propose that targeted disruption of ribosome biogenesis should be explored as a therapeutic strategy against NPM1-mutant AML.",
+      "authors": [
+        "Damaskou A",
+        "Wilson R",
+        "Gozdecka M"
+      ],
+      "journal": "Blood",
+      "year": "2025",
+      "pmc_id": null,
+      "has_fulltext": false
+    },
+    {
+      "pmid": "31213012",
+      "title": "Direct and Indirect Targeting of HOXA9 Transcription Factor in Acute Myeloid Leukemia.",
+      "abstract": "HOXA9 (Homeobox A9) is a homeotic transcription factor known for more than two decades to be associated with leukemia. The expression of HOXA9 homeoprotein is associated with anterior-posterior patterning during embryonic development, and its expression is then abolished in most adult cells, with the exception of hematopoietic progenitor cells. The oncogenic function of HOXA9 was first assessed in human acute myeloid leukemia (AML), particularly in the mixed-phenotype associated lineage leukemia (MPAL) subtype. HOXA9 expression in AML is associated with aggressiveness and a poor prognosis. Since then, HOXA9 has been involved in other hematopoietic malignancies and an increasing number of solid tumors. Despite this, HOXA9 was for a long time not targeted to treat cancer, mainly since, as a transcription factor, it belongs to a class of protein long considered to be an \"undruggable\" target; however, things have now evolved. The aim of the present review is to focus on the different aspects of HOXA9 targeting that could be achieved through multiple ways: (1) indirectly, through the inhibition of its expression, a strategy acting principally at the epigenetic level; or (2) directly, through the inhibition of its transcription factor function by acting at either the protein/protein interaction or the protein/DNA interaction interfaces.",
+      "authors": [
+        "Lambert M",
+        "Alioui M",
+        "Jambon S"
+      ],
+      "journal": "Cancers",
+      "year": "2019",
+      "pmc_id": "PMC6627208",
+      "has_fulltext": true
+    },
+    {
+      "pmid": "37740103",
+      "title": "The acidic stretch and the C-terminal nuclear export signal motif of NPM1 mutant: are they druggable in AML?",
+      "abstract": "",
+      "authors": [
+        "Falini B",
+        "Gjertsen BT",
+        "Andresen V"
+      ],
+      "journal": "Leukemia",
+      "year": "2023",
+      "pmc_id": null,
+      "has_fulltext": false
+    },
+    {
+      "pmid": "39605444",
+      "title": "Genotype-immunophenotype relationships in <i>NPM1</i>-mutant AML clonal evolution uncovered by single cell multiomic analysis.",
+      "abstract": "Acute myeloid leukemia (AML) is a multi-clonal disease, existing as a milieu of clones with unique but related genotypes as initiating clones acquire subsequent mutations. However, bulk sequencing cannot fully capture AML clonal architecture or the clonal evolution that occurs as patients undergo therapy. To interrogate clonal evolution, we performed simultaneous single cell molecular profiling and immunophenotyping on 43 samples from 32 <i>NPM1</i>-mutant AML patients at different stages of disease. Here we show that diagnosis and relapsed AML samples display similar clonal architecture patterns, but signaling mutations can drive increased clonal diversity specifically at relapse. We uncovered unique genotype-immunophenotype relationships regardless of disease state, suggesting leukemic lineage trajectories can be hard-wired by the mutations present. Analysis of longitudinal samples from patients on therapy identified dynamic clonal, transcriptomic, and immunophenotypic changes. Our studies provide resolved understanding of leukemic clonal evolution and the relationships between genotype and cell state in leukemia biology.",
+      "authors": [
+        "Drucker M",
+        "Lee D",
+        "Zhang X"
+      ],
+      "journal": "bioRxiv : the preprint server for biology",
+      "year": "2024",
+      "pmc_id": "PMC11601460",
+      "has_fulltext": true
+    },
+    {
+      "pmid": "26028034",
+      "title": "Role of HOXA9 in leukemia: dysregulation, cofactors and essential targets.",
+      "abstract": "HOXA9 is a homeodomain-containing transcription factor that has an important role in hematopoietic stem cell expansion and is commonly deregulated in acute leukemias. A variety of upstream genetic alterations in acute myeloid leukemia lead to overexpression of HOXA9, which is a strong predictor of poor prognosis. In many cases, HOXA9 has been shown to be necessary for maintaining leukemic transformation; however, the molecular mechanisms through which it promotes leukemogenesis remain elusive. Recent work has established that HOXA9 regulates downstream gene expression through binding at promoter distal enhancers along with a subset of cell-specific cofactor and collaborator proteins. Increasing efforts are being made to identify both the critical cofactors and target genes required for maintaining transformation in HOXA9-overexpressing leukemias. With continued advances in understanding HOXA9-mediated transformation, there is a wealth of opportunity for developing novel therapeutics that would be applicable for greater than 50% of AML with overexpression of HOXA9.",
+      "authors": [
+        "Collins CT",
+        "Hess JL"
+      ],
+      "journal": "Oncogene",
+      "year": "2016",
+      "pmc_id": "PMC4666810",
+      "has_fulltext": true
+    },
+    {
+      "pmid": "39462379",
+      "title": "HOXA9 and CD163 potentiate pancreatic ductal adenocarcinoma progression.",
+      "abstract": "The role of HOXA9 requires investigations in pancreatic ductal adenocarcinoma (PDAC) as HOXA9 inhibitors are being developed. HOXA9 might attract CD163 expressed tumor associated macrophages (TAM) and could affect PDAC prognosis. This work aims to study the expression and relevance of HOXA9 and CD163 in PDAC progression. Selected 98 PDAC and 98 adjacent non tumor tissues as a control group were immunostained with HOXA9 and CD163 antibodies. PDAC displayed highly significant higher HOXA9 staining intensity, percent and H score values than control group. HOXA9 staining of PDAC cases showed significant associations with poor prognostic indicators including larger tumor size, higher grade and advanced stage. PDAC showed highly significant differences regarding CD163 macrophage-specific staining intensity, percent and H score values than control group. CD163 showed significant higher expressions with larger tumor size, higher histological grade and advanced stage group. HOXA9 staining in PDAC showed highly significant direct correlations with CD163 positive macrophages. Follow up of PDAC cases revealed that high median H score of HOXA9 and CD163 were significantly associated with worse overall survival. CD163 was an independent prognostic marker of worse survival. In conclusion, HOXA9 could potentiate PDAC progression by stimulating CD163 expressed TAM attraction in tumors. HOXA9 and CD163 could participate in PDAC therapy. HOXA9 and CD163 could be predictors of worse prognosis and shorter survival in PDAC.",
+      "authors": [
+        "Hemida AS",
+        "Ahmed MM",
+        "Tantawy MS"
+      ],
+      "journal": "Diagnostic pathology",
+      "year": "2024",
+      "pmc_id": "PMC11514874",
+      "has_fulltext": true
+    },
+    {
+      "pmid": "37317978",
+      "title": "NPM1-mutated acute myeloid leukemia: New pathogenetic and therapeutic insights and open questions.",
+      "abstract": "The nucleophosmin (NPM1) gene encodes for a multifunctional chaperone protein that is localized in the nucleolus but continuously shuttles between the nucleus and cytoplasm. NPM1 mutations occur in about one-third of AML, are AML-specific, usually involve exon 12 and are frequently associated with FLT3-ITD, DNMT3A, TET2, and IDH1/2 mutations. Because of its unique molecular and clinico-pathological features, NPM1-mutated AML is regarded as a distinct leukemia entity in both the International Consensus Classification (ICC) and the 5th edition of the World Health Organization (WHO) classification of myeloid neoplasms. All NPM1 mutations generate leukemic mutants that are aberrantly exported in the cytoplasm of the leukemic cells and are relevant to the pathogenesis of the disease. Here, we focus on recently identified functions of the NPM1 mutant at chromatin level and its relevance in driving HOX/MEIS gene expression. We also discuss yet controversial issues of the ICC/WHO classifications, including the biological and clinical significance of therapy-related NPM1-mutated AML and the relevance of blasts percentage in defining NPM1-mutated AML. Finally, we address the impact of new targeted therapies in NPM1-mutated AML with focus on CAR T cells directed against NPM1/HLA neoepitopes, as well as XPO1 and menin inhibitors.",
+      "authors": [
+        "Falini B"
+      ],
+      "journal": "American journal of hematology",
+      "year": "2023",
+      "pmc_id": null,
+      "has_fulltext": false
+    },
+    {
+      "pmid": "39690184",
+      "title": "Functions of the native NPM1 protein and its leukemic mutant.",
+      "abstract": "The nucleophosmin (NPM1) gene encodes for the most abundant nucleolar protein. Thanks to its property to act as histone chaperone and to shuttle between the nucleus and cytoplasm, the NPM1 protein is involved in multiple cellular function that are here extensively reviewed and include the formation of the nucleolus through liquid-liquid phase separation, regulation of ribosome biogenesis and transport, control of DNA repair and centrosome duplication as well as response to nucleolar stress. NPM1 is mutated in about 30-35% of adult acute myeloid leukemia (AML). Due to its unique biological and clinical features, NPM1-mutated AML is regarded as a distinct leukemia entity in the WHO 5th edition and ICC classifications of myeloid malignancies. The NPM1 mutant undergoes changes at the C-terminus of the protein that leads to its delocalization in the cytoplasm of the leukemic cells. Here, we focus also on its biological functions discussing the murine models of NPM1 mutations and the various mechanisms that occur at cytoplasmic and nuclear levels to promote and maintain NPM1-mutated AML.",
+      "authors": [
+        "Falini B",
+        "Sorcini D",
+        "Perriello VM"
+      ],
+      "journal": "Leukemia",
+      "year": "2025",
+      "pmc_id": null,
+      "has_fulltext": false
+    },
+    {
+      "pmid": "36922593",
+      "title": "The menin inhibitor revumenib in KMT2A-rearranged or NPM1-mutant leukaemia.",
+      "abstract": "Targeting critical epigenetic regulators reverses aberrant transcription in cancer, thereby restoring normal tissue function<sup>1-3</sup>. The interaction of menin with lysine methyltransferase\u20092A (KMT2A), an epigenetic regulator, is a dependence in acute leukaemia caused by either rearrangement of KMT2A or mutation of the nucleophosmin\u20091 gene\u00a0(NPM1)<sup>4-6</sup>. KMT2A rearrangements occur in up to 10% of acute leukaemias and have an adverse prognosis, whereas NPM1 mutations occur in up to 30%, forming the most common genetic alteration in acute myeloid leukaemia<sup>7,8</sup>. Here, we describe the results of the first-in-human phase\u20091 clinical trial investigating revumenib (SNDX-5613), a potent and selective oral inhibitor of the menin-KMT2A interaction, in patients with relapsed or refractory acute leukaemia (ClinicalTrials.gov, NCT04065399). We show that therapy with revumenib was associated with a low frequency of grade\u20093 or higher treatment-related adverse events and a 30% rate of complete remission or complete remission with partial haematologic recovery (CR/CRh) in the efficacy analysis population. Asymptomatic prolongation of the QT interval on electrocardiography was identified as the only dose-limiting toxicity. Remissions occurred in leukaemias refractory to multiple previous lines of therapy. We demonstrate clearance of residual disease using sensitive clinical assays and identify hallmarks of differentiation into normal haematopoietic cells, including differentiation syndrome. These data establish menin inhibition as a therapeutic strategy for susceptible acute leukaemia subtypes.",
+      "authors": [
+        "Issa GC",
+        "Aldoss I",
+        "DiPersio J"
+      ],
+      "journal": "Nature",
+      "year": "2023",
+      "pmc_id": "PMC10060155",
+      "has_fulltext": true
+    },
+    {
+      "pmid": "37119006",
+      "title": "The NPM1 mutant defines AML irrespective of blast count.",
+      "abstract": "",
+      "authors": [
+        "Falini B",
+        "Martelli MP",
+        "Brunetti L"
+      ],
+      "journal": "American journal of hematology",
+      "year": "2023",
+      "pmc_id": null,
+      "has_fulltext": false
+    },
+    {
+      "pmid": "39264614",
+      "title": "A menin-KMT2A inhibitor to overcome resistance.",
+      "abstract": "",
+      "authors": [
+        "Heckman CA"
+      ],
+      "journal": "Blood",
+      "year": "2024",
+      "pmc_id": "PMC11419777",
+      "has_fulltext": true
+    },
+    {
+      "pmid": "39704147",
+      "title": "Bleximenib, the novel menin-KMT2A inhibitor JNJ-75276617, impairs long-term proliferation and immune evasion in acute myeloid leukemia.",
+      "abstract": "Acute myeloid leukemia (AML) remains challenging to treat, which in part relates to genetic heterogeneity of the disease, to the protective tumor microenvironment driving resistance to therapy, and also to immune evasion characteristics of leukemic cells. Targeting epigenetic programs in AML provides an attractive opportunity to impair long-term proliferation and induce differentiation. The novel inhibitor JNJ-75276617 (bleximenib) targets the menin-KMT2A interaction and has shown preclinical efficacy in AML.1 Here, we provide mechanistic insights into how JNJ-75276617 impairs proliferation and drives differentiation of primary AML patient cells. A large-scale drug screen was set up in which genetic alterations and quantitative proteomics were compared with drug sensitivity in a preclinical setting, which revealed that granulocyte-macrophage progenitor (GMP)-like AML display the greatest sensitivity. Furthermore, we identified that NPM1c/DNMT3Amut AML are sensitive, and some NPM1wt AML subtypes without KMT2A-MLLT3 rearrangements benefit from menin-KMT2A inhibition. Genome-wide chromatin immunoprecipitation- sequencing studies revealed patient-specific epigenetic alterations upon JNJ-75276617 treatment, uncovering a striking upregulation of MHC class I and class II expression as a consequence of epigenetic changes upon menin-KMT2A inhibition, independent of MEIS1 loss but involving CIITA activation. Functionally, this results in enhanced sensitivity of leukemic blasts to T-cell-mediated cytotoxicity in allogeneic and autologous settings. Our data indicate that JNJ-75276617 provides a potential therapeutic approach whereby not only proliferation is impaired and differentiation is induced, but whereby therapeutic benefit might also be achieved by reactivating the antigen presentation machinery.",
+      "authors": [
+        "Hogeling SM",
+        "L\u00ea DM",
+        "La Rose N"
+      ],
+      "journal": "Haematologica",
+      "year": "2025",
+      "pmc_id": "PMC12130779",
+      "has_fulltext": true
+    },
+    {
+      "pmid": "30205049",
+      "title": "Mutant NPM1 Maintains the Leukemic State through HOX Expression.",
+      "abstract": "NPM1 is the most frequently mutated gene in cytogenetically normal acute myeloid leukemia (AML). In AML cells, NPM1 mutations result in abnormal cytoplasmic localization of the mutant protein (NPM1c); however, it is unknown whether NPM1c is required to maintain the leukemic state. Here, we show that loss of NPM1c from the cytoplasm, either through nuclear relocalization or targeted degradation, results in immediate downregulation of homeobox (HOX) genes followed by differentiation. Finally, we show that XPO1 inhibition relocalizes NPM1c to the nucleus, promotes differentiation of AML cells, and prolongs survival of Npm1-mutated leukemic mice. We describe an exquisite dependency of NPM1-mutant AML cells on NPM1c, providing the rationale for the use of nuclear export inhibitors in AML with mutated NPM1.",
+      "authors": [
+        "Brunetti L",
+        "Gundry MC",
+        "Sorcini D"
+      ],
+      "journal": "Cancer cell",
+      "year": "2018",
+      "pmc_id": "PMC6159911",
+      "has_fulltext": true
+    },
+    {
+      "pmid": "34743404",
+      "title": "Molecular regulators of HOXA9 in acute myeloid leukemia.",
+      "abstract": "Dysregulation of the oncogenic transcription factor HOXA9 is a prominent feature for most aggressive acute myeloid leukemia cases and a strong indicator of poor prognosis in patients. Leukemia subtypes with hallmark overexpression of HOXA9 include those carrying MLL gene rearrangements, NPM1c mutations, and other genetic alternations. A growing body of evidence indicates that HOXA9 dysregulation is both sufficient and necessary for leukemic transformation. The HOXA9 mRNA and protein regulation includes multilayered controls by transcription factors (such as CDX2/4 and USF2/1), epigenetic factors (such as MLL-menin-LEDGF, DOT1L, ENL, HBO1, NPM1c-XPO1, and polycomb proteins), microRNAs (such as miR-126 and miR-196b), long noncoding RNAs (such as HOTTIP), three-dimensional chromatin interactions, and post-translational protein modifications. Recently, insights into the dynamic regulation of HOXA9 have led to an advanced understanding of the HOXA9 regulome and provided new cancer therapeutic opportunities, including developing inhibitors targeting DOT1L, menin, and ENL proteins. This review summarizes recent advances in understanding the molecular mechanisms controlling HOXA9 regulation and the pharmacological approaches that target HOXA9 regulators to treat HOXA9-driven acute myeloid leukemia.",
+      "authors": [
+        "Aryal S",
+        "Zhang Y",
+        "Wren S"
+      ],
+      "journal": "The FEBS journal",
+      "year": "2023",
+      "pmc_id": null,
+      "has_fulltext": false
+    },
+    {
+      "pmid": "37890156",
+      "title": "Acute myeloid leukemias with UBTF tandem duplications are sensitive to menin inhibitors.",
+      "abstract": "UBTF tandem duplications (UBTF-TDs) have recently emerged as a recurrent alteration in pediatric and adult acute myeloid leukemia (AML). UBTF-TD leukemias are characterized by a poor response to conventional chemotherapy and a transcriptional signature that mirrors NUP98-rearranged and NPM1-mutant AMLs, including HOX-gene dysregulation. However, the mechanism by which UBTF-TD drives leukemogenesis remains unknown. In this study, we investigated the genomic occupancy of UBTF-TD in transformed cord blood CD34+ cells and patient-derived xenograft models. We found that UBTF-TD protein maintained genomic occupancy at ribosomal DNA loci while also occupying genomic targets commonly dysregulated in UBTF-TD myeloid malignancies, such as the HOXA/HOXB gene clusters and MEIS1. These data suggest that UBTF-TD is a gain-of-function alteration that results in mislocalization to genomic loci dysregulated in UBTF-TD leukemias. UBTF-TD also co-occupies key genomic loci with KMT2A and menin, which are known to be key partners involved in HOX-dysregulated leukemias. Using a protein degradation system, we showed that stemness, proliferation, and transcriptional signatures are dependent on sustained UBTF-TD localization to chromatin. Finally, we\u00a0demonstrate that primary cells from UBTF-TD leukemias are sensitive to the menin inhibitor SNDX-5613, resulting in markedly reduced in\u00a0vitro and in\u00a0vivo tumor growth, myeloid differentiation, and abrogation of the UBTF-TD leukemic expression signature. These findings provide a viable therapeutic strategy for patients with this high-risk AML subtype.",
+      "authors": [
+        "Barajas JM",
+        "Rasouli M",
+        "Umeda M"
+      ],
+      "journal": "Blood",
+      "year": "2024",
+      "pmc_id": "PMC10873536",
+      "has_fulltext": true
+    }
+  ],
+  "search_terms": [
+    "NPM1-mutant AML",
+    "HOXA9",
+    "menin inhibitor"
+  ],
+  "stats": {
+    "total_papers": 34,
+    "with_fulltext": 23,
+    "abstract_only": 11
+  }
+}

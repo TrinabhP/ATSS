@@ -1,0 +1,660 @@
+{
+  "extracted_results": [
+    {
+      "pmid": "38635250",
+      "title": "HOXA9 and \u03b2-catenin safeguard HSC integrity.",
+      "authors": [
+        "Mapperley C",
+        "Kranc KR"
+      ],
+      "year": "2024",
+      "journal": "Blood",
+      "key_findings": [
+        "HOXA9 and \u03b2-catenin maintain HSC integrity",
+        "their cooperative interaction is crucial for HSC function",
+        "dysregulation leads to HSC exhaustion"
+      ],
+      "methods": "N/A",
+      "sample_size": "N/A",
+      "limitations": "N/A",
+      "relevance": "This study is relevant because it provides insights into the molecular mechanisms that regulate hematopoietic stem cell integrity."
+    },
+    {
+      "pmid": "36376832",
+      "title": "Role of HOXA9 in solid tumors: mechanistic insights and therapeutic potential.",
+      "authors": [
+        "Tang L",
+        "Peng L",
+        "Tan C"
+      ],
+      "year": "2022",
+      "journal": "Cancer cell international",
+      "key_findings": [
+        "HOXA9 functions as a transcription factor",
+        "aberrant expression of HOXA9 is associated with prognosis in solid tumors",
+        "signaling pathways and post-transcriptional regulation of HOXA9 are crucial in solid tumor progression"
+      ],
+      "methods": "Review of existing literature",
+      "sample_size": "N/A",
+      "limitations": "None mentioned",
+      "relevance": "This study is relevant because it provides insights into the role of HOXA9 in solid tumors, which could lead to the development of new therapeutic strategies."
+    },
+    {
+      "pmid": "38062297",
+      "title": "HOXA9 transcription factor is a double-edged sword: from development to cancer progression.",
+      "authors": [
+        "Shenoy US",
+        "Adiga D",
+        "Alhedyan F"
+      ],
+      "year": "2024",
+      "journal": "Cancer metastasis reviews",
+      "key_findings": [
+        "HOXA9 serves as a molecular orchestrator in cancer stemness and metastasis",
+        "HOXA9 has a dual role as an oncogene or tumor suppressor",
+        "HOXA9 is involved in fundamental biological processes such as embryogenesis and tissue homeostasis"
+      ],
+      "methods": "N/A",
+      "sample_size": "N/A",
+      "limitations": "The multiple modes of regulation and context-dependent interactions of HOXA9 are not fully understood, making it challenging to design targeted therapies",
+      "relevance": "Understanding the role of HOXA9 in cancer progression and development is crucial for designing effective targeted therapies and developing personalized treatment strategies."
+    },
+    {
+      "pmid": "39017854",
+      "title": "HOXA9 Regulome and Pharmacological Interventions in Leukemia.",
+      "authors": [
+        "Aryal S",
+        "Lu R"
+      ],
+      "year": "2024",
+      "journal": "Advances in experimental medicine and biology",
+      "key_findings": [
+        "HOXA9 is a strong indicator of poor prognosis in leukemia patients",
+        "HOXA9 expression correlates with patient survival outcomes and response to therapy",
+        "HOXA9 regulome provides new therapeutic opportunities"
+      ],
+      "methods": "N/A",
+      "sample_size": "N/A",
+      "limitations": "N/A",
+      "relevance": "This study is relevant because it provides new insights into the biochemical mechanisms underlying HOXA9-mediated leukemogenesis and potential pharmacological approaches to treat HOXA9-driven leukemia."
+    },
+    {
+      "pmid": "31821784",
+      "title": "A Menin-MLL Inhibitor Induces Specific Chromatin Changes and Eradicates Disease in Models of MLL-Rearranged Leukemia.",
+      "authors": [
+        "Krivtsov AV",
+        "Evans K",
+        "Gadrey JY"
+      ],
+      "year": "2019",
+      "journal": "Cancer cell",
+      "key_findings": [
+        "VTP50469 inhibits Menin-MLL interaction",
+        "VTP50469 induces chromatin changes and apoptosis in MLL-r leukemia cells",
+        "VTP50469 eradicates disease in MLL-r leukemia models"
+      ],
+      "methods": "Structure-based design, cell lines, patient-derived xenograft models",
+      "sample_size": "N/A",
+      "limitations": "None mentioned",
+      "relevance": "This study is relevant because it presents a potential therapeutic strategy for MLL-rearranged leukemia, a type of blood cancer."
+    },
+    {
+      "pmid": "39292289",
+      "title": "HOXA9 promotes proliferation, metastasis and prevents apoptosis in hepatocellular carcinoma.",
+      "authors": [
+        "Bao G",
+        "Wei H",
+        "Yan J"
+      ],
+      "year": "2024",
+      "journal": "Journal of cancer research and clinical oncology",
+      "key_findings": [
+        "HOXA9 is upregulated in HCC and predicts poor survival",
+        "HOXA9 promotes proliferation, metastasis, and prevents apoptosis in HCC",
+        "HOXA9 is regulated by Ribosomal protein RPL38 in HCC"
+      ],
+      "methods": "Bioinformatic analysis, qPCR, Western blot, in vitro cell assays, RNA sequencing, and xenograft tumor model",
+      "sample_size": "N/A",
+      "limitations": "None mentioned",
+      "relevance": "This study is relevant because it identifies HOXA9 as a potential therapeutic target for the treatment of hepatocellular carcinoma."
+    },
+    {
+      "pmid": "39121437",
+      "title": "Menin Inhibition With Revumenib for <i>KMT2A</i>-Rearranged Relapsed or Refractory Acute Leukemia (AUGMENT-101).",
+      "authors": [
+        "Issa GC",
+        "Aldoss I",
+        "Thirman MJ"
+      ],
+      "year": "2025",
+      "journal": "Journal of clinical oncology : official journal of the American Society of Clinical Oncology",
+      "key_findings": [
+        "Revumenib showed promising efficacy and safety in patients with KMT2A-rearranged acute leukemia",
+        "The CR + CRh rate was 22.8%, exceeding the null hypothesis of 10%",
+        "Overall response rate was 63.2% with 68.2% of patients having no detectable residual disease"
+      ],
+      "methods": "Phase I/II, open-label, dose-escalation and expansion study of revumenib",
+      "sample_size": "N = 94 patients",
+      "limitations": "None mentioned in the abstract",
+      "relevance": "This study is relevant because it represents the largest evaluation of a targeted therapy for patients with KMT2A-rearranged relapsed or refractory acute leukemia."
+    },
+    {
+      "pmid": "34527579",
+      "title": "Comparison of Multiple Clinical Testing Modalities for Assessment of NPM1-Mutant AML.",
+      "authors": [
+        "Lopez A",
+        "Patel S",
+        "Geyer JT"
+      ],
+      "year": "2021",
+      "journal": "Frontiers in oncology",
+      "key_findings": [
+        "RT-PCR showed superior sensitivity compared to NGS, IHC, and FC for detecting mutant NPM1",
+        "NGS, IHC, and FC had positive predictive values of \u2265 80%, indicating positive results are typically associated with RT-PCR positivity",
+        "FC did not identify any NPM1-mutated residual disease not already detected by RT-PCR, NGS, or IHC"
+      ],
+      "methods": "Peripheral blood and bone marrow samples were tested by quantitative, real-time, RT-PCR, NGS, IHC, and FC",
+      "sample_size": "N/A",
+      "limitations": "The main challenge of NGS, IHC, and FC was identifying low disease burden (<0.5% NCN by RT-PCR)",
+      "relevance": "This study is relevant because it informs future clinical testing algorithms for assessing NPM1-mutant AML and detecting residual disease."
+    },
+    {
+      "pmid": "39158067",
+      "title": "Epigenetic regulation of noncanonical menin targets modulates menin inhibitor response in acute myeloid leukemia.",
+      "authors": [
+        "Zhou X",
+        "Zhang L",
+        "Aryal S"
+      ],
+      "year": "2024",
+      "journal": "Blood",
+      "key_findings": [
+        "Menin inhibitors can be resisted by noncanonical menin targets",
+        "Loss of PRC1.1 subunits leads to menin inhibitor resistance",
+        "Combinational treatment with venetoclax overcomes resistance to menin inhibition"
+      ],
+      "methods": "Systematic chromatin-focused CRISPR screens, genetic, epigenetic, and pharmacologic studies",
+      "sample_size": "N/A",
+      "limitations": "None mentioned",
+      "relevance": "This study is relevant because it provides potential strategies to treat acute myeloid leukemia with compromised PRC1.1 function, which can help overcome resistance to menin inhibitors."
+    },
+    {
+      "pmid": "39656142",
+      "title": "Acute myeloid leukemia management and research in 2025.",
+      "authors": [
+        "Kantarjian HM",
+        "DiNardo CD",
+        "Kadia TM"
+      ],
+      "year": "2025",
+      "journal": "CA: a cancer journal for clinicians",
+      "key_findings": [
+        "12 new agents have received regulatory approval for AML in the United States since 2017",
+        "menin inhibitors and CD123 antibody-drug conjugates show promising results",
+        "oral decitabine-cedazuridine can be used as a bioequivalent alternative to parenteral hypomethylating agents in AML"
+      ],
+      "methods": "N/A",
+      "sample_size": "N/A",
+      "limitations": "N/A",
+      "relevance": "This research is relevant because it highlights recent advances in acute myeloid leukemia management and identifies promising areas for future research."
+    },
+    {
+      "pmid": "34131281",
+      "title": "Therapeutic implications of menin inhibition in acute leukemias.",
+      "authors": [
+        "Issa GC",
+        "Ravandi F",
+        "DiNardo CD"
+      ],
+      "year": "2021",
+      "journal": "Leukemia",
+      "key_findings": [
+        "Menin inhibitors show promise in treating acute leukemias with KMT2A rearrangement",
+        "Menin inhibition may also target leukemias with mutated NPM1",
+        "Early clinical data validates the proof-of-concept for menin inhibition in susceptible leukemia subsets"
+      ],
+      "methods": "Rationally designed clinical studies investigating small-molecule oral menin inhibitors",
+      "sample_size": "N/A",
+      "limitations": "None mentioned",
+      "relevance": "This study is relevant because it explores a novel therapeutic approach for acute leukemias with poor outcomes using current standard therapies."
+    },
+    {
+      "pmid": "40081214",
+      "title": "O-GlcNAc-modified HOXA9 suppresses ferroptosis via promoting UBR5-mediated SIRT6 degradation in nasopharyngeal carcinoma.",
+      "authors": [
+        "Liu H",
+        "Fu Y",
+        "Tang L"
+      ],
+      "year": "2025",
+      "journal": "Neoplasia (New York, N.Y.)",
+      "key_findings": [
+        "HOXA9 is highly expressed in NPC and promotes tumor growth",
+        "O-GlcNAcylation stabilizes HOXA9 and facilitates its nuclear translocation",
+        "HOXA9 inhibits ferroptosis by enhancing UBR5 expression and SIRT6 degradation"
+      ],
+      "methods": "GEO dataset analysis, cell viability assays, immunoprecipitation, ChIP and luciferase assays, Co-IP assays, and subcutaneous NPC mouse model",
+      "sample_size": "N/A",
+      "limitations": "None mentioned",
+      "relevance": "This study provides potential therapeutic targets for nasopharyngeal carcinoma treatment by elucidating the regulatory mechanism of ferroptosis."
+    },
+    {
+      "pmid": "38905635",
+      "title": "Preclinical efficacy of the potent, selective menin-KMT2A inhibitor JNJ-75276617 (bleximenib) in KMT2A- and NPM1-altered leukemias.",
+      "authors": [
+        "Kwon MC",
+        "Thuring JW",
+        "Querolle O"
+      ],
+      "year": "2024",
+      "journal": "Blood",
+      "key_findings": [
+        "JNJ-75276617 inhibits menin-KMT2A interaction, reducing target gene expression",
+        "JNJ-75276617 shows potent antiproliferative activity in AML and ALL cell lines and patient samples",
+        "JNJ-75276617 exhibits synergistic effects with other therapies and overcomes resistance to revumenib"
+      ],
+      "methods": "In vitro and in vivo experiments, including cell line studies, patient sample analysis, and xenograft models",
+      "sample_size": "N/A",
+      "limitations": "None mentioned",
+      "relevance": "This study is relevant because it presents a potential new therapeutic option for acute leukemias with KMT2A or NPM1 alterations."
+    },
+    {
+      "pmid": "38753266",
+      "title": "HOXA9 versus HOXB9; particular focus on their controversial role in tumor pathogenesis.",
+      "authors": [
+        "Hjazi A",
+        "Jasim SA",
+        "Al-Dhalimy AMB"
+      ],
+      "year": "2024",
+      "journal": "Journal of applied genetics",
+      "key_findings": [
+        "HOXA9 and HOXB9 have distinctive functions in tumor advancement",
+        "HOX genes are essential for regulating cellular processes",
+        "Aberrant functioning of HOX genes is linked to many diseases, especially cancer"
+      ],
+      "methods": "N/A",
+      "sample_size": "N/A",
+      "limitations": "N/A",
+      "relevance": "This study is relevant because it explores the roles of HOXA9 and HOXB9 in tumor pathogenesis, which can lead to a better understanding of cancer development and progression."
+    },
+    {
+      "pmid": "34514844",
+      "title": "HOXA9-methylated DNA as a diagnostic biomarker of ovarian malignancy.",
+      "authors": [
+        "Faaborg L",
+        "Jakobsen A",
+        "Waldstr\u00f8m M"
+      ],
+      "year": "2021",
+      "journal": "Biomarkers in medicine",
+      "key_findings": [
+        "Meth-HOXA9 was detected in 93% of ovarian cancer specimens",
+        "Meth-HOXA9 had a diagnostic accuracy of 98%",
+        "Meth-HOXA9 was detected in 17% of benign ovarian tumors"
+      ],
+      "methods": "Droplet digital PCR",
+      "sample_size": "138 tissue specimens",
+      "limitations": "None mentioned",
+      "relevance": "This study is relevant because it identifies meth-HOXA9 as a potential diagnostic biomarker for ovarian malignancy."
+    },
+    {
+      "pmid": "40196700",
+      "title": "<i>TP53</i> Inactivation Confers Resistance to the Menin Inhibitor Revumenib in Acute Myeloid Leukemia.",
+      "authors": [
+        "D'Souza J",
+        "Leung CJ",
+        "Ballapuram AC"
+      ],
+      "year": "2025",
+      "journal": "bioRxiv : the preprint server for biology",
+      "key_findings": [
+        "TP53 mutations are associated with de novo resistance to revumenib",
+        "TP53 mutations impair induction of TP53 transcriptional targets",
+        "MCL-1 inhibitor MIK665 sensitizes TP53-mutant AML cells to revumenib"
+      ],
+      "methods": "Analysis of a panel of cell lines and an isogenic model",
+      "sample_size": "N/A",
+      "limitations": "Not mentioned in abstract",
+      "relevance": "This study is relevant because it identifies a potential biomarker for resistance to a promising treatment for acute myeloid leukemia."
+    },
+    {
+      "pmid": "38941537",
+      "title": "Intensive induction chemotherapy vs hypomethylating agents in\u00a0combination with venetoclax in NPM1-mutant AML.",
+      "authors": [
+        "Bewersdorf JP",
+        "Shimony S",
+        "Shallis RM"
+      ],
+      "year": "2024",
+      "journal": "Blood advances",
+      "key_findings": [],
+      "methods": "N/A",
+      "sample_size": "N/A",
+      "limitations": "N/A",
+      "relevance": "N/A"
+    },
+    {
+      "pmid": "35017466",
+      "title": "Effective Menin inhibitor-based combinations against AML with MLL rearrangement or NPM1 mutation (NPM1c).",
+      "authors": [
+        "Fiskus W",
+        "Boettcher S",
+        "Daver N"
+      ],
+      "year": "2022",
+      "journal": "Blood cancer journal",
+      "key_findings": [
+        "Menin inhibitor treatment disrupts the interaction between Menin and MLL1 or MLL1-fusion protein",
+        "Co-treatment with Menin inhibitor and BCL2 or CDK6 inhibitors induces synergistic lethality in AML cells",
+        "Combined therapy with Menin inhibitor and venetoclax exerts superior in vivo efficacy in AML xenografts"
+      ],
+      "methods": "Pre-clinical studies using genetic knockout, degradation of Menin, and treatment with Menin inhibitors",
+      "sample_size": "N/A",
+      "limitations": "Not explicitly mentioned",
+      "relevance": "This study is relevant because it highlights the promise of Menin inhibitor-based combinations as a potential treatment for Acute Myeloid Leukemia (AML) with MLL rearrangement or NPM1 mutation."
+    },
+    {
+      "pmid": "36922589",
+      "title": "MEN1 mutations mediate clinical resistance to menin inhibition.",
+      "authors": [
+        "Perner F",
+        "Stein EM",
+        "Wenge DV"
+      ],
+      "year": "2023",
+      "journal": "Nature",
+      "key_findings": [
+        "MEN1 mutations mediate clinical resistance to menin inhibition",
+        "inhibitor-menin interface mutations represent a conserved mechanism of therapeutic resistance",
+        "these mutants attenuate drug-target binding and prevent inhibitor-induced eviction of menin and MLL1 from chromatin"
+      ],
+      "methods": "phase 1 first-in-human clinical trial, xenograft models, and unbiased base-editor screen",
+      "sample_size": "N/A",
+      "limitations": "none mentioned",
+      "relevance": "This study is relevant because it demonstrates a common mechanism of therapeutic resistance to a chromatin-targeting therapeutic drug, which has implications for the development of effective treatments for leukaemia."
+    },
+    {
+      "pmid": "31213012",
+      "title": "Direct and Indirect Targeting of HOXA9 Transcription Factor in Acute Myeloid Leukemia.",
+      "authors": [
+        "Lambert M",
+        "Alioui M",
+        "Jambon S"
+      ],
+      "year": "2019",
+      "journal": "Cancers",
+      "key_findings": [
+        "HOXA9 is associated with leukemia and poor prognosis in AML",
+        "HOXA9 expression is linked to aggressiveness in AML",
+        "HOXA9 can be targeted indirectly or directly for cancer treatment"
+      ],
+      "methods": "Review of existing research on HOXA9 targeting",
+      "sample_size": "N/A",
+      "limitations": "No specific limitations mentioned in the abstract",
+      "relevance": "This research is relevant because it explores potential therapeutic strategies for targeting HOXA9 in acute myeloid leukemia and other cancers."
+    },
+    {
+      "pmid": "40561247",
+      "title": "Posttranscriptional depletion of ribosome biogenesis factors engenders therapeutic vulnerabilities in NPM1-mutant AML.",
+      "authors": [
+        "Damaskou A",
+        "Wilson R",
+        "Gozdecka M"
+      ],
+      "year": "2025",
+      "journal": "Blood",
+      "key_findings": [],
+      "methods": "N/A",
+      "sample_size": "N/A",
+      "limitations": "N/A",
+      "relevance": "N/A"
+    },
+    {
+      "pmid": "37740103",
+      "title": "The acidic stretch and the C-terminal nuclear export signal motif of NPM1 mutant: are they druggable in AML?",
+      "authors": [
+        "Falini B",
+        "Gjertsen BT",
+        "Andresen V"
+      ],
+      "year": "2023",
+      "journal": "Leukemia",
+      "key_findings": [
+        "NPM1 mutant's acidic stretch and C-terminal nuclear export signal motif are potential therapeutic targets",
+        "these motifs may be druggable in Acute Myeloid Leukemia (AML)",
+        "further research is needed to explore the potential of targeting these motifs"
+      ],
+      "methods": "Experimental/analytical methods are not specified in the abstract",
+      "sample_size": "N/A",
+      "limitations": "No limitations are mentioned in the abstract",
+      "relevance": "This study is relevant because it explores potential therapeutic targets for Acute Myeloid Leukemia (AML), a type of blood cancer with limited treatment options."
+    },
+    {
+      "pmid": "39605444",
+      "title": "Genotype-immunophenotype relationships in <i>NPM1</i>-mutant AML clonal evolution uncovered by single cell multiomic analysis.",
+      "authors": [
+        "Drucker M",
+        "Lee D",
+        "Zhang X"
+      ],
+      "year": "2024",
+      "journal": "bioRxiv : the preprint server for biology",
+      "key_findings": [],
+      "methods": "N/A",
+      "sample_size": "N/A",
+      "limitations": "N/A",
+      "relevance": "N/A"
+    },
+    {
+      "pmid": "26028034",
+      "title": "Role of HOXA9 in leukemia: dysregulation, cofactors and essential targets.",
+      "authors": [
+        "Collins CT",
+        "Hess JL"
+      ],
+      "year": "2016",
+      "journal": "Oncogene",
+      "key_findings": [
+        "HOXA9 is a strong predictor of poor prognosis in acute leukemias",
+        "HOXA9 regulates downstream gene expression through binding at promoter distal enhancers",
+        "HOXA9-overexpressing leukemias can be targeted for novel therapeutics"
+      ],
+      "methods": "N/A",
+      "sample_size": "N/A",
+      "limitations": "N/A",
+      "relevance": "This study is relevant because it provides opportunities for developing novel therapeutics for over 50% of acute myeloid leukemia cases with HOXA9 overexpression."
+    },
+    {
+      "pmid": "39462379",
+      "title": "HOXA9 and CD163 potentiate pancreatic ductal adenocarcinoma progression.",
+      "authors": [
+        "Hemida AS",
+        "Ahmed MM",
+        "Tantawy MS"
+      ],
+      "year": "2024",
+      "journal": "Diagnostic pathology",
+      "key_findings": [
+        "HOXA9 and CD163 are highly expressed in PDAC and associated with poor prognostic indicators",
+        "High HOXA9 and CD163 expression are correlated with worse overall survival",
+        "CD163 is an independent prognostic marker of worse survival"
+      ],
+      "methods": "Immunostaining of 98 PDAC and 98 adjacent non-tumor tissues with HOXA9 and CD163 antibodies",
+      "sample_size": "196",
+      "limitations": "None mentioned",
+      "relevance": "This study is relevant because it identifies HOXA9 and CD163 as potential therapeutic targets and prognostic markers for pancreatic ductal adenocarcinoma."
+    },
+    {
+      "pmid": "39690184",
+      "title": "Functions of the native NPM1 protein and its leukemic mutant.",
+      "authors": [
+        "Falini B",
+        "Sorcini D",
+        "Perriello VM"
+      ],
+      "year": "2025",
+      "journal": "Leukemia",
+      "key_findings": [
+        "NPM1 protein acts as histone chaperone and shuttles between nucleus and cytoplasm",
+        "NPM1 is mutated in 30-35% of adult acute myeloid leukemia (AML)",
+        "NPM1 mutant delocalizes to cytoplasm in leukemic cells"
+      ],
+      "methods": "Review of existing research and murine models of NPM1 mutations",
+      "sample_size": "N/A",
+      "limitations": "None mentioned",
+      "relevance": "This research is relevant because it helps understand the functions of the NPM1 protein and its leukemic mutant, which is crucial for developing treatments for acute myeloid leukemia (AML)."
+    },
+    {
+      "pmid": "37317978",
+      "title": "NPM1-mutated acute myeloid leukemia: New pathogenetic and therapeutic insights and open questions.",
+      "authors": [
+        "Falini B"
+      ],
+      "year": "2023",
+      "journal": "American journal of hematology",
+      "key_findings": [],
+      "methods": "N/A",
+      "sample_size": "N/A",
+      "limitations": "N/A",
+      "relevance": "N/A"
+    },
+    {
+      "pmid": "37119006",
+      "title": "The NPM1 mutant defines AML irrespective of blast count.",
+      "authors": [
+        "Falini B",
+        "Martelli MP",
+        "Brunetti L"
+      ],
+      "year": "2023",
+      "journal": "American journal of hematology",
+      "key_findings": [
+        "NPM1 mutant defines AML",
+        "blast count is not a determining factor",
+        "NPM1 mutation is a key characteristic of AML"
+      ],
+      "methods": "N/A",
+      "sample_size": "N/A",
+      "limitations": "N/A",
+      "relevance": "This study is relevant because it provides new insights into the definition and diagnosis of Acute Myeloid Leukemia (AML)."
+    },
+    {
+      "pmid": "39264614",
+      "title": "A menin-KMT2A inhibitor to overcome resistance.",
+      "authors": [
+        "Heckman CA"
+      ],
+      "year": "2024",
+      "journal": "Blood",
+      "key_findings": [],
+      "methods": "N/A",
+      "sample_size": "N/A",
+      "limitations": "N/A",
+      "relevance": "This study is relevant because it potentially offers a solution to overcome resistance in certain diseases."
+    },
+    {
+      "pmid": "36922593",
+      "title": "The menin inhibitor revumenib in KMT2A-rearranged or NPM1-mutant leukaemia.",
+      "authors": [
+        "Issa GC",
+        "Aldoss I",
+        "DiPersio J"
+      ],
+      "year": "2023",
+      "journal": "Nature",
+      "key_findings": [
+        "30% rate of complete remission or complete remission with partial haematologic recovery",
+        "low frequency of grade 3 or higher treatment-related adverse events",
+        "remissions occurred in leukaemias refractory to multiple previous lines of therapy"
+      ],
+      "methods": "first-in-human phase 1 clinical trial investigating revumenib in patients with relapsed or refractory acute leukaemia",
+      "sample_size": "N/A",
+      "limitations": "asymptomatic prolongation of the QT interval on electrocardiography was identified as the only dose-limiting toxicity",
+      "relevance": "This study is relevant because it establishes menin inhibition as a therapeutic strategy for susceptible acute leukaemia subtypes."
+    },
+    {
+      "pmid": "30205049",
+      "title": "Mutant NPM1 Maintains the Leukemic State through HOX Expression.",
+      "authors": [
+        "Brunetti L",
+        "Gundry MC",
+        "Sorcini D"
+      ],
+      "year": "2018",
+      "journal": "Cancer cell",
+      "key_findings": [
+        "Loss of NPM1c results in downregulation of HOX genes and differentiation",
+        "NPM1c is required to maintain the leukemic state",
+        "XPO1 inhibition relocalizes NPM1c and promotes differentiation"
+      ],
+      "methods": "Experimental methods including nuclear relocalization and targeted degradation of NPM1c, and XPO1 inhibition",
+      "sample_size": "N/A",
+      "limitations": "None mentioned",
+      "relevance": "This study is relevant because it provides a rationale for the use of nuclear export inhibitors in acute myeloid leukemia with mutated NPM1."
+    },
+    {
+      "pmid": "39704147",
+      "title": "Bleximenib, the novel menin-KMT2A inhibitor JNJ-75276617, impairs long-term proliferation and immune evasion in acute myeloid leukemia.",
+      "authors": [
+        "Hogeling SM",
+        "L\u00ea DM",
+        "La Rose N"
+      ],
+      "year": "2025",
+      "journal": "Haematologica",
+      "key_findings": [],
+      "methods": "N/A",
+      "sample_size": "N/A",
+      "limitations": "N/A",
+      "relevance": "N/A"
+    },
+    {
+      "pmid": "37890156",
+      "title": "Acute myeloid leukemias with UBTF tandem duplications are sensitive to menin inhibitors.",
+      "authors": [
+        "Barajas JM",
+        "Rasouli M",
+        "Umeda M"
+      ],
+      "year": "2024",
+      "journal": "Blood",
+      "key_findings": [
+        "UBTF-TD leukemias are sensitive to menin inhibitors",
+        "UBTF-TD protein maintains genomic occupancy at ribosomal DNA loci and occupies genomic targets commonly dysregulated in UBTF-TD myeloid malignancies",
+        "SNDX-5613 menin inhibitor reduces tumor growth and abrogates the UBTF-TD leukemic expression signature"
+      ],
+      "methods": "genomic occupancy analysis, protein degradation system, in vitro and in vivo tumor growth assays",
+      "sample_size": "N/A",
+      "limitations": "none mentioned",
+      "relevance": "This study provides a viable therapeutic strategy for patients with high-risk acute myeloid leukemia subtype characterized by UBTF tandem duplications."
+    },
+    {
+      "pmid": "34743404",
+      "title": "Molecular regulators of HOXA9 in acute myeloid leukemia.",
+      "authors": [
+        "Aryal S",
+        "Zhang Y",
+        "Wren S"
+      ],
+      "year": "2023",
+      "journal": "The FEBS journal",
+      "key_findings": [
+        "HOXA9 dysregulation is a prominent feature in aggressive acute myeloid leukemia",
+        "HOXA9 regulation includes multilayered controls by various factors",
+        "Targeting HOXA9 regulators provides new cancer therapeutic opportunities"
+      ],
+      "methods": "N/A",
+      "sample_size": "N/A",
+      "limitations": "N/A",
+      "relevance": "This study is relevant because understanding the molecular mechanisms controlling HOXA9 regulation can lead to the development of new therapeutic approaches for treating acute myeloid leukemia."
+    }
+  ],
+  "stats": {
+    "papers_processed": 34,
+    "total_findings": 84,
+    "rag_service": "Ragie.ai",
+    "llm_service": "Groq",
+    "parallel_processing": true
+  }
+}
