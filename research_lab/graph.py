@@ -357,35 +357,135 @@ def run_research(abstract: str) -> ResearchState:
     return final_state
 
 
-# ── Standalone integration test ────────────────────────────────────────────────
+# ── CLI entry point ────────────────────────────────────────────────────────────
+
+def _print_section(title: str) -> None:
+    width = 64
+    print(f"\n{'=' * width}")
+    print(f"  {title}")
+    print(f"{'=' * width}")
+
+
+def _print_field(label: str, value: str, indent: int = 2) -> None:
+    pad = " " * indent
+    prefix = f"{pad}{label}: "
+    # Wrap long values
+    if len(value) > 80:
+        print(f"{prefix}")
+        for line in value.splitlines():
+            print(f"{pad}  {line}")
+    else:
+        print(f"{prefix}{value}")
+
+
+def print_results(result: ResearchState) -> None:
+    """Pretty-print the full pipeline result to stdout."""
+
+    _print_section("PIPELINE COMPLETE")
+    print(f"  Stage:      {result['current_stage']}")
+    print(f"  Reviews:    {len(result['reviews'])}")
+    print(f"  Confidence: {result.get('confidence_level', 'N/A')}")
+    if result.get("error"):
+        print(f"\n  ⚠  ERROR: {result['error']}")
+
+    # Orchestrator log
+    _print_section("ORCHESTRATOR LOG")
+    for msg in result["orchestrator_messages"]:
+        print(f"  {msg}")
+
+    # Review history
+    _print_section("REVIEW HISTORY")
+    for r in result["reviews"]:
+        status = "✓ PASS" if r["passed"] else "✗ FAIL"
+        print(f"  [{r['agent_name']:12s}] rev {r['revision_number']}  {status}")
+        if not r["passed"] and r["feedback"]:
+            for line in r["feedback"][:300].splitlines():
+                print(f"               {line}")
+
+    # Literature
+    lit = result.get("literature")
+    if lit:
+        _print_section("LITERATURE REVIEW")
+        print(f"  Papers found:  {len(lit.get('papers', []))}")
+        print(f"  Search terms:  {', '.join(lit.get('search_terms', []))}")
+        print(f"  Synthesis:\n")
+        for line in (lit.get("synthesis") or "").splitlines():
+            print(f"    {line}")
+
+    # Hypothesis
+    hyp = result.get("hypothesis")
+    if hyp:
+        _print_section("HYPOTHESIS")
+        _print_field("H1", hyp.get("hypothesis", ""))
+        _print_field("H0", hyp.get("null_hypothesis", ""))
+        _print_field("Design", hyp.get("design_approach", ""))
+        print(f"  Expected outcomes:")
+        for o in hyp.get("expected_outcomes", []):
+            print(f"    - {o}")
+
+    # Procedure
+    proc = result.get("procedure")
+    if proc:
+        _print_section("STUDY PROCEDURE")
+        _print_field("Population N", proc.get("population_size", ""))
+        _print_field("Criteria", proc.get("population_criteria", ""))
+        _print_field("Design", proc.get("research_design", ""))
+        _print_field("Statistics", proc.get("statistical_approach", ""))
+        _print_field("Timeline", proc.get("timeline_estimate", ""))
+
+    # Peer review
+    peer = result.get("peer_review")
+    if peer:
+        _print_section("PEER REVIEW")
+        print(f"  Verdict:               {peer.get('overall_verdict', 'N/A')}")
+        print(f"  Reproducibility score: {peer.get('reproducibility_score', 'N/A')}/10")
+        print(f"  Summary:\n")
+        for line in (peer.get("summary") or "").splitlines():
+            print(f"    {line}")
+        issues = peer.get("issues") or []
+        if issues:
+            print(f"\n  Issues ({len(issues)}):")
+            for issue in issues:
+                print(f"    [{issue.get('severity', '?'):8s}] {issue.get('section', '')}: {issue.get('description', '')[:100]}")
+        changes = peer.get("suggested_changes") or []
+        if changes:
+            print(f"\n  Suggested changes:")
+            for c in changes:
+                print(f"    - {c}")
+
+    # Final recommendation
+    _print_section("FINAL RECOMMENDATION")
+    print(f"  Confidence: {result.get('confidence_level', 'N/A')}\n")
+    for line in (result.get("final_recommendation") or "(none)").splitlines():
+        print(f"  {line}")
+
+    if result.get("action_items"):
+        print(f"\n  Action items:")
+        for item in result["action_items"]:
+            print(f"    • {item}")
+
+    if result.get("caveats"):
+        print(f"\n  Caveats:")
+        for c in result["caveats"]:
+            print(f"    • {c}")
+
+    print(f"\n{'=' * 64}\n")
+
 
 if __name__ == "__main__":
+    import sys as _sys
+
     DEMO_ABSTRACT = (
         "We're investigating menin inhibitors for NPM1-mutant AML. "
         "Key question: Does HOX gene expression predict treatment response to "
         "menin inhibitors in NPM1-mutant acute myeloid leukemia patients?"
     )
 
-    print("Starting LabOS Research Analysis Engine (new architecture)...")
-    print(f"Abstract: {DEMO_ABSTRACT[:80]}...\n")
+    abstract = " ".join(_sys.argv[1:]) if len(_sys.argv) > 1 else DEMO_ABSTRACT
 
-    result = run_research(DEMO_ABSTRACT)
+    print("LabOS Research Analysis Engine")
+    print(f"Abstract: {abstract[:100]}{'...' if len(abstract) > 100 else ''}\n")
+    print("Running pipeline — this may take 1-3 minutes...\n")
 
-    print("\n" + "=" * 60)
-    print("PIPELINE COMPLETE")
-    print("=" * 60)
-    print(f"Current stage:     {result['current_stage']}")
-    print(f"Reviews completed: {len(result['reviews'])}")
-    print(f"Confidence level:  {result['confidence_level']}")
-    print(f"Action items:      {len(result['action_items'])}")
-    print(f"Caveats:           {len(result['caveats'])}")
-
-    if result.get("error"):
-        print(f"\n[ERROR] {result['error']}")
-
-    print("\n--- ORCHESTRATOR LOG ---")
-    for msg in result["orchestrator_messages"]:
-        print(f"  {msg}")
-
-    print("\n--- FINAL RECOMMENDATION ---")
-    print(result.get("final_recommendation", "(none)"))
+    result = run_research(abstract)
+    print_results(result)

@@ -1,196 +1,269 @@
 # LabOS — Research Analysis Engine
 
-A multi-agent system for automated biomedical literature review and analysis. Two pipelines are available depending on your setup.
+A hierarchical multi-agent research analysis system built for KiroHacks Cal Poly (May 2, 2026). A researcher submits a scientific abstract and a sequential pipeline of three specialized AI agents produces a structured final recommendation.
+
+Two pipelines are available depending on your setup.
 
 ---
 
-## Architecture
+## How It Works
 
 ### Pipeline A — LangGraph + Claude (primary)
 
-The main pipeline uses LangGraph for orchestration and Claude (via the Anthropic API) for all agent logic.
+```
+Abstract Input
+    ↓
+[Agent 1 — Literature Review]
+  Sub-Agent 1A: Paper discovery (5–10 papers via web search)
+  Sub-Agent 1B: Analysis & synthesis
+    ↓
+[Agent 2 — Hypothesis Design]
+  Generates a testable hypothesis with an internal self-review loop
+    ↓
+[Agent 3 — Procedure Design]
+  Designs population, methods, statistics, and timeline
+    ↓
+[Orchestrator / Critic]
+  Reviews each agent — up to 2 revision cycles per agent
+    ↓
+[Final Synthesis]
+  Confidence level (High / Moderate / Low) + action items + caveats
+    ↓
+[Peer Review]
+  Reproducibility score, strengths, issues, replication checklist
+```
+
+### Pipeline B — PubMed + Ragie RAG (alternative)
+
+An alternative pipeline that uses PubMed (via Biopython/Entrez) for literature search and Ragie.ai for RAG indexing. Uses Gemini for extraction.
 
 ```
 Abstract Input
     ↓
-[Agent 1: Literature Finder]   — Claude + web_search → 5–10 papers
+[Agent 1: PubMed Finder]       — Gemini term extraction + Entrez API → papers + PMIDs
     ↓
-[Agent 2: Results Extractor]   — Claude + web_fetch → key findings per paper
-    ↓
-[Agent 3: Initial Analysis]    — Claude → synthesis + identified gaps
-    ↓
-[Multi-Agent Debate Loop × 3]
-    Critic Agent ↔ Results Re-evaluator ↔ Analysis Refiner
-    ↓
-[Final Recommendation]         — confidence level + action items + caveats
+[Agent 2: Ragie RAG Builder]   — PMC full-text fetch + Ragie.ai upload (threaded, 3 workers)
+    + Results Extractor        — Gemini parallel extraction → structured findings (2 workers)
 ```
-
-Entry points:
-- `research_lab/app.py` — Streamlit dashboard (live streaming UI)
-- `research_lab/graph.py` — programmatic entry (`run_research`, `stream_research`)
-
-### Pipeline B — PubMed + Ragie RAG (Groq-Powered)
-
-An alternative Phase 1 pipeline that uses PubMed (via Biopython/Entrez) for literature search and Ragie.ai for RAG indexing. Uses Groq (`llama-3.3-70b-versatile`) for term extraction and result extraction — 14,400 free requests/day with no quota issues.
-
-```
-Abstract Input
-    ↓
-[Agent 1: PubMed Finder]       — Groq term extraction + Entrez API → papers + PMIDs
-    ↓
-[Agent 2: Ragie RAG Builder]   — PMC full-text fetch (1 worker) + Ragie.ai upload (2 workers, threaded)
-    + Results Extractor        — Groq parallel extraction → structured findings (2 workers, threaded)
-```
-
-Agent 2 runs two stages concurrently:
-- **RAG build**: fetches PMC full-text where available (1 parallel worker, NCBI rate limit), falls back to abstract, then uploads all documents to Ragie.ai in parallel (2 workers). Documents are uploaded with string-coerced metadata and a `"data"` payload field; a 415 fallback automatically retries with `"content"` for older Ragie API versions.
-- **Extraction**: calls Groq in parallel (2 workers) to produce structured `key_findings`, `methods`, `sample_size`, `limitations`, and `relevance` fields.
 
 Entry point: `run_pipeline.py`
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| AI | Anthropic Claude (`claude-sonnet-4-20250514`) |
+| Orchestration | LangGraph `StateGraph` (synchronous) |
+| Frontend (production) | Streamlit |
+| Frontend (mockup) | React 19 + Vite + React Router DOM v7 |
+| Persistence | Supabase (Postgres + Auth + RLS) |
+| Language | Python 3.11+ |
 
 ---
 
 ## Project Structure
 
 ```
-.
+/
+├── research_lab/              # Production Python backend
+│   ├── app.py                 # Streamlit dashboard (UI only)
+│   ├── server.py              # FastAPI HTTP server — POST /api/analyze
+│   ├── graph.py               # LangGraph wiring — nodes, edges, run_research()
+│   ├── state.py               # Shared TypedDict schema (ResearchState)
+│   ├── supabase_client.py     # Supabase write integration (service role key)
+│   ├── literature.py          # PubMed literature finder (Pipeline B, Agent 1)
+│   ├── rag.py                 # Ragie RAG builder + results extractor (Pipeline B, Agent 2)
+│   ├── requirements.txt       # Pinned Python dependencies
+│   └── agents/
+│       ├── literature.py      # Agent 1 — paper discovery + synthesis
+│       ├── hypothesis.py      # Agent 2 — hypothesis design
+│       ├── procedure.py       # Agent 3 — study procedure design
+│       ├── orchestrator.py    # Critic review + final synthesis
+│       └── peer_reviewer.py   # Agent 4 — independent reproducibility review
+│
+├── labos-mockup/              # React/Vite UI prototype
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── lib/
+│   │   │   ├── supabase.js    # Supabase client (anon key)
+│   │   │   └── api.js         # All Supabase data-fetching functions
+│   │   ├── context/
+│   │   │   └── SupabaseContext.jsx  # Auth session provider
+│   │   ├── components/
+│   │   │   └── Auth/
+│   │   │       └── ProtectedRoute.jsx
+│   │   └── pages/
+│   │       ├── SignIn.jsx
+│   │       ├── ProjectList.jsx
+│   │       ├── ProjectDashboard.jsx
+│   │       ├── NewProject.jsx
+│   │       └── AnalysisView.jsx
+│   └── package.json
+│
 ├── main.py                    # Standalone LangGraph prototype (Tavily search)
 ├── run_pipeline.py            # Pipeline B runner (PubMed → Ragie)
-├── requirements.txt           # Dependencies for Pipeline A
 ├── requirements_ragie.txt     # Dependencies for Pipeline B
-└── research_lab/
-    ├── agents.py              # All Claude agent functions (Pipeline A)
-    ├── graph.py               # LangGraph graph definition + stream_research
-    ├── app.py                 # Streamlit dashboard
-    ├── state.py               # Shared TypedDicts (ResearchState, Paper, etc.)
-    ├── literature.py          # PubMed literature finder (Pipeline B, Agent 1)
-    ├── rag.py                 # Ragie RAG builder + results extractor (Pipeline B, Agent 2)
-    └── .env                   # API keys (gitignored)
+├── .env.example               # Environment variable template (root)
+└── .kiro/specs/               # Feature specs (requirements, design, tasks)
 ```
 
 ---
 
-## Setup
+## Getting Started
 
-### Pipeline A (LangGraph + Claude)
+### Prerequisites
+
+- Python 3.11+
+- Node.js 18+
+- An [Anthropic API key](https://console.anthropic.com/settings/keys)
+- A [Supabase project](https://supabase.com) (for persistence and auth)
+
+### 1. Clone and configure environment
 
 ```bash
-pip install -r requirements.txt
+cp .env.example .env
+# Fill in ANTHROPIC_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 ```
 
-Required keys in `research_lab/.env`:
-```
-ANTHROPIC_API_KEY=...
-```
+### 2. Run the Streamlit dashboard (Pipeline A)
 
-Run the Streamlit dashboard:
 ```bash
+pip install -r research_lab/requirements.txt
 streamlit run research_lab/app.py
 ```
 
-Run headless:
-```python
-from research_lab.graph import run_research
-result = run_research("Your research abstract here")
-```
-
-### Pipeline B (PubMed + Ragie)
+### 3. Run Pipeline B (PubMed + Ragie)
 
 ```bash
 pip install -r requirements_ragie.txt
-```
-
-Required keys in `research_lab/.env`:
-```
-GROQ_API_KEY=...
-RAGIE_API_KEY=...
-ENTREZ_EMAIL=your.email@example.com
-```
-
-Run the pipeline:
-```bash
+# Fill in GOOGLE_API_KEY, RAGIE_API_KEY, ENTREZ_EMAIL in .env
 python run_pipeline.py
 ```
 
-The default demo abstract in `run_pipeline.py` is:
-> "I am researching how NPM1 mutations in Acute Myeloid Leukemia (AML) respond to menin inhibitors. I specifically want to know if high expression of the HOXA9 and MEIS1 genes can predict if a patient will have a good treatment response. Additionally, I am looking for data on combining menin inhibitors with CAR-T cell therapy."
+### 4. Run the React mockup
 
-`run_pipeline.py` loads environment variables from `research_lab/.env` at startup and exits with a clear error message if the file is missing, if required packages (`groq`, `biopython`, `requests`) are not installed, or if any API keys are absent.
-
-Outputs are saved to:
-- `agent1_output.json` — papers found by PubMed search
-- `agent2_output.json` — extracted results and stats
-
-After the pipeline completes, the returned `ragie_client` object can be used to query the indexed documents:
-
-```python
-from research_lab.rag import extract_and_build_rag
-
-result = extract_and_build_rag(papers)
-ragie_client = result["ragie_client"]
-
-hits = ragie_client.query("HOXA9 expression and treatment response", top_k=3)
-for hit in hits:
-    print(hit["score"], hit["metadata"]["title"])
-    print(hit["text"][:200])
+```bash
+cd labos-mockup
+cp .env.example .env.local
+# Fill in VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
+npm install
+npm run dev
 ```
-
-`query()` returns a list of scored chunks from Ragie.ai, each with `score`, `text`, and `metadata` (pmid, title, authors, journal, year, has_fulltext).
 
 ---
 
-## Agents (Pipeline A)
+## Streamlit Dashboard
 
-| Agent | File | Description |
+The production UI (`research_lab/app.py`) provides:
+
+- **Abstract input** with character validation (20–4,000 chars)
+- **6-stage pipeline status bar** — Literature Review → Hypothesis Design → Procedure Design → Synthesis → Peer Review → Complete
+- **Tabbed results view** — Literature, Hypothesis, Procedure, Peer Review, Log
+- **Confidence badge** — High / Moderate / Low with colour coding
+- **Critic review history** — pass/fail per revision with expandable feedback
+- **Dark theme** — IBM Plex fonts, `#0a0e1a` background
+
+### Demo Abstract
+
+```
+We're investigating menin inhibitors for NPM1-mutant AML.
+Key question: Does HOX gene expression predict treatment response to
+menin inhibitors in NPM1-mutant acute myeloid leukemia patients?
+```
+
+---
+
+## Environment Variables
+
+| Variable | Used by | Description |
 |---|---|---|
-| Literature Finder | `agents.py` | Finds 5–10 relevant papers via Claude web_search |
-| Results Extractor | `agents.py` | Extracts findings, methods, sample sizes from each paper |
-| Initial Analysis | `agents.py` | Synthesizes findings; identifies gaps and contradictions |
-| Critic | `agents.py` | Challenges the analysis (sample sizes, confounders, stats) |
-| Results Re-evaluator | `agents.py` | Responds to critic with CONFIRMED / REFUTED / PARTIALLY VALIDATED |
-| Analysis Refiner | `agents.py` | Updates synthesis based on debate; states what changed and why |
-| Final Recommendation | `agents.py` | Produces structured recommendation with confidence level |
-
-Confidence levels: `High` (≥3 consistent papers), `Moderate` (consistent but limited), `Low` (contradictory or weak evidence).
+| `ANTHROPIC_API_KEY` | All agents (Pipeline A) | Claude API access |
+| `GOOGLE_API_KEY` | Pipeline B | Gemini API access |
+| `RAGIE_API_KEY` | Pipeline B (`rag.py`) | Ragie.ai RAG indexing |
+| `ENTREZ_EMAIL` | Pipeline B (`literature.py`) | PubMed/Entrez identification |
+| `SUPABASE_URL` | `supabase_client.py` | Supabase project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | `supabase_client.py` | Bypasses RLS — backend only, never expose in frontend |
+| `VITE_SUPABASE_URL` | `labos-mockup/` | Supabase project URL (Vite env) |
+| `VITE_SUPABASE_ANON_KEY` | `labos-mockup/` | Public anon key — safe for browser, RLS enforced |
 
 ---
 
-## State Schema
+## Running the Pipeline (CLI)
 
-Defined in `research_lab/state.py`. Key fields:
+`graph.py` doubles as a CLI entry point:
 
-```python
-class ResearchState(TypedDict):
-    abstract: str
-    papers: List[Paper]                  # title, url, abstract, relevance_score
-    extracted_results: List[ExtractedResult]  # findings, methods, sample_size
-    initial_synthesis: str
-    identified_gaps: List[str]
-    debate_rounds: List[DebateRound]     # critic / re-evaluator / refiner per round
-    current_round: int
-    final_recommendation: str
-    confidence_level: str                # "High" | "Moderate" | "Low"
-    action_items: List[str]
-    caveats: List[str]
-    current_stage: str                   # used by Streamlit status bar
-    error: Optional[str]
+```bash
+# Run with the built-in demo abstract
+python research_lab/graph.py
+
+# Run with a custom abstract
+python research_lab/graph.py "Your research abstract text here"
 ```
 
 ---
 
-## Example
+## HTTP API Server
 
-```python
-from research_lab.graph import run_research
+`research_lab/server.py` exposes the pipeline as a FastAPI HTTP server:
 
-abstract = """
-Does HOX gene expression predict treatment response to menin inhibitors
-in NPM1-mutant acute myeloid leukemia patients?
-"""
-
-result = run_research(abstract)
-print(result["confidence_level"])       # "High" | "Moderate" | "Low"
-print(result["final_recommendation"])
-for item in result["action_items"]:
-    print("-", item)
+```bash
+pip install fastapi uvicorn
+python3 research_lab/server.py
+# Server starts on http://localhost:8000 by default
+# Set PORT env var to override: PORT=9000 python3 research_lab/server.py
 ```
+
+### Endpoints
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/health` | Returns `{"status": "ok"}` — liveness check |
+| `POST` | `/api/analyze` | Runs the full pipeline; returns `ResearchState` as JSON |
+
+**Request body:**
+```json
+{ "abstract": "Your research abstract (20–4000 characters)" }
+```
+
+CORS is configured for `localhost:5173`, `localhost:5174`, and `localhost:3000`.
+
+---
+
+## Running Tests
+
+```bash
+# Python unit tests
+python -m pytest research_lab/tests/
+
+# React build check
+cd labos-mockup && npm run build
+
+# ESLint
+cd labos-mockup && npm run lint
+```
+
+---
+
+## Key Constants
+
+| Constant | Value | File |
+|---|---|---|
+| `MODEL` | `claude-sonnet-4-20250514` | each agent file |
+| `MAX_REVISIONS` | `2` | `graph.py` |
+| `MAX_ABSTRACT_LENGTH` | `4,000` | `app.py` |
+| `MIN_ABSTRACT_LENGTH` | `20` | `app.py` |
+| `MAX_PAPERS` | `10` | `agents/literature.py` |
+| `MIN_PAPERS` | `5` | `agents/literature.py` |
+
+---
+
+## Architecture Notes
+
+- **All Python code is synchronous** — no `async/await`, no event loops
+- **`supabase_client.py` is the only file** that imports `supabase` in the Python codebase
+- **Service role key stays in the backend** — never referenced in any frontend file
+- **Supabase write failures do not abort the pipeline** — errors are logged and execution continues
+- **All frontend Supabase queries go through `api.js`** — no raw `supabase.from()` calls in component files
+- **RLS enforces user isolation** — users can only read and write their own research sessions

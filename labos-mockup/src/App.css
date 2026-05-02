@@ -354,11 +354,17 @@
 }
 
 .badge {
-  padding: 0.15rem 0.5rem;
-  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
   font-size: 0.75rem;
   font-family: var(--font-mono);
-  font-weight: 500;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
 .badge-success { background-color: rgba(5, 150, 105, 0.1); color: var(--success); }
