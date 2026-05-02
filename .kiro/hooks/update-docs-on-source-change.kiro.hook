@@ -1,0 +1,39 @@
+{
+  "enabled": true,
+  "name": "Update README Documentation",
+  "description": "Watches source files across common languages and project configs. When any of them change, asks the agent to update the README or /docs folder to reflect the latest changes.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.py",
+      "**/*.java",
+      "**/*.go",
+      "**/*.rs",
+      "**/*.rb",
+      "**/*.cs",
+      "**/*.cpp",
+      "**/*.c",
+      "**/*.h",
+      "**/*.swift",
+      "**/*.kt",
+      "**/*.php",
+      "package.json",
+      "pyproject.toml",
+      "Cargo.toml",
+      "go.mod",
+      "pom.xml",
+      "*.gradle"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A source file was just edited. Review the change and update the README.md at the root. Keep the docs accurate and in sync with the current state of the code. Only update sections that are affected by the change."
+  },
+  "workspaceFolderName": "ATSS",
+  "shortName": "update-docs-on-source-change"
+}

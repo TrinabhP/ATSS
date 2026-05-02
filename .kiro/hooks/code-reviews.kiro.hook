@@ -1,0 +1,13 @@
+{
+  "version": "1.0.0",
+  "enabled": true,
+  "name": "Code Reviews",
+  "description": "Automatically does code reviews anytime a pull request is asked to be created.",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Review this PR. First, infer the intent from the diff and PR description, then assess whether the implementation fully and correctly achieves it. Flag any regressions, broken dependencies, unhandled edge cases, error handling gaps, or logical errors. Pay attention to boundary conditions, null states, and any assumptions that could fail silently. Then evaluate test coverage: identify any new code paths, branches, or failure modes that lack tests — not just missing unit tests but missing edge case and integration coverage. Finally, flag any deviations from existing codebase conventions."
+  }
+}
