@@ -9,7 +9,7 @@ export default function SignIn() {
   
   const handleSignIn = (e) => {
     e.preventDefault();
-    if(email) navigate('/dashboard');
+    if(email) navigate('/projects');
   };
 
   return (

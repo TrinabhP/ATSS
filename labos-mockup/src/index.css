@@ -89,11 +89,26 @@ button {
 
 .text-sm { font-size: 0.875rem; }
 .text-muted { color: var(--text-secondary); }
+.uppercase { text-transform: uppercase; }
+.font-semibold { font-weight: 600; }
+
 .flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-wrap { flex-wrap: wrap; }
 .items-center { align-items: center; }
 .justify-between { justify-content: space-between; }
+
 .gap-2 { gap: 0.5rem; }
 .gap-4 { gap: 1rem; }
+
 .p-4 { padding: 1rem; }
 .p-6 { padding: 1.5rem; }
+
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-4 { margin-top: 1rem; }
+
 .w-full { width: 100%; }
+

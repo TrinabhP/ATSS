@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Plus, History, Sun, Moon, LogOut } from 'lucide-react';
+import { Plus, FolderKanban, Sun, Moon, LogOut } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 
 export default function Sidebar() {
@@ -15,25 +15,33 @@ export default function Sidebar() {
 
   return (
     <div className="sidebar">
-      <div className="sidebar-header">
+      <div className="sidebar-header" style={{ cursor: 'pointer' }} onClick={() => navigate('/projects')}>
         <div style={{ color: 'var(--accent-primary)', fontSize: '1.5rem' }}>⬡</div>
         <span>LabOS</span>
       </div>
 
-      <button className="new-analysis-btn" onClick={() => navigate('/dashboard')}>
+      <button className="new-analysis-btn" onClick={() => navigate('/projects/new')}>
         <Plus size={18} />
-        New Analysis
+        New Project
       </button>
 
       <div className="sidebar-section">
-        <div className="sidebar-label">Recent Projects</div>
+        <div className="sidebar-label">Your Projects</div>
         <ul className="history-list">
+          <li 
+            className={`history-item ${location.pathname === '/projects' ? 'active' : ''}`}
+            onClick={() => navigate('/projects')}
+          >
+            <FolderKanban size={14} />
+            <span>All Projects</span>
+          </li>
           {recentProjects.map(proj => (
             <li 
               key={proj.id} 
-              className={`history-item ${location.pathname.includes('/analysis') ? '' : ''}`}
+              className={`history-item ${location.pathname === `/projects/${proj.id}` ? 'active' : ''}`}
+              onClick={() => navigate(`/projects/${proj.id}`)}
             >
-              <History size={14} />
+              <span className="text-muted" style={{ fontSize: '10px' }}>•</span>
               <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{proj.title}</span>
             </li>
           ))}

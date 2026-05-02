@@ -102,7 +102,7 @@ export default function AnalysisView() {
 
           <div className="card p-6">
             <h3 className="font-mono mb-4 text-sm text-muted uppercase">Pipeline Status</h3>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-wrap gap-4">
               {STAGES.map((stage, idx) => {
                 const isActive = idx === currentStageIndex && !isFinished;
                 const isCompleted = idx < currentStageIndex || isFinished;

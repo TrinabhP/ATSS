@@ -1,20 +1,27 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import SignIn from './pages/SignIn';
-import Dashboard from './pages/Dashboard';
-import AnalysisView from './pages/AnalysisView';
 import Layout from './components/Layout/Layout';
+import ProjectList from './pages/ProjectList';
+import NewProject from './pages/NewProject';
+import ProjectDashboard from './pages/ProjectDashboard';
+import './App.css';
 
-export default function App() {
+function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
         <Route path="/" element={<SignIn />} />
+        
         <Route element={<Layout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/analysis/new" element={<AnalysisView />} />
+          <Route path="/projects" element={<ProjectList />} />
+          <Route path="/projects/new" element={<NewProject />} />
+          <Route path="/projects/:id" element={<ProjectDashboard />} />
         </Route>
+        
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
+
+export default App;
