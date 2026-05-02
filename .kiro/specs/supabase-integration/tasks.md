@@ -42,7 +42,7 @@ Integrate Supabase as the persistent data layer and authentication provider for 
     - `test_log_output_excludes_key` — verify key value not in any log record
     - _Requirements: 2.7, 2.8, 2.9_
 
-  - [~] 2.4 Write property test: agent output round-trip (Property 3)
+  - [ ] 2.4 Write property test: agent output round-trip (Property 3)
     - **Property 3: Agent output write round-trip**
     - **Validates: Requirements 2.3**
     - Create `research_lab/tests/test_supabase_properties.py` using Hypothesis
@@ -50,7 +50,7 @@ Integrate Supabase as the persistent data layer and authentication provider for 
     - Mock the supabase client; call `upsert_agent_output`; verify the data passed to the mock matches the input
     - Tag: `# Feature: supabase-integration, Property 3: agent output round-trip`
 
-  - [~] 2.5 Write property test: critic review round-trip (Property 4)
+  - [ ] 2.5 Write property test: critic review round-trip (Property 4)
     - **Property 4: Critic review write round-trip**
     - **Validates: Requirements 2.4**
     - Add to `research_lab/tests/test_supabase_properties.py`
@@ -58,7 +58,7 @@ Integrate Supabase as the persistent data layer and authentication provider for 
     - Mock the supabase client; call `insert_critic_review`; verify fields passed to mock match input
     - Tag: `# Feature: supabase-integration, Property 4: critic review round-trip`
 
-  - [~] 2.6 Write property test: write failure does not abort pipeline (Property 5)
+  - [ ] 2.6 Write property test: write failure does not abort pipeline (Property 5)
     - **Property 5: Supabase write failure does not abort pipeline**
     - **Validates: Requirements 2.8**
     - Add to `research_lab/tests/test_supabase_properties.py`
@@ -66,7 +66,7 @@ Integrate Supabase as the persistent data layer and authentication provider for 
     - Verify `run_research()` returns a `ResearchState` dict and does not raise
     - Tag: `# Feature: supabase-integration, Property 5: write failure does not abort pipeline`
 
-  - [~] 2.7 Write property test: service role key never in logs (Property 6)
+  - [ ] 2.7 Write property test: service role key never in logs (Property 6)
     - **Property 6: Service role key never appears in log output**
     - **Validates: Requirements 2.7, 5.4**
     - Add to `research_lab/tests/test_supabase_properties.py`
@@ -75,12 +75,12 @@ Integrate Supabase as the persistent data layer and authentication provider for 
     - Tag: `# Feature: supabase-integration, Property 6: key never in logs`
 
 - [ ] 3. Python backend — wire `supabase_client` into `graph.py` and `state.py`
-  - [~] 3.1 Add `session_id` field to `ResearchState` in `state.py`
+  - [ ] 3.1 Add `session_id` field to `ResearchState` in `state.py`
     - Add `session_id: Optional[str]` to the `ResearchState` TypedDict (import `Optional` from `typing` if not already present)
     - Update the `if __name__ == "__main__":` block to include `"session_id": None` in the test state dict
     - _Requirements: 2.2_
 
-  - [~] 3.2 Integrate `supabase_client` calls into `graph.py`
+  - [ ] 3.2 Integrate `supabase_client` calls into `graph.py`
     - Import `supabase_client` at the top of `graph.py` (the only import of supabase in the Python codebase)
     - In `run_research()`: call `supabase_client.create_session(abstract)` before `compiled.invoke(initial)`; store the returned UUID in `initial["session_id"]`; wrap in `try/except` so a failure sets `session_id = None` and logs but does not abort
     - In `dispatch_literature`, `dispatch_hypothesis`, `dispatch_procedure`: after a successful agent result, call `supabase_client.upsert_agent_output(state["session_id"], agent_name, new_count, result)` — guard with `if state.get("session_id")`
@@ -89,22 +89,22 @@ Integrate Supabase as the persistent data layer and authentication provider for 
     - In each node's `except` block: call `supabase_client.mark_session_error(state.get("session_id"), str(e))` — guard with `if state.get("session_id")`
     - _Requirements: 2.2, 2.3, 2.4, 2.5, 2.6_
 
-- [~] 4. Checkpoint — verify Python integration
+- [ ] 4. Checkpoint — verify Python integration
   - Ensure all Python unit tests pass, ask the user if questions arise.
 
 - [ ] 5. Frontend — library setup and environment
-  - [~] 5.1 Install `@supabase/supabase-js@2.49.4` in `labos-mockup/`
+  - [ ] 5.1 Install `@supabase/supabase-js@2.49.4` in `labos-mockup/`
     - Add `"@supabase/supabase-js": "2.49.4"` to the `dependencies` section of `labos-mockup/package.json`
     - _Requirements: 3.1_
 
-  - [~] 5.2 Create `labos-mockup/src/lib/supabase.js`
+  - [ ] 5.2 Create `labos-mockup/src/lib/supabase.js`
     - Import `createClient` from `@supabase/supabase-js`
     - Read `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` from `import.meta.env`
     - Export a single named constant `supabase = createClient(supabaseUrl, supabaseAnonKey)`
     - No other logic; no reference to `SERVICE_ROLE_KEY`
     - _Requirements: 3.1, 5.2_
 
-  - [~] 5.3 Create `labos-mockup/src/lib/api.js`
+  - [ ] 5.3 Create `labos-mockup/src/lib/api.js`
     - Import `supabase` from `./supabase`
     - Implement `fetchSessions()` — SELECT all `research_sessions` ordered by `created_at` descending; return `{ data, error }`
     - Implement `fetchRecentSessions(n)` — SELECT top `n` `research_sessions` ordered by `created_at` descending; return `{ data, error }`
@@ -116,42 +116,42 @@ Integrate Supabase as the persistent data layer and authentication provider for 
     - All functions are `async`; no raw `supabase.from(...)` calls may appear in any component file
     - _Requirements: 4.1, 4.4, 4.7, 4.8, 4.9, 4.10_
 
-  - [~] 5.4 Update `.env.example` files
+  - [ ] 5.4 Update `.env.example` files
     - Update root `.env.example`: add `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` with placeholder values and comments explaining their purpose and where to obtain them
     - Create `labos-mockup/.env.example`: add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` with placeholder values and comments
     - Verify `labos-mockup/.env` and `labos-mockup/.env.local` are listed in `labos-mockup/.gitignore`
     - _Requirements: 5.1, 5.2, 5.3, 5.8_
 
 - [ ] 6. Frontend — Supabase auth context and protected route
-  - [~] 6.1 Create `labos-mockup/src/context/SupabaseContext.jsx`
+  - [ ] 6.1 Create `labos-mockup/src/context/SupabaseContext.jsx`
     - Create `SupabaseContext` with `createContext(null)`
     - Implement `SupabaseProvider` component: on mount call `supabase.auth.getSession()` to set initial `session`, `user`, and `loading=false`; subscribe to `supabase.auth.onAuthStateChange` and handle `SIGNED_IN`/`TOKEN_REFRESHED` (update session + user, call `startAutoRefresh()`) and `SIGNED_OUT` (clear session + user, call `stopAutoRefresh()`); unsubscribe in `useEffect` cleanup
     - Export `useSupabase()` hook that reads from context and throws if used outside the provider
     - Context value shape: `{ session, user, loading }`
     - _Requirements: 3.2, 3.3, 6.1, 6.2, 6.3, 6.4_
 
-  - [~] 6.2 Create `labos-mockup/src/components/Auth/ProtectedRoute.jsx`
+  - [ ] 6.2 Create `labos-mockup/src/components/Auth/ProtectedRoute.jsx`
     - Import `useSupabase` from `SupabaseContext`
     - If `loading` is true, render a loading spinner
     - If `session` is null and `loading` is false, render `<Navigate to="/" replace />`
     - Otherwise render `children`
     - _Requirements: 3.8, 3.9_
 
-  - [~] 6.3 Write property test: ProtectedRoute redirects unauthenticated requests (Property 7)
+  - [ ] 6.3 Write property test: ProtectedRoute redirects unauthenticated requests (Property 7)
     - **Property 7: ProtectedRoute redirects all unauthenticated requests**
     - **Validates: Requirements 3.8**
     - Create `labos-mockup/src/tests/properties/protectedRoute.property.test.jsx` using fast-check
     - Generate random route path strings; render `ProtectedRoute` with `session=null` and `loading=false`; verify the rendered output is a redirect to `'/'` for all generated paths
     - Tag: `# Feature: supabase-integration, Property 7: ProtectedRoute redirects unauthenticated`
 
-  - [~] 6.4 Update `App.jsx` to add `SupabaseProvider` and `ProtectedRoute`
+  - [ ] 6.4 Update `App.jsx` to add `SupabaseProvider` and `ProtectedRoute`
     - Import `SupabaseProvider` from `./context/SupabaseContext`
     - Import `ProtectedRoute` from `./components/Auth/ProtectedRoute`
     - Wrap the entire `<Router>` tree in `<SupabaseProvider>`
     - Wrap the `<Layout />` route element in `<ProtectedRoute>` so all child routes (`/projects`, `/projects/new`, `/projects/:id`) require authentication
     - _Requirements: 3.10_
 
-- [~] 7. Frontend — update SignIn page
+- [ ] 7. Frontend — update SignIn page
   - Modify `labos-mockup/src/pages/SignIn.jsx`
   - Add a `password` state variable and a password `<input type="password">` field below the email field
   - Replace the `handleSignIn` function body: call `supabase.auth.signInWithPassword({ email, password })`; on success navigate to `/projects`; on error call `setError(error.message)` and display the message inline below the form
@@ -159,7 +159,7 @@ Integrate Supabase as the persistent data layer and authentication provider for 
   - Import `supabase` from `../lib/supabase` (not from api.js — auth calls go directly to the supabase client)
   - _Requirements: 3.4, 3.5, 3.6, 3.7_
 
-- [~] 8. Frontend — update Sidebar
+- [ ] 8. Frontend — update Sidebar
   - Modify `labos-mockup/src/components/Layout/Sidebar.jsx`
   - Import `useSupabase` from `../../context/SupabaseContext`
   - Import `fetchRecentSessions` from `../../lib/api`
@@ -167,7 +167,7 @@ Integrate Supabase as the persistent data layer and authentication provider for 
   - Wire the `<LogOut>` button's `onClick` to call `supabase.auth.signOut()` then `navigate('/')`
   - _Requirements: 3.11, 4.7_
 
-- [~] 8.1 Write unit tests for `SupabaseContext` and `ProtectedRoute`
+- [ ] 8.1 Write unit tests for `SupabaseContext` and `ProtectedRoute`
   - Create `labos-mockup/src/tests/SupabaseContext.test.jsx`
   - Verify `getSession()` is called on mount
   - Verify `SIGNED_OUT` event clears `session` and `user`
@@ -179,7 +179,7 @@ Integrate Supabase as the persistent data layer and authentication provider for 
   - Render with `loading=true` — verify loading indicator is shown, not a redirect
   - _Requirements: 3.2, 3.3, 3.8, 3.9_
 
-- [~] 9. Frontend — update ProjectList page
+- [ ] 9. Frontend — update ProjectList page
   - Modify `labos-mockup/src/pages/ProjectList.jsx`
   - Replace the hardcoded `projects` array with `useState(null)` for data, `useState(false)` for loading, and `useState(null)` for error
   - Add a `useEffect` that calls `api.fetchSessions()` on mount; set loading true before the call, false after; on error set the error state
@@ -189,14 +189,14 @@ Integrate Supabase as the persistent data layer and authentication provider for 
   - Map over the fetched `research_sessions` rows to render project cards (use `session.id`, `session.abstract` truncated as title, `session.status`, `session.created_at`)
   - _Requirements: 4.1, 4.2, 4.3, 5.6_
 
-- [~] 10. Frontend — update NewProject page
+- [ ] 10. Frontend — update NewProject page
   - Modify `labos-mockup/src/pages/NewProject.jsx`
   - Replace the `setTimeout` + random ID logic in `handleSubmit` with a call to `api.createSession(abstract)`
   - On success, navigate to `/projects/${data[0].id}` using the UUID returned from Supabase
   - On error, set an error state and display the message inline; do not navigate
   - _Requirements: 4.8_
 
-- [~] 11. Frontend — update ProjectDashboard page
+- [ ] 11. Frontend — update ProjectDashboard page
   - Modify `labos-mockup/src/pages/ProjectDashboard.jsx`
   - Remove all mock data arrays (`mockLitDocs`, `mockHypotheses`) and the `useEffect` timer simulation
   - Add state variables: `session`, `agentOutputs`, `criticReviews`, `finalSynthesis`, `loading`, `error`
@@ -208,21 +208,21 @@ Integrate Supabase as the persistent data layer and authentication provider for 
   - If any fetch returns a 401 or 403 error, call `supabase.auth.signOut()` and navigate to `/`
   - _Requirements: 4.4, 4.5, 4.6, 5.6_
 
-  - [~] 11.1 Write property test: polling does not sign out during running session (Property 9)
+  - [ ] 11.1 Write property test: polling does not sign out during running session (Property 9)
     - **Property 9: Polling continues while session is running**
     - **Validates: Requirements 4.6, 6.5**
     - Create `labos-mockup/src/tests/properties/polling.property.test.jsx` using fast-check
     - Generate random numbers of polling cycles (1–20); mock `fetchSessionById` to always return `status='running'`; verify `supabase.auth.signOut()` is never called regardless of cycle count
     - Tag: `# Feature: supabase-integration, Property 9: polling does not sign out`
 
-  - [~] 11.2 Write property test: 401/403 responses trigger sign-out (Property 8)
+  - [ ] 11.2 Write property test: 401/403 responses trigger sign-out (Property 8)
     - **Property 8: 401/403 responses trigger sign-out**
     - **Validates: Requirements 5.6**
     - Create `labos-mockup/src/tests/properties/api.property.test.js` using fast-check
     - Generate random API function names from the `api.js` exports; mock Supabase to return a 401 or 403 error; verify `supabase.auth.signOut()` is called for all functions
     - Tag: `# Feature: supabase-integration, Property 8: 401/403 triggers sign-out`
 
-- [~] 12. Final checkpoint — ensure all tests pass
+- [ ] 12. Final checkpoint — ensure all tests pass
   - Ensure all Python unit and property tests pass (`python -m pytest research_lab/tests/`)
   - Ensure the React app builds without errors (`npm run build` in `labos-mockup/`)
   - Ensure ESLint passes (`npm run lint` in `labos-mockup/`)
