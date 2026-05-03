@@ -42,6 +42,7 @@ import json
 import asyncio
 
 from graph import run_research, run_research_streaming
+from chat import chat_router
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -63,6 +64,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ── Mount PDF Research Chat router ─────────────────────────────────────────────
+app.include_router(chat_router)
 
 # ── Request / Response models ──────────────────────────────────────────────────
 

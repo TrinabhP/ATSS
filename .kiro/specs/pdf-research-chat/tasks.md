@@ -6,11 +6,11 @@ Build a self-contained `research_lab/chat/` subpackage that adds PDF-grounded co
 
 ## Tasks
 
-- [ ] 1. Set up the chat subpackage structure and data models
-  - [ ] 1.1 Create `research_lab/chat/` directory with `__init__.py`, exporting `chat_router` (placeholder import initially)
+- [x] 1. Set up the chat subpackage structure and data models
+  - [x] 1.1 Create `research_lab/chat/` directory with `__init__.py`, exporting `chat_router` (placeholder import initially)
     - Create `research_lab/chat/__init__.py`
     - _Requirements: 5.1, 4.6_
-  - [ ] 1.2 Create `research_lab/chat/models.py` with all Pydantic request/response models and internal dataclasses
+  - [x] 1.2 Create `research_lab/chat/models.py` with all Pydantic request/response models and internal dataclasses
     - Define `ChatMessageRequest` with `message` field validator (1–4,000 chars after strip)
     - Define `UploadResponse`, `ChatMessageResponse`, `SessionInfo`, `SessionListResponse`, `ConversationMessage`, `HistoryResponse`, `DeleteResponse`, `ErrorResponse`
     - Define `ChatSession` dataclass (session_id, pdf_text, page_count, char_count, truncated, created_at, conversation_history)
@@ -23,8 +23,8 @@ Build a self-contained `research_lab/chat/` subpackage that adds PDF-grounded co
     - Test file: `research_lab/tests/test_chat/test_models.py`
     - **Validates: Requirements 6.5**
 
-- [ ] 2. Implement PDF text extraction
-  - [ ] 2.1 Create `research_lab/chat/pdf_extractor.py`
+- [x] 2. Implement PDF text extraction
+  - [x] 2.1 Create `research_lab/chat/pdf_extractor.py`
     - Define `ExtractedPDF` dataclass with `text`, `page_count`, `char_count`, `truncated` fields
     - Define `MAX_TEXT_LENGTH = 60_000` constant
     - Implement `extract_text(file_bytes: bytes) -> ExtractedPDF`
@@ -53,11 +53,11 @@ Build a self-contained `research_lab/chat/` subpackage that adds PDF-grounded co
     - Test file: `research_lab/tests/test_chat/test_pdf_extractor.py`
     - **Validates: Requirements 1.5**
 
-- [ ] 3. Checkpoint — Verify models and PDF extraction
+- [x] 3. Checkpoint — Verify models and PDF extraction
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 4. Implement the Groq LLM client
-  - [ ] 4.1 Create `research_lab/chat/llm_client.py`
+- [x] 4. Implement the Groq LLM client
+  - [x] 4.1 Create `research_lab/chat/llm_client.py`
     - Define `MODEL = "openai/gpt-oss-20b"` and `TIMEOUT = 60` constants
     - Implement lazy singleton Groq client pattern (matching `orchestrator.py` style)
     - Implement `_strip_think_blocks(text: str) -> str` using `re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL)`
@@ -74,8 +74,8 @@ Build a self-contained `research_lab/chat/` subpackage that adds PDF-grounded co
     - Test file: `research_lab/tests/test_chat/test_llm_client.py`
     - **Validates: Requirements 3.4**
 
-- [ ] 5. Implement chat session management service
-  - [ ] 5.1 Create `research_lab/chat/chat_service.py`
+- [x] 5. Implement chat session management service
+  - [x] 5.1 Create `research_lab/chat/chat_service.py`
     - Implement in-memory `_sessions: Dict[str, ChatSession]` store
     - Implement `create_session(text, page_count, char_count, truncated) -> ChatSession` — generates UUID4, stores session
     - Implement `get_session(session_id) -> Optional[ChatSession]`
@@ -108,11 +108,11 @@ Build a self-contained `research_lab/chat/` subpackage that adds PDF-grounded co
     - Test file: `research_lab/tests/test_chat/test_chat_service.py`
     - **Validates: Requirements 3.1**
 
-- [ ] 6. Checkpoint — Verify LLM client and session service
+- [x] 6. Checkpoint — Verify LLM client and session service
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 7. Implement the FastAPI router with all endpoints
-  - [ ] 7.1 Create `research_lab/chat/router.py` with all 5 endpoints
+- [x] 7. Implement the FastAPI router with all endpoints
+  - [x] 7.1 Create `research_lab/chat/router.py` with all 5 endpoints
     - Create `chat_router = APIRouter(prefix="/api/chat", tags=["chat"])`
     - Implement `POST /api/chat/upload` — accept multipart file, validate `.pdf` extension and `application/pdf` content type, call `extract_text`, call `create_session`, return `UploadResponse`
     - Implement `POST /api/chat/{session_id}/message` — validate session exists (404 if not), append user message, call `get_chat_response` with built system prompt and history, append assistant response, return `ChatMessageResponse`
@@ -122,7 +122,7 @@ Build a self-contained `research_lab/chat/` subpackage that adds PDF-grounded co
     - Map exceptions: `ValueError` → 400/422, `EnvironmentError` → 503, `TimeoutError` → 504, `RuntimeError` → 502, `Exception` → 500
     - Add logging using `logging.getLogger("research_lab.chat")`
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 6.1, 6.2, 6.3, 6.4, 6.5_
-  - [ ] 7.2 Update `research_lab/chat/__init__.py` to export `chat_router` from `router.py`
+  - [x] 7.2 Update `research_lab/chat/__init__.py` to export `chat_router` from `router.py`
     - Replace placeholder with `from .router import chat_router`
     - _Requirements: 4.6, 5.1_
   - [ ]* 7.3 Write property test for file upload validation (Property 9)
@@ -142,11 +142,11 @@ Build a self-contained `research_lab/chat/` subpackage that adds PDF-grounded co
     - Test file: `research_lab/tests/test_chat/test_router.py`
     - _Requirements: 2.3, 3.6, 3.7, 6.1, 6.2, 6.3, 6.4_
 
-- [ ] 8. Checkpoint — Verify router and all endpoints
+- [x] 8. Checkpoint — Verify router and all endpoints
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 9. Create integration guide and wire everything together
-  - [ ] 9.1 Create `research_lab/chat/README.md` with integration instructions
+- [x] 9. Create integration guide and wire everything together
+  - [x] 9.1 Create `research_lab/chat/README.md` with integration instructions
     - Document the two lines needed to mount the router in `server.py`: `from chat import chat_router` and `app.include_router(chat_router)`
     - Document the `PyPDF2` dependency addition to `requirements.txt`
     - Document the `GROQ_API_KEY` environment variable requirement
@@ -159,7 +159,7 @@ Build a self-contained `research_lab/chat/` subpackage that adds PDF-grounded co
     - Test file: `research_lab/tests/test_chat/test_integration.py`
     - _Requirements: 1.1, 1.6, 2.1, 2.5, 2.7, 2.8, 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [ ] 10. Final checkpoint — Ensure all tests pass
+- [x] 10. Final checkpoint — Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
