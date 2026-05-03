@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from typing import List
 
-import anthropic
+from groq import Groq
 from state import (
     LiteratureOutput,
     HypothesisOutput,
@@ -21,23 +21,20 @@ from state import (
     ResearchState,
 )
 
-MODEL = "claude-sonnet-4-20250514"
+MODEL = "openai/gpt-oss-20b"
 
-_client: anthropic.Anthropic | None = None
+_client: Groq | None = None
 
 
-def _get_client() -> anthropic.Anthropic:
+def _get_client() -> Groq:
     global _client
     if _client is None:
-        _client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+        _client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
     return _client
 
 
-def _extract_text(response: anthropic.types.Message) -> str:
-    for block in response.content:
-        if block.type == "text":
-            return block.text
-    return ""
+def _extract_text(response) -> str:
+    return response.choices[0].message.content or ""
 
 
 def _safe_json(text: str, fallback: object) -> object:
@@ -94,11 +91,13 @@ def review_literature(literature: LiteratureOutput, abstract: str) -> CriticRevi
 
     raw: dict = {}
     try:
-        response = client.messages.create(
+        response = client.chat.completions.create(
             model=MODEL,
             max_tokens=1024,
-            system=_REVIEW_LITERATURE_SYSTEM,
-            messages=[{"role": "user", "content": user_content}],
+            messages=[
+                {"role": "system", "content": _REVIEW_LITERATURE_SYSTEM},
+                {"role": "user", "content": user_content},
+            ],
         )
         text = _extract_text(response)
         parsed = _safe_json(text, {})
@@ -170,11 +169,13 @@ def review_hypothesis(
 
     raw: dict = {}
     try:
-        response = client.messages.create(
+        response = client.chat.completions.create(
             model=MODEL,
             max_tokens=1024,
-            system=_REVIEW_HYPOTHESIS_SYSTEM,
-            messages=[{"role": "user", "content": user_content}],
+            messages=[
+                {"role": "system", "content": _REVIEW_HYPOTHESIS_SYSTEM},
+                {"role": "user", "content": user_content},
+            ],
         )
         text = _extract_text(response)
         parsed = _safe_json(text, {})
@@ -241,11 +242,13 @@ def review_procedure(
 
     raw: dict = {}
     try:
-        response = client.messages.create(
+        response = client.chat.completions.create(
             model=MODEL,
             max_tokens=1024,
-            system=_REVIEW_PROCEDURE_SYSTEM,
-            messages=[{"role": "user", "content": user_content}],
+            messages=[
+                {"role": "system", "content": _REVIEW_PROCEDURE_SYSTEM},
+                {"role": "user", "content": user_content},
+            ],
         )
         text = _extract_text(response)
         parsed = _safe_json(text, {})
@@ -330,11 +333,13 @@ def synthesize_final(state: ResearchState) -> tuple:
 
     raw: dict = {}
     try:
-        response = client.messages.create(
+        response = client.chat.completions.create(
             model=MODEL,
             max_tokens=3000,
-            system=_SYNTHESIS_SYSTEM,
-            messages=[{"role": "user", "content": user_content}],
+            messages=[
+                {"role": "system", "content": _SYNTHESIS_SYSTEM},
+                {"role": "user", "content": user_content},
+            ],
         )
         text = _extract_text(response)
         parsed = _safe_json(text, {})

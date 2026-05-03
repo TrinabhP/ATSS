@@ -11,7 +11,7 @@ import os
 import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import anthropic
+from groq import Groq
 from state import (
     LiteratureOutput,
     HypothesisOutput,
@@ -20,23 +20,20 @@ from state import (
     ReproducibilityIssue,
 )
 
-MODEL = "claude-sonnet-4-20250514"
+MODEL = "openai/gpt-oss-20b"
 
-_client: anthropic.Anthropic | None = None
+_client: Groq | None = None
 
 
-def _get_client() -> anthropic.Anthropic:
+def _get_client() -> Groq:
     global _client
     if _client is None:
-        _client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+        _client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
     return _client
 
 
-def _extract_text(response: anthropic.types.Message) -> str:
-    for block in response.content:
-        if block.type == "text":
-            return block.text
-    return ""
+def _extract_text(response) -> str:
+    return response.choices[0].message.content or ""
 
 
 def _safe_json(text: str, fallback: object) -> object:
@@ -102,18 +99,6 @@ def run_peer_review_agent(
     procedure: ProcedureOutput,
     abstract: str,
 ) -> PeerReviewOutput:
-    """
-    Perform an independent peer review of the full research plan.
-
-    Args:
-        literature: Approved output from Agent 1
-        hypothesis: Approved output from Agent 2
-        procedure:  Approved output from Agent 3
-        abstract:   Original research abstract
-
-    Returns:
-        PeerReviewOutput with verdict, score, issues, and replication checklist
-    """
     client = _get_client()
 
     lit = literature or {}
@@ -151,11 +136,13 @@ def run_peer_review_agent(
 
     raw: dict = {}
     try:
-        response = client.messages.create(
+        response = client.chat.completions.create(
             model=MODEL,
             max_tokens=4096,
-            system=_PEER_REVIEW_SYSTEM,
-            messages=[{"role": "user", "content": user_content}],
+            messages=[
+                {"role": "system", "content": _PEER_REVIEW_SYSTEM},
+                {"role": "user", "content": user_content},
+            ],
         )
         text = _extract_text(response)
         parsed = _safe_json(text, {})
@@ -209,42 +196,3 @@ def run_peer_review_agent(
         suggested_changes=[str(c) for c in (raw.get("suggested_changes") or [])],
         replication_checklist=[str(i) for i in (raw.get("replication_checklist") or [])],
     )
-
-
-# ── Standalone test ────────────────────────────────────────────────────────────
-
-if __name__ == "__main__":
-    from state import LiteratureOutput, HypothesisOutput, ProcedureOutput
-
-    mock_lit = LiteratureOutput(
-        papers=[{"title": "HOX gene expression in AML", "url": "", "abstract": "...", "relevance_score": 0.9}],
-        analyses=[{"paper_title": "HOX gene expression in AML", "key_findings": ["HOX overexpression correlates with menin inhibitor response"], "methodology": "retrospective cohort", "sample_size": "120", "limitations": "single center", "relevance_to_question": "directly relevant"}],
-        search_terms=["menin inhibitors", "NPM1-mutant AML", "HOX gene expression"],
-        synthesis="HOX gene overexpression is a consistent finding in NPM1-mutant AML and preliminary data suggest it may predict menin inhibitor response.",
-        revision_count=0,
-    )
-    mock_hyp = HypothesisOutput(
-        hypothesis="In NPM1-mutant AML patients, high HOX gene expression (HOXA9/HOXB4 > median) predicts superior response to menin inhibitors vs. low expressors.",
-        null_hypothesis="HOX gene expression level does not predict menin inhibitor response in NPM1-mutant AML.",
-        rationale="Based on HOX overexpression data from the literature.",
-        design_approach="Prospective cohort study",
-        expected_outcomes=["Higher CR rate in HOX-high group", "Longer PFS in HOX-high group"],
-        revision_count=0,
-    )
-    mock_proc = ProcedureOutput(
-        population_size="N=120 (60 per arm), 80% power, alpha=0.05, effect size 0.5",
-        population_criteria="Adults ≥18, NPM1-mutant AML confirmed by PCR, ECOG 0-2",
-        research_design="Prospective cohort, stratified by HOX expression quartile",
-        data_collection="RNA-seq at baseline, response assessed at day 28 and 56",
-        statistical_approach="Cox proportional hazards for PFS; logistic regression for CR rate",
-        timeline_estimate="Months 1-6: enrollment; Months 7-18: follow-up; Months 19-24: analysis",
-        revision_count=0,
-    )
-
-    print("Running peer review agent test...")
-    result = run_peer_review_agent(mock_lit, mock_hyp, mock_proc, "HOX gene expression and menin inhibitor response in NPM1-mutant AML")
-    print(f"Verdict: {result['overall_verdict']}")
-    print(f"Reproducibility score: {result['reproducibility_score']}/10")
-    print(f"Summary: {result['summary'][:200]}...")
-    print(f"Issues: {len(result['issues'])}")
-    print(f"Strengths: {result['strengths']}")

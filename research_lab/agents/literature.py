@@ -11,14 +11,25 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import anthropic
+from groq import Groq
 from state import LiteratureOutput, Paper, PaperAnalysis
 from literature import find_literature
 from rag import extract_results_threaded, ProgressTracker
 
+_SYNTHESIS_MODEL = "openai/gpt-oss-20b"
+_groq_client: Groq | None = None
+
+
+def _get_groq_client() -> Groq:
+    global _groq_client
+    if _groq_client is None:
+        import os
+        _groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+    return _groq_client
+
 
 def _build_synthesis(abstract: str, extracted: list, search_terms: list) -> str:
-    client = anthropic.Anthropic()
+    client = _get_groq_client()
     all_findings = [f for e in extracted for f in e.get("key_findings", [])]
     prompt = (
         f"Research question: {abstract}\n\n"
@@ -29,12 +40,12 @@ def _build_synthesis(abstract: str, extracted: list, search_terms: list) -> str:
         "collectively shows about the research question."
     )
     try:
-        resp = client.messages.create(
-            model="claude-sonnet-4-20250514",
+        resp = client.chat.completions.create(
+            model=_SYNTHESIS_MODEL,
             max_tokens=300,
             messages=[{"role": "user", "content": prompt}],
         )
-        return resp.content[0].text
+        return resp.choices[0].message.content or ""
     except Exception:
         return (
             f"Found {len(extracted)} papers on {', '.join(search_terms)} "

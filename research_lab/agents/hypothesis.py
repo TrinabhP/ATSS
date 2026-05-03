@@ -7,26 +7,23 @@ import os
 import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import anthropic
+from groq import Groq
 from state import LiteratureOutput, HypothesisOutput
 
-MODEL = "claude-sonnet-4-20250514"
+MODEL = "openai/gpt-oss-20b"
 
-_client: anthropic.Anthropic | None = None
+_client: Groq | None = None
 
 
-def _get_client() -> anthropic.Anthropic:
+def _get_client() -> Groq:
     global _client
     if _client is None:
-        _client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+        _client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
     return _client
 
 
-def _extract_text(response: anthropic.types.Message) -> str:
-    for block in response.content:
-        if block.type == "text":
-            return block.text
-    return ""
+def _extract_text(response) -> str:
+    return response.choices[0].message.content or ""
 
 
 def _safe_json(text: str, fallback: object) -> object:
@@ -120,15 +117,6 @@ def run_hypothesis_agent(
     critic_feedback: str = "",
     revision_count: int = 0,
 ) -> HypothesisOutput:
-    """
-    Generate or revise a research hypothesis.
-
-    Args:
-        literature: Output from Agent 1 (or mock during testing)
-        abstract: Original research abstract
-        critic_feedback: Non-empty string triggers revision mode
-        revision_count: Passed in by the dispatch node; stored in returned output
-    """
     client = _get_client()
     lit_context = _build_lit_context(literature)
 
@@ -150,11 +138,13 @@ def run_hypothesis_agent(
 
     raw_data: dict = {}
     try:
-        response = client.messages.create(
+        response = client.chat.completions.create(
             model=MODEL,
             max_tokens=2048,
-            system=system,
-            messages=[{"role": "user", "content": user_content}],
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": user_content},
+            ],
         )
         text = _extract_text(response)
         parsed = _safe_json(text, {})
@@ -169,7 +159,6 @@ def run_hypothesis_agent(
             revision_count=revision_count,
         )
 
-    # Self-review step — second Claude call before returning to Orchestrator
     hypothesis_text = raw_data.get("hypothesis", "")
     if hypothesis_text:
         try:
@@ -182,33 +171,37 @@ def run_hypothesis_agent(
                 f"Rationale: {raw_data.get('rationale', '')}\n"
                 f"Design: {raw_data.get('design_approach', '')}"
             )
-            review_resp = client.messages.create(
+            review_resp = client.chat.completions.create(
                 model=MODEL,
                 max_tokens=512,
-                system=_SELF_REVIEW_SYSTEM,
-                messages=[{"role": "user", "content": self_review_input}],
+                messages=[
+                    {"role": "system", "content": _SELF_REVIEW_SYSTEM},
+                    {"role": "user", "content": self_review_input},
+                ],
             )
             review_text = _extract_text(review_resp).strip()
 
             if review_text.startswith("ISSUES_FOUND:"):
                 issues = review_text[len("ISSUES_FOUND:"):].strip()
                 fix_system = _HYPOTHESIS_FIX_SYSTEM.format(issues=issues)
-                fix_resp = client.messages.create(
+                fix_resp = client.chat.completions.create(
                     model=MODEL,
                     max_tokens=2048,
-                    system=fix_system,
-                    messages=[{"role": "user", "content": (
-                        f"Research abstract:\n{abstract}\n\n"
-                        f"{lit_context}\n"
-                        f"Original hypothesis (needs fixing):\n{json.dumps(raw_data, indent=2)}"
-                    )}],
+                    messages=[
+                        {"role": "system", "content": fix_system},
+                        {"role": "user", "content": (
+                            f"Research abstract:\n{abstract}\n\n"
+                            f"{lit_context}\n"
+                            f"Original hypothesis (needs fixing):\n{json.dumps(raw_data, indent=2)}"
+                        )},
+                    ],
                 )
                 fix_text = _extract_text(fix_resp)
                 fixed = _safe_json(fix_text, {})
                 if isinstance(fixed, dict) and fixed.get("hypothesis"):
                     raw_data = fixed
         except Exception:
-            pass  # Self-review failure is non-fatal
+            pass
 
     return HypothesisOutput(
         hypothesis=str(raw_data.get("hypothesis", "")),

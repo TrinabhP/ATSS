@@ -7,26 +7,23 @@ import os
 import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import anthropic
+from groq import Groq
 from state import LiteratureOutput, HypothesisOutput, ProcedureOutput
 
-MODEL = "claude-sonnet-4-20250514"
+MODEL = "openai/gpt-oss-20b"
 
-_client: anthropic.Anthropic | None = None
+_client: Groq | None = None
 
 
-def _get_client() -> anthropic.Anthropic:
+def _get_client() -> Groq:
     global _client
     if _client is None:
-        _client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+        _client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
     return _client
 
 
-def _extract_text(response: anthropic.types.Message) -> str:
-    for block in response.content:
-        if block.type == "text":
-            return block.text
-    return ""
+def _extract_text(response) -> str:
+    return response.choices[0].message.content or ""
 
 
 def _safe_json(text: str, fallback: object) -> object:
@@ -96,16 +93,6 @@ def run_procedure_agent(
     critic_feedback: str = "",
     revision_count: int = 0,
 ) -> ProcedureOutput:
-    """
-    Design the full study procedure for the given hypothesis.
-
-    Args:
-        literature: Output from Agent 1 (or mock during testing)
-        hypothesis: Output from Agent 2
-        abstract: Original research abstract
-        critic_feedback: Non-empty string triggers revision mode
-        revision_count: Passed in by the dispatch node; stored in returned output
-    """
     client = _get_client()
     context = _build_context(literature, hypothesis, abstract)
 
@@ -125,11 +112,13 @@ def run_procedure_agent(
 
     raw_data: dict = {}
     try:
-        response = client.messages.create(
+        response = _get_client().chat.completions.create(
             model=MODEL,
             max_tokens=3000,
-            system=system,
-            messages=[{"role": "user", "content": user_content}],
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": user_content},
+            ],
         )
         text = _extract_text(response)
         parsed = _safe_json(text, {})
