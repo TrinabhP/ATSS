@@ -209,7 +209,7 @@ export default function ChatPanel({ isOpen, onClose, pipelineState, projectId })
         pipelineState.caveats?.length && `CAVEATS\n${pipelineState.caveats.map(c => `• ${c}`).join('\n')}`,
       ].filter(Boolean).join('\n\n');
 
-      const fullText = `LabOS Research Plan — Project #${projectId}\nConfidence: ${pipelineState.confidence_level || 'N/A'}\n\n${parts}`;
+      const fullText = `SynThesis Research Plan — Project #${projectId}\nConfidence: ${pipelineState.confidence_level || 'N/A'}\n\n${parts}`;
 
       const res = await fetch(`${API_BASE}/api/chat/from-text`, {
         method: 'POST',
@@ -414,13 +414,13 @@ export default function ChatPanel({ isOpen, onClose, pipelineState, projectId })
                       )}
                       {messages.map((msg, i) => (
                         <div key={i} className={`chat-message ${msg.role}`}>
-                          <div className="chat-message-label">{msg.role === 'user' ? 'You' : 'LabOS'}</div>
+                          <div className="chat-message-label">{msg.role === 'user' ? 'You' : 'SynThesis'}</div>
                           <div className="chat-message-content">{msg.role === 'assistant' ? renderMarkdown(msg.content) : msg.content}</div>
                         </div>
                       ))}
                       {sending && (
                         <div className="chat-message assistant">
-                          <div className="chat-message-label">LabOS</div>
+                          <div className="chat-message-label">SynThesis</div>
                           <div className="chat-message-content chat-typing">
                             <span></span><span></span><span></span>
                           </div>

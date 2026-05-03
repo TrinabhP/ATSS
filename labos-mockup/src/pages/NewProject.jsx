@@ -1,20 +1,41 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../context/AuthContext';
 
 export default function NewProject() {
   const [abstract, setAbstract] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!abstract.trim()) return;
 
     setIsSubmitting(true);
-    // In a production app, we would await a real API call here to create the project
-    const newProjectId = Date.now(); // Generate a unique ID based on timestamp
-    navigate(`/projects/${newProjectId}`, { state: { abstract } });
+    setError(null);
+
+    const { data, error: insertError } = await supabase
+      .from('projects')
+      .insert({
+        user_id: user.id,
+        name: 'Untitled Project',
+        abstract,
+        status: 'running',
+      })
+      .select()
+      .single();
+
+    if (insertError) {
+      setError(insertError.message);
+      setIsSubmitting(false);
+      return;
+    }
+
+    navigate(`/projects/${data.id}`, { state: { abstract } });
   };
 
   return (
@@ -37,6 +58,11 @@ export default function NewProject() {
               required
             />
           </div>
+          {error && (
+            <div className="text-red-500 text-sm mt-2" role="alert">
+              {error}
+            </div>
+          )}
           <div className="flex justify-between items-center mt-6">
             <button type="button" className="btn-secondary" onClick={() => navigate('/projects')}>
               Cancel

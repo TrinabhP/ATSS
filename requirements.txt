@@ -19,3 +19,9 @@ requests>=2.31.0
  
 # RAG handled by Ragie.ai (cloud, no local dependencies!)
 
+# Supabase integration
+supabase>=2.0.0
+
+# JWT verification (for auth middleware)
+pyjwt>=2.0.0
+

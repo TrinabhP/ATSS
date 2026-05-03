@@ -1,15 +1,19 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, FlaskConical, Network, X, ExternalLink, CheckCircle2, CircleDashed, AlertCircle, Download, MessageSquare, ChevronDown } from 'lucide-react';
+import { Search, FlaskConical, Network, X, ExternalLink, CheckCircle2, CircleDashed, AlertCircle, Download, MessageSquare, ChevronDown, Pencil } from 'lucide-react';
 import ChatPanel from '../components/ChatPanel';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../context/AuthContext';
 
 const API_BASE = '';
 
 export default function ProjectDashboard() {
   const { id } = useParams();
   const location = useLocation();
-  const abstract = location.state?.abstract || '';
+  const navigate = useNavigate();
+  const { user, session } = useAuth();
+  const passedAbstract = location.state?.abstract || '';
 
   const [pipelineState, setPipelineState] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,8 +24,121 @@ export default function ProjectDashboard() {
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
   const exportRef = useRef(null);
 
+  // Persisted results state
+  const [persistedResults, setPersistedResults] = useState(null);
+  const [loadingResults, setLoadingResults] = useState(true);
+  const [projectAbstract, setProjectAbstract] = useState(passedAbstract);
+
+  // Rename state
+  const [projectName, setProjectName] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [renameError, setRenameError] = useState(null);
+  const editInputRef = useRef(null);
+
+  // Fetch project name, abstract, and check for persisted results on mount
   useEffect(() => {
-    if (!abstract) {
+    const fetchProjectData = async () => {
+      // Fetch project name and abstract
+      const { data: project, error: projectError } = await supabase
+        .from('projects')
+        .select('name, abstract')
+        .eq('id', id)
+        .single();
+      if (!projectError && project) {
+        setProjectName(project.name);
+        // Use project abstract from DB as fallback if not passed via location.state
+        if (!passedAbstract && project.abstract) {
+          setProjectAbstract(project.abstract);
+        }
+      }
+
+      // Check for persisted analysis results
+      const { data: results } = await supabase
+        .from('analysis_results')
+        .select('*')
+        .eq('project_id', id)
+        .single();
+
+      if (results) {
+        setPersistedResults(results);
+        setPipelineState(results);
+        setLoading(false);
+      }
+
+      setLoadingResults(false);
+    };
+    fetchProjectData();
+  }, [id, passedAbstract]);
+
+  // Focus the input when entering edit mode
+  useEffect(() => {
+    if (isEditing && editInputRef.current) {
+      editInputRef.current.focus();
+      editInputRef.current.select();
+    }
+  }, [isEditing]);
+
+  const startEditing = useCallback(() => {
+    setEditName(projectName);
+    setRenameError(null);
+    setIsEditing(true);
+  }, [projectName]);
+
+  const confirmRename = useCallback(async () => {
+    const trimmed = editName.trim();
+    if (!trimmed) {
+      // Reject whitespace-only names — revert silently
+      setIsEditing(false);
+      setEditName('');
+      return;
+    }
+    if (trimmed === projectName) {
+      // No change
+      setIsEditing(false);
+      return;
+    }
+    const previousName = projectName;
+    // Optimistically update
+    setProjectName(trimmed);
+    setIsEditing(false);
+    setRenameError(null);
+
+    const { error: updateError } = await supabase
+      .from('projects')
+      .update({ name: trimmed })
+      .eq('id', id);
+
+    if (updateError) {
+      // Revert on failure
+      setProjectName(previousName);
+      setRenameError('Failed to rename project. Please try again.');
+    }
+  }, [editName, projectName, id]);
+
+  const cancelEditing = useCallback(() => {
+    setIsEditing(false);
+    setEditName('');
+    setRenameError(null);
+  }, []);
+
+  const handleEditKeyDown = useCallback((e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      confirmRename();
+    } else if (e.key === 'Escape') {
+      cancelEditing();
+    }
+  }, [confirmRename, cancelEditing]);
+
+  useEffect(() => {
+    // Don't run pipeline if still checking for persisted results
+    if (loadingResults) return;
+
+    // Don't run pipeline if persisted results already loaded
+    if (persistedResults) return;
+
+    if (!projectAbstract) {
       setError('No abstract provided. Please start a new project.');
       setLoading(false);
       return;
@@ -33,12 +150,27 @@ export default function ProjectDashboard() {
 
     const run = async () => {
       try {
+        // Build headers with JWT authorization
+        const headers = { 'Content-Type': 'application/json' };
+        if (session?.access_token) {
+          headers['Authorization'] = `Bearer ${session.access_token}`;
+        }
+
         const res = await fetch(`${API_BASE}/api/analyze/stream`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ abstract }),
+          headers,
+          body: JSON.stringify({
+            abstract: projectAbstract,
+            project_id: id,
+            user_id: user?.id || null,
+          }),
         });
         if (!res.ok) {
+          // Handle 401 — redirect to sign-in
+          if (res.status === 401) {
+            navigate('/');
+            return;
+          }
           const detail = await res.json().catch(() => ({}));
           throw new Error(detail?.detail || `Server error ${res.status}`);
         }
@@ -84,7 +216,7 @@ export default function ProjectDashboard() {
     };
 
     run();
-  }, [abstract]);
+  }, [projectAbstract, loadingResults, persistedResults, session, user, id, navigate]);
 
   const agentStatus = (key) => {
     if (error) return 'error';
@@ -157,7 +289,7 @@ export default function ProjectDashboard() {
   const exportAs = async (format) => {
     if (!synthesis) return;
     setExportMenuOpen(false);
-    const title = `LabOS Research Plan — Project #${id}`;
+    const title = `SynThesis Research Plan — Project #${id}`;
     const sections = [
       { heading: 'Result', body: synthesis.result || '' },
       { heading: 'Hypothesis', body: synthesis.hypothesis || '' },
@@ -202,7 +334,7 @@ export default function ProjectDashboard() {
   };
 
   const exportLatex = (title, sections) => {
-    let latex = `\\documentclass[12pt]{article}\n\\usepackage[utf8]{inputenc}\n\\usepackage[margin=1in]{geometry}\n\\usepackage{hyperref}\n\\title{${title}}\n\\author{LabOS Multi-Agent Research Engine}\n\\date{${new Date().toLocaleDateString()}}\n\\begin{document}\n\\maketitle\n\n`;
+    let latex = `\\documentclass[12pt]{article}\n\\usepackage[utf8]{inputenc}\n\\usepackage[margin=1in]{geometry}\n\\usepackage{hyperref}\n\\title{${title}}\n\\author{SynThesis Multi-Agent Research Engine}\n\\date{${new Date().toLocaleDateString()}}\n\\begin{document}\n\\maketitle\n\n`;
     if (pipelineState?.confidence_level) {
       latex += `\\noindent\\textbf{Confidence Level:} ${pipelineState.confidence_level}\n\n`;
     }
@@ -239,13 +371,52 @@ export default function ProjectDashboard() {
   return (
     <div className="project-dashboard relative">
       <div className="page-header">
-        <h1 className="page-title">Project #{id} Dashboard</h1>
+        <div className="flex items-center gap-3">
+          {isEditing ? (
+            <input
+              ref={editInputRef}
+              type="text"
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              onBlur={confirmRename}
+              onKeyDown={handleEditKeyDown}
+              className="page-title"
+              style={{
+                background: 'var(--bg-secondary, #1a1a2e)',
+                border: '1px solid var(--accent-primary, #d4a843)',
+                borderRadius: '6px',
+                padding: '4px 10px',
+                color: 'inherit',
+                fontSize: 'inherit',
+                fontWeight: 'inherit',
+                fontFamily: 'inherit',
+                outline: 'none',
+                width: '100%',
+                maxWidth: '500px',
+              }}
+              aria-label="Project name"
+            />
+          ) : (
+            <h1
+              className="page-title"
+              onClick={startEditing}
+              style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+              title="Click to rename"
+            >
+              {projectName || `Project #${id}`}
+              <Pencil size={16} color="var(--text-secondary)" />
+            </h1>
+          )}
+        </div>
+        {renameError && (
+          <p className="text-sm" style={{ color: '#ef4444', marginTop: '4px' }}>{renameError}</p>
+        )}
         <p className="text-muted">Research overview and agent status.</p>
       </div>
 
       <div className="card p-6 mb-6">
         <h3 className="font-mono mb-2 text-sm text-muted uppercase">Input Abstract</h3>
-        <p className="text-sm" style={{ maxHeight: '150px', overflowY: 'auto', whiteSpace: 'pre-wrap' }}>{abstract || 'No abstract provided.'}</p>
+        <p className="text-sm" style={{ maxHeight: '150px', overflowY: 'auto', whiteSpace: 'pre-wrap' }}>{projectAbstract || 'No abstract provided.'}</p>
       </div>
 
       {loading && (
