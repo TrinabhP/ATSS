@@ -1,8 +1,14 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { isSupabaseConfigured } from '../lib/supabase';
 
 export default function ProtectedRoute() {
   const { user, loading } = useAuth();
+
+  // If Supabase is not configured, skip auth entirely
+  if (!isSupabaseConfigured) {
+    return <Outlet />;
+  }
 
   if (loading) {
     return (
