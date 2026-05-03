@@ -13,6 +13,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Fix macOS Python SSL certificate issue for Biopython Entrez HTTPS calls
+try:
+    import certifi as _certifi
+    os.environ.setdefault("SSL_CERT_FILE", _certifi.where())
+except ImportError:
+    pass
+
 try:
     from Bio import Entrez
     ENTREZ_AVAILABLE = True
