@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, FlaskConical, Network, X, ExternalLink, CheckCircle2, CircleDashed, AlertCircle } from 'lucide-react';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = '';
 
 export default function ProjectDashboard() {
   const { id } = useParams();
@@ -14,6 +14,7 @@ export default function ProjectDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activePanel, setActivePanel] = useState(null);
+  const hasRun = useRef(false);
 
   useEffect(() => {
     if (!abstract) {
@@ -21,6 +22,10 @@ export default function ProjectDashboard() {
       setLoading(false);
       return;
     }
+
+    // Guard against React StrictMode double-invocation
+    if (hasRun.current) return;
+    hasRun.current = true;
 
     const run = async () => {
       try {

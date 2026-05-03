@@ -9,7 +9,7 @@ from typing import List
 from langgraph.graph import StateGraph, END
 
 from state import ResearchState, LiteratureOutput, CriticReview
-from agents.literature import run_literature_agent
+from literature import run_literature_agent
 from agents.hypothesis import run_hypothesis_agent
 from agents.procedure import run_procedure_agent
 from agents.orchestrator import (
@@ -22,7 +22,7 @@ from agents.peer_reviewer import run_peer_review_agent
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 
-MAX_REVISIONS = 2
+MAX_REVISIONS = 1
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────

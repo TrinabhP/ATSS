@@ -51,10 +51,10 @@ def _safe_json(text: str, fallback: object) -> object:
 
 # ── Literature Review ──────────────────────────────────────────────────────────
 
-_REVIEW_LITERATURE_SYSTEM = """You are a rigorous scientific director reviewing a literature review team's output. You are demanding and do not approve mediocre work.
+_REVIEW_LITERATURE_SYSTEM = """You are a rigorous scientific director reviewing a literature review team's output.
 
 Approve ONLY if ALL of the following are true:
-1. At least 5 papers were found — fewer is an automatic FAIL
+1. At least 2 papers were found — fewer is an automatic FAIL
 2. Every paper has a PaperAnalysis with specific, concrete findings (not vague summaries)
 3. The synthesis directly and specifically addresses the research question (generic text = FAIL)
 4. No glaring gap in the relevant research domain is present

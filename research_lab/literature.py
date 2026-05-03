@@ -5,6 +5,7 @@ Uses Groq API (14,400 free requests/day!) instead of Gemini
 
 import os
 import json
+import time
 from typing import Dict, List, Callable, Optional
 from datetime import datetime
 from groq import Groq
@@ -49,7 +50,7 @@ def extract_search_terms(abstract: str, progress: ProgressTracker) -> List[str]:
     
     api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
-        raise ValueError("GROQ_API_KEY not found in .env file")
+        raise ValueError("GROQ_API_KEY not found in environment")
     
     client = Groq(api_key=api_key)
     
@@ -68,26 +69,92 @@ Return ONLY a JSON array, no markdown, no explanation:
 ["term1", "term2", "term3"]
 """
     
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",  # Fast, accurate model
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.3,
-        max_tokens=500
-    )
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",  # Chat model — better for structured JSON output
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3,
+            max_tokens=500
+        )
+        
+        text = response.choices[0].message.content.strip()
+        progress.log(f"Raw Groq response: {text[:200]}", "info")
+        
+        # Strip markdown fences
+        if "```" in text:
+            # Extract content between first ``` pair
+            parts = text.split("```")
+            for part in parts:
+                part = part.strip()
+                if part.startswith("json"):
+                    part = part[4:].strip()
+                if part.startswith("["):
+                    text = part
+                    break
+        
+        # Find the JSON array anywhere in the response
+        start = text.find("[")
+        end = text.rfind("]")
+        if start != -1 and end != -1 and end > start:
+            text = text[start:end+1]
+        
+        search_terms = json.loads(text)
+        
+        # Validate it's a non-empty list of strings
+        if not isinstance(search_terms, list) or len(search_terms) == 0:
+            raise ValueError(f"Parsed empty or invalid list: {search_terms}")
+        
+        search_terms = [str(t).strip() for t in search_terms if str(t).strip()]
+        
+    except Exception as e:
+        progress.log(f"Groq term extraction failed ({e}), using fallback terms", "error")
+        # Fallback: extract key noun phrases from the abstract directly
+        search_terms = _fallback_search_terms(abstract)
     
-    text = response.choices[0].message.content.strip()
-    
-    # Clean markdown if present
-    if text.startswith("```"):
-        text = text.split("```")[1]
-        if text.startswith("json"):
-            text = text[4:]
-        text = text.strip()
-    
-    search_terms = json.loads(text)
     progress.log(f"Extracted {len(search_terms)} search terms: {', '.join(search_terms)}", "success")
-    
     return search_terms
+
+
+def _fallback_search_terms(abstract: str) -> List[str]:
+    """
+    Simple keyword fallback when LLM extraction fails.
+    Looks for known biomedical patterns and common words.
+    """
+    import re
+    terms = []
+    
+    # Look for gene names (all-caps 2-8 chars, or mixed like NPM1, HOXA9)
+    genes = re.findall(r'\b[A-Z][A-Z0-9]{1,7}\b', abstract)
+    terms.extend(genes[:2])
+    
+    # Look for disease mentions
+    diseases = re.findall(
+        r'\b(?:leukemia|lymphoma|cancer|carcinoma|AML|CML|ALL|myeloma|tumor)\b',
+        abstract, re.IGNORECASE
+    )
+    terms.extend(diseases[:1])
+    
+    # Look for drug/therapy mentions
+    therapies = re.findall(
+        r'\b(?:inhibitor|therapy|treatment|CAR-T|immunotherapy|chemotherapy)\b',
+        abstract, re.IGNORECASE
+    )
+    terms.extend(therapies[:1])
+    
+    # Deduplicate and ensure we have at least something
+    seen = set()
+    unique = []
+    for t in terms:
+        if t.lower() not in seen:
+            seen.add(t.lower())
+            unique.append(t)
+    
+    if not unique:
+        # Last resort: first 3 significant words
+        words = [w for w in abstract.split() if len(w) > 5]
+        unique = words[:3]
+    
+    return unique[:5]
 
 
 def search_pubmed(search_terms: List[str], max_results: int, progress: ProgressTracker) -> List[str]:
@@ -118,6 +185,7 @@ def search_pubmed(search_terms: List[str], max_results: int, progress: ProgressT
             all_pmids.update(pmids)
             
             progress.log(f"  Found {len(pmids)} papers for '{term}'", "success")
+            time.sleep(0.4)  # Respect NCBI rate limit (3 requests/sec)
             
         except Exception as e:
             progress.log(f"  Error searching '{term}': {str(e)}", "error")
@@ -248,6 +316,89 @@ def find_literature(abstract: str, max_papers: int = 8,
         "search_terms": search_terms,
         "stats": stats
     }
+
+
+def run_literature_agent(abstract: str, critic_feedback: str = ""):
+    """
+    Entry point called by graph.py.
+    Runs find_literature + extract_results_threaded and returns a LiteratureOutput.
+    Kept here so graph.py imports from a single canonical file.
+    """
+    from state import LiteratureOutput, Paper, PaperAnalysis
+    from rag import extract_results_threaded, ProgressTracker as RagProgressTracker
+
+    _SYNTHESIS_MODEL = "openai/gpt-oss-20b"
+
+    search_context = abstract
+    if critic_feedback:
+        search_context = f"{abstract}\n\nPrior review feedback to address: {critic_feedback}"
+
+    # Step 1: PubMed search + term extraction
+    lit_result = find_literature(search_context, max_papers=3)
+    raw_papers = lit_result["papers"]
+    search_terms = lit_result["search_terms"]
+
+    if not raw_papers:
+        raise ValueError("PubMed search returned no papers — check GROQ_API_KEY and ENTREZ_EMAIL")
+
+    # Step 2: Map to Paper TypedDicts
+    papers = [
+        Paper(
+            title=p["title"],
+            url=f"https://pubmed.ncbi.nlm.nih.gov/{p['pmid']}/",
+            abstract=p.get("abstract", "")[:600],
+            relevance_score=round(max(0.5, 1.0 - i * 0.05), 2),
+        )
+        for i, p in enumerate(raw_papers)
+    ]
+
+    # Step 3: Parallel extraction — must use raw_papers (has pmid/authors/journal/year)
+    progress = RagProgressTracker()
+    extracted = extract_results_threaded(raw_papers, progress)
+
+    analyses = [
+        PaperAnalysis(
+            paper_title=e["title"],
+            key_findings=e.get("key_findings", []),
+            methodology=e.get("methods", ""),
+            sample_size=e.get("sample_size", "N/A"),
+            limitations=e.get("limitations", ""),
+            relevance_to_question=e.get("relevance", ""),
+        )
+        for e in extracted
+    ]
+
+    # Step 4: Synthesis
+    all_findings = [f for e in extracted for f in e.get("key_findings", [])]
+    synthesis_prompt = (
+        f"Research question: {abstract}\n\n"
+        f"Search terms: {', '.join(search_terms)}\n\n"
+        f"Key findings across {len(extracted)} papers:\n"
+        + "\n".join(f"- {f}" for f in all_findings[:20])
+        + "\n\nWrite a concise 2-3 sentence synthesis of what this literature "
+        "collectively shows about the research question."
+    )
+    try:
+        groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+        resp = groq_client.chat.completions.create(
+            model=_SYNTHESIS_MODEL,
+            max_tokens=300,
+            messages=[{"role": "user", "content": synthesis_prompt}],
+        )
+        synthesis = resp.choices[0].message.content or ""
+    except Exception:
+        synthesis = (
+            f"Found {len(extracted)} papers on {', '.join(search_terms)} "
+            f"with {len(all_findings)} key findings."
+        )
+
+    return LiteratureOutput(
+        papers=papers,
+        analyses=analyses,
+        search_terms=search_terms,
+        synthesis=synthesis,
+        revision_count=0,
+    )
 
 
 if __name__ == "__main__":
