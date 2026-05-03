@@ -61,6 +61,11 @@ h1, h2, h3, h4, h5, h6, .font-mono {
   margin-bottom: 0.5rem;
 }
 
+/* Remove heading margin when inside flex containers */
+.flex > h1, .flex > h2, .flex > h3, .flex > h4, .flex > h5, .flex > h6 {
+  margin-bottom: 0;
+}
+
 a {
   color: var(--accent-primary);
   text-decoration: none;
@@ -113,4 +118,36 @@ button {
 .mt-4 { margin-top: 1rem; }
 
 .w-full { width: 100%; }
+
+/* Text sizes */
+.text-xs { font-size: 0.75rem; }
+.text-lg { font-size: 1.125rem; }
+
+/* Spacing — margins */
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-5 { margin-bottom: 1.25rem; }
+.mt-1 { margin-top: 0.25rem; }
+.mt-6 { margin-top: 1.5rem; }
+.mt-8 { margin-top: 2rem; }
+
+/* Spacing — padding */
+.pt-4 { padding-top: 1rem; }
+
+/* Layout */
+.gap-1 { gap: 0.25rem; }
+.justify-center { justify-content: center; }
+.flex-grow { flex: 1; }
+.max-w-2xl { max-width: 42rem; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+
+/* Borders & misc */
+.border-t { border-top: 1px solid var(--border-color); }
+.border-subtle { border-color: var(--border-subtle); }
+.list-disc { list-style-type: disc; }
+.pl-4 { padding-left: 1rem; }
+.text-center { text-align: center; }
+.whitespace-pre-wrap { white-space: pre-wrap; }
+.relative { position: relative; }
+.items-start { align-items: flex-start; }
 

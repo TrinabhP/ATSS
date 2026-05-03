@@ -392,7 +392,7 @@ export default function ChatPanel({ isOpen, onClose, pipelineState, projectId })
                     </div>
                   ))}
                   {sessions.length === 0 && (
-                    <p className="text-xs text-muted" style={{ padding: '8px' }}>No chats yet. Upload a PDF or chat with your results.</p>
+                    <p className="text-xs text-muted p-4">No chats yet. Upload a PDF or chat with your results.</p>
                   )}
                 </div>
               </div>

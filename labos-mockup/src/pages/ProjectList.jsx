@@ -28,7 +28,7 @@ export default function ProjectList() {
                 {proj.status}
               </span>
             </div>
-            <h3 className="font-semibold mb-2" style={{ fontSize: '1.1rem' }}>{proj.title}</h3>
+            <h3 className="font-semibold mb-2">{proj.title}</h3>
             <div className="mt-auto pt-4 border-t border-subtle flex justify-between items-center text-sm text-muted">
               <span>{proj.date}</span>
               <span className="flex items-center gap-1">{proj.agents}/3 Agents <ArrowRight size={14}/></span>

@@ -88,26 +88,34 @@ export default function ProjectDashboard() {
 
   const agentStatus = (key) => {
     if (error) return 'error';
-    if (!pipelineState) return loading ? (key === 'literature' ? 'running' : 'waiting') : 'waiting';
+    if (!loading && !pipelineState) return 'waiting';
+    if (!pipelineState) return key === 'literature' ? 'running' : 'waiting';
 
     // If this agent's data exists, it's done
     if (pipelineState[key]) return 'done';
 
-    // Determine what's currently running based on the stage
-    const stage = pipelineState.stage || pipelineState.current_stage || '';
-    if (key === 'literature' && (stage.startsWith('literature') || !stage)) return loading ? 'running' : 'waiting';
-    if (key === 'hypothesis' && stage.startsWith('hypothesis')) return 'running';
-    if (key === 'procedure' && (stage.startsWith('procedure') || stage === 'synthesis' || stage === 'done')) return stage === 'procedure' ? 'running' : 'waiting';
+    // Still loading — infer which agent is currently running based on
+    // what has completed so far. The SSE stream only yields *after* each
+    // agent finishes, so we derive the active agent from the gap.
+    if (!loading) return 'waiting';
 
-    return loading ? 'waiting' : 'waiting';
+    const litDone = !!pipelineState.literature;
+    const hypDone = !!pipelineState.hypothesis;
+    const procDone = !!pipelineState.procedure;
+
+    if (key === 'literature' && !litDone) return 'running';
+    if (key === 'hypothesis' && litDone && !hypDone) return 'running';
+    if (key === 'procedure' && hypDone && !procDone) return 'running';
+
+    return 'waiting';
   };
 
   const renderStatus = (status) => {
     if (status === 'done') return <CheckCircle2 size={20} color="var(--success)" />;
     if (status === 'running') return (
-      <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 2, ease: 'linear' }} style={{ display: 'inline-flex' }}>
-        <CircleDashed size={20} color="var(--accent-primary)" />
-      </motion.div>
+      <div className="agent-spinner">
+        <div className="agent-spinner-circle" />
+      </div>
     );
     if (status === 'error') return <AlertCircle size={20} color="var(--danger, #ef4444)" />;
     return <CircleDashed size={20} color="var(--text-secondary)" />;
@@ -219,11 +227,13 @@ export default function ProjectDashboard() {
     URL.revokeObjectURL(url);
   };
 
-  // Detect if final result is loading (synthesis stage)
+  // Detect if final result is loading (all agents done, synthesis in progress)
   const isFinalResultLoading = useMemo(() => {
     if (!loading || !pipelineState) return false;
-    const stage = pipelineState.stage || pipelineState.current_stage || '';
-    return (stage === 'synthesis' || stage === 'synthesizing' || stage === 'peer_review') && !pipelineState.final_recommendation;
+    const litDone = !!pipelineState.literature;
+    const hypDone = !!pipelineState.hypothesis;
+    const procDone = !!pipelineState.procedure;
+    return litDone && hypDone && procDone && !pipelineState.final_recommendation;
   }, [loading, pipelineState]);
 
   return (
@@ -251,10 +261,10 @@ export default function ProjectDashboard() {
       )}
 
       <h3 className="font-mono mb-4 mt-6 text-sm text-muted uppercase">Agent Modules</h3>
-      <div className="overview-cards">
+      <div className="overview-cards mb-6">
 
         {/* Agent 1: Literature */}
-        <div className="agent-card flex flex-col" onClick={() => lit && setActivePanel('lit')}>
+        <div className="agent-card" onClick={() => lit && setActivePanel('lit')}>
           <div className="flex justify-between items-start mb-4">
             <div className="flex items-center gap-2 font-mono font-semibold">
               <Search size={18} color="var(--accent-primary)" />
@@ -262,7 +272,7 @@ export default function ProjectDashboard() {
             </div>
             {renderStatus(agentStatus('literature'))}
           </div>
-          <p className="text-sm text-muted flex-grow">Searches academic databases to extract relevant context and prior methodologies.</p>
+          <p className="text-sm text-muted">Searches academic databases to extract relevant context and prior methodologies.</p>
           {lit && (
             <div className="mt-4 pt-4 border-t border-subtle text-sm font-semibold" style={{ color: 'var(--success)' }}>
               {lit.papers?.length ?? 0} Papers Extracted
@@ -271,7 +281,7 @@ export default function ProjectDashboard() {
         </div>
 
         {/* Agent 2: Hypothesis */}
-        <div className="agent-card flex flex-col" onClick={() => hyp && setActivePanel('hypothesis')}>
+        <div className="agent-card" onClick={() => hyp && setActivePanel('hypothesis')}>
           <div className="flex justify-between items-start mb-4">
             <div className="flex items-center gap-2 font-mono font-semibold">
               <FlaskConical size={18} color="var(--accent-primary)" />
@@ -279,7 +289,7 @@ export default function ProjectDashboard() {
             </div>
             {renderStatus(agentStatus('hypothesis'))}
           </div>
-          <p className="text-sm text-muted flex-grow">Synthesizes literature to propose testable primary and null hypotheses.</p>
+          <p className="text-sm text-muted">Synthesizes literature to propose testable primary and null hypotheses.</p>
           {hyp && (
             <div className="mt-4 pt-4 border-t border-subtle text-sm font-semibold" style={{ color: 'var(--success)' }}>
               Hypothesis Generated
@@ -288,7 +298,7 @@ export default function ProjectDashboard() {
         </div>
 
         {/* Agent 3: Procedure */}
-        <div className="agent-card flex flex-col" onClick={() => proc && setActivePanel('design')}>
+        <div className="agent-card" onClick={() => proc && setActivePanel('design')}>
           <div className="flex justify-between items-start mb-4">
             <div className="flex items-center gap-2 font-mono font-semibold">
               <Network size={18} color="var(--accent-primary)" />
@@ -296,7 +306,7 @@ export default function ProjectDashboard() {
             </div>
             {renderStatus(agentStatus('procedure'))}
           </div>
-          <p className="text-sm text-muted flex-grow">Drafts a step-by-step scientific process cycle to test the hypothesis.</p>
+          <p className="text-sm text-muted">Drafts a step-by-step scientific process cycle to test the hypothesis.</p>
           {proc && (
             <div className="mt-4 pt-4 border-t border-subtle text-sm font-semibold" style={{ color: 'var(--success)' }}>
               Protocol Ready
@@ -307,10 +317,10 @@ export default function ProjectDashboard() {
       </div>
 
       {/* Final Research Plan — always-present card */}
-      <div className="card p-6 mt-6">
+      <div className="card p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <h3 className="font-mono text-sm text-muted uppercase mb-0">Final Research Plan</h3>
+            <h3 className="font-mono text-sm text-muted uppercase">Final Research Plan</h3>
             {synthesis && pipelineState.confidence_level && (
               <span className="badge" style={{
                 backgroundColor: pipelineState.confidence_level === 'High' ? 'rgba(16, 185, 129, 0.15)' : pipelineState.confidence_level === 'Moderate' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(239, 68, 68, 0.15)',
@@ -365,8 +375,8 @@ export default function ProjectDashboard() {
         {/* Loading state */}
         {!synthesis && isFinalResultLoading && (
           <div className="final-result-loading">
-            <div className="final-result-loading-dots">
-              <span></span><span></span><span></span>
+            <div className="agent-spinner">
+              <div className="agent-spinner-circle" />
             </div>
             <p className="text-muted text-sm font-mono">Synthesizing final research plan…</p>
           </div>

@@ -172,9 +172,9 @@ menin inhibitors in NPM1-mutant acute myeloid leukemia patients?
 
 ---
 
-## React Mockup — PDF Export
+## React Mockup — Project Dashboard
 
-The `ProjectDashboard` page includes a client-side PDF export feature. It parses the consolidated `final_recommendation` JSON from the pipeline state and renders a styled HTML document containing:
+The `ProjectDashboard` page auto-generates a display title from the submitted abstract (first sentence or first ~60 characters, truncated at a word boundary). It also includes a client-side PDF export feature that parses the consolidated `final_recommendation` JSON from the pipeline state and renders a styled HTML document containing:
 
 - Result summary
 - Hypothesis
@@ -183,7 +183,20 @@ The `ProjectDashboard` page includes a client-side PDF export feature. It parses
 - Confidence level badge
 - Action items and caveats
 
+The exported HTML applies its own formatting for print:
+
+- **Step blocks** — procedure steps are split at "Step N:" boundaries and rendered as individually bordered cards with an amber left accent, improving scanability in the printed document.
+- **Citation hyperlinks** — URLs within citation text are converted to clickable amber-coloured links so readers can navigate directly to sources from the PDF.
+
 Clicking the export button opens the rendered report in a new browser tab and triggers the native print dialog, allowing the user to save it as a PDF. No additional dependencies are required.
+
+### Rich Text Rendering
+
+The dashboard includes several rendering helpers for improved readability of pipeline output:
+
+- **URL linkification** — bare `http`/`https` URLs in agent text are automatically converted to clickable links.
+- **Step formatting** — procedure text containing "Step N:" patterns is split into visually distinct cards with accent-coloured left borders.
+- **Citation enrichment** — citation lines are cross-referenced against the literature agent's paper list; matching titles receive an inline PubMed link icon via the `ExternalLink` Lucide icon.
 
 ---
 

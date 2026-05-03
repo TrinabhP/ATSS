@@ -74,12 +74,12 @@ export default function AnalysisView() {
         {/* Left Pane */}
         <div>
           <div className="card p-6 mb-6">
-            <h3 className="font-mono mb-4 text-sm text-muted uppercase">Input Abstract</h3>
+            <h3 className="font-mono mb-2 text-sm text-muted uppercase">Input Abstract</h3>
             <p className="text-sm">{abstract}</p>
           </div>
 
           <div className="card p-6">
-            <h3 className="font-mono mb-4 text-sm text-muted uppercase">Pipeline Status</h3>
+            <h3 className="font-mono mb-2 text-sm text-muted uppercase">Pipeline Status</h3>
             <div className="flex flex-wrap gap-4">
               {STAGES.map((stage, idx) => {
                 const isActive = idx === currentStageIndex && !isFinished;
@@ -90,9 +90,9 @@ export default function AnalysisView() {
                     {isCompleted ? (
                       <CheckCircle2 size={20} className="text-success" color="var(--success)" />
                     ) : isActive ? (
-                      <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 2, ease: "linear" }} style={{ display: 'inline-flex' }}>
-                        <CircleDashed size={20} color="var(--accent-primary)" />
-                      </motion.div>
+                      <div className="agent-spinner">
+                        <div className="agent-spinner-circle" />
+                      </div>
                     ) : (
                       <CircleDashed size={20} color="var(--text-secondary)" />
                     )}
@@ -173,13 +173,13 @@ export default function AnalysisView() {
               <div className="flex gap-4">
                 <div className="w-full">
                   <h4 className="font-mono text-sm mb-2" style={{ color: 'var(--success)' }}>Action Items</h4>
-                  <ul className="text-sm" style={{ paddingLeft: '1.5rem' }}>
+                  <ul className="text-sm list-disc pl-4">
                     {finalRec.action_items.map((item, i) => { return <li key={i}>{item}</li>; })}
                   </ul>
                 </div>
                 <div className="w-full">
                   <h4 className="font-mono text-sm mb-2" style={{ color: 'var(--warning)' }}>Caveats</h4>
-                  <ul className="text-sm" style={{ paddingLeft: '1.5rem' }}>
+                  <ul className="text-sm list-disc pl-4">
                     {finalRec.caveats.map((item, i) => { return <li key={i}>{item}</li>; })}
                   </ul>
                 </div>

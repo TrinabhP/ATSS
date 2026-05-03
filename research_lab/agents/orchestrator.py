@@ -295,7 +295,7 @@ Return valid JSON only (no markdown, no extra text):
   "result": "2-3 paragraph executive summary with feasibility assessment and confidence rationale.",
   "hypothesis": "Full hypothesis section: H1, H0, rationale, design approach, expected outcomes.",
   "steps": "Step 1: [Title]\\n[1-3 sentences]\\n\\nStep 2: [Title]\\n[1-3 sentences]\\n\\n... (8-12 steps covering setup, recruitment, data collection, intervention, analysis, reporting)",
-  "literature_citations": "Formatted citation list. For each paper: [Author(s), Title, Journal/URL] — one-sentence relevance summary.",
+  "literature_citations": "Formatted citation list. For each paper include the full PubMed URL. Format each citation on its own line as: [Number]. Author(s) — Title. Journal. URL: https://pubmed.ncbi.nlm.nih.gov/PMID/ — One-sentence relevance summary.",
   "confidence_level": "High",
   "action_items": ["Immediate action 1", "Immediate action 2"],
   "caveats": ["Important caveat 1"]
@@ -309,7 +309,7 @@ Confidence level rules:
 Requirements:
 - All four sections (result, hypothesis, steps, literature_citations) are REQUIRED
 - Steps must reference specific details from the procedure (exact sample size, named statistical tests, etc.)
-- Literature citations must list every paper provided, with title and relevance
+- Literature citations must list every paper provided, with title, PubMed URL, and relevance
 - confidence_level must be exactly "High", "Moderate", or "Low"
 - action_items: 3-5 immediate next steps
 - caveats: 2-4 limitations or risks"""
