@@ -20,6 +20,7 @@ export default function Sidebar() {
     if (!user) return;
 
     const fetchProjects = async () => {
+      if (!supabase) return;
       const { data } = await supabase
         .from('projects')
         .select('id, name')
@@ -91,7 +92,7 @@ export default function Sidebar() {
               </button>
               <button onClick={async () => {
                 setShowProfileMenu(false);
-                await supabase.auth.signOut();
+                if (supabase) await supabase.auth.signOut();
                 navigate('/');
               }}>
                 <LogOut size={16} /> Log Out

@@ -1,50 +1,50 @@
-# LabOS — Research Analysis Engine
+# SynThesis — Multi-Agent Research Analysis Engine
 
-A hierarchical multi-agent research analysis system built for KiroHacks Cal Poly (May 2, 2026). A researcher submits a scientific abstract and a sequential pipeline of three specialized AI agents produces a structured final recommendation.
+A hierarchical multi-agent research analysis system built for **KiroHacks Cal Poly** (May 2, 2026). A researcher submits a scientific abstract and a sequential pipeline of three specialized AI agents produces a structured final research plan — complete with literature review, hypothesis, study protocol, and confidence assessment.
 
-Two pipelines are available depending on your setup.
+**Track:** Intellectual Pursuit
+
+**Live:** [https://labos-research-engine.onrender.com](https://labos-research-engine.onrender.com)
 
 ---
 
 ## How It Works
 
-### Pipeline A — LangGraph + Claude (primary)
-
 ```
-Abstract Input
+Abstract Input (20–4,000 characters)
     ↓
-[Agent 1 — Literature Review]
-  Sub-Agent 1A: Paper discovery (5–10 papers via web search)
-  Sub-Agent 1B: Analysis & synthesis
-    ↓
-[Agent 2 — Hypothesis Design]
-  Generates a testable hypothesis with an internal self-review loop
-    ↓
-[Agent 3 — Procedure Design]
-  Designs population, methods, statistics, and timeline
-    ↓
-[Orchestrator / Critic]
-  Reviews each agent — up to 2 revision cycles per agent
-    ↓
-[Final Synthesis]
-  Consolidated output: executive summary, hypothesis, step-by-step plan,
-  literature citations + confidence level + action items + caveats
+┌─────────────────────────────────────────┐
+│  Agent 1 — Literature Review            │
+│  PubMed search + Ragie RAG indexing     │
+│  → 5–10 papers extracted & synthesized  │
+└──────────────────┬──────────────────────┘
+                   ↓
+┌─────────────────────────────────────────┐
+│  Agent 2 — Hypothesis Design            │
+│  Generates testable H₁ and H₀          │
+│  with internal self-review loop         │
+└──────────────────┬──────────────────────┘
+                   ↓
+┌─────────────────────────────────────────┐
+│  Agent 3 — Procedure Design             │
+│  Population, methods, statistics,       │
+│  data collection, and timeline          │
+└──────────────────┬──────────────────────┘
+                   ↓
+┌─────────────────────────────────────────┐
+│  Orchestrator / Critic                  │
+│  Reviews each agent's output            │
+│  Up to 2 revision cycles per agent      │
+└──────────────────┬──────────────────────┘
+                   ↓
+┌─────────────────────────────────────────┐
+│  Final Synthesis                        │
+│  Executive summary + hypothesis +       │
+│  step-by-step plan + literature         │
+│  citations + confidence level +         │
+│  action items + caveats                 │
+└─────────────────────────────────────────┘
 ```
-
-### Pipeline B — PubMed + Ragie RAG (alternative)
-
-An alternative pipeline that uses PubMed (via Biopython/Entrez) for literature search and Ragie.ai for RAG indexing. Uses Groq (`llama-3.3-70b-versatile`) for term extraction and results extraction.
-
-```
-Abstract Input
-    ↓
-[Agent 1: PubMed Finder]       — Groq term extraction + Entrez API → papers + PMIDs
-    ↓
-[Agent 2: Ragie RAG Builder]   — PMC full-text fetch + Ragie.ai upload (threaded, 1 worker)
-    + Results Extractor        — Groq extraction → structured findings (1 worker)
-```
-
-Entry point: `run_pipeline.py`
 
 ---
 
@@ -52,12 +52,17 @@ Entry point: `run_pipeline.py`
 
 | Layer | Technology |
 |---|---|
-| AI | Anthropic Claude (`claude-sonnet-4-20250514`) |
+| LLM (Agents) | Groq (`llama-3.3-70b-versatile`) |
 | Orchestration | LangGraph `StateGraph` (synchronous) |
-| Frontend (production) | Streamlit |
-| Frontend (mockup) | React 19 + Vite + React Router DOM v7 |
+| Frontend | React 19 + Vite 8 + React Router DOM v7 |
+| Backend | FastAPI + Uvicorn |
+| Literature Search | PubMed via Biopython/Entrez |
+| RAG | Ragie.ai (cloud-hosted) |
 | Persistence | Supabase (Postgres + Auth + RLS) |
-| Language | Python 3.11+ |
+| PDF Export | fpdf2 (server-side) + LaTeX export |
+| Chat | Groq-powered document Q&A with PDF upload |
+| Deployment | Render (single web service) |
+| Language | Python 3.11+ / JavaScript (ES2022) |
 
 ---
 
@@ -65,45 +70,53 @@ Entry point: `run_pipeline.py`
 
 ```
 /
-├── research_lab/              # Production Python backend
-│   ├── app.py                 # Streamlit dashboard (UI only)
-│   ├── server.py              # FastAPI HTTP server — POST /api/analyze
+├── research_lab/              # Python backend
+│   ├── server.py              # FastAPI HTTP server + SPA serving
 │   ├── graph.py               # LangGraph wiring — nodes, edges, run_research()
 │   ├── state.py               # Shared TypedDict schema (ResearchState)
+│   ├── literature.py          # Agent 1 — PubMed paper discovery + Ragie RAG
+│   ├── rag.py                 # Ragie RAG builder + results extractor
+│   ├── auth.py                # Supabase JWT auth middleware
 │   ├── supabase_client.py     # Supabase write integration (service role key)
-│   ├── literature.py          # PubMed literature finder (Pipeline B, Agent 1)
-│   ├── rag.py                 # Ragie RAG builder + results extractor (Pipeline B, Agent 2)
-│   ├── requirements.txt       # Pinned Python dependencies
-│   └── agents/
-│       ├── literature.py      # Agent 1 — paper discovery + synthesis
-│       ├── hypothesis.py      # Agent 2 — hypothesis design
-│       ├── procedure.py       # Agent 3 — study procedure design
-│       └── orchestrator.py    # Critic review + final synthesis
+│   ├── agents/
+│   │   ├── hypothesis.py      # Agent 2 — hypothesis design
+│   │   ├── procedure.py       # Agent 3 — study procedure design
+│   │   └── orchestrator.py    # Critic review + final synthesis
+│   ├── chat/
+│   │   ├── router.py          # FastAPI chat endpoints
+│   │   ├── chat_service.py    # In-memory session management
+│   │   ├── llm_client.py      # Groq API wrapper for chat
+│   │   ├── pdf_extractor.py   # PDF text extraction
+│   │   ├── pdf_generator.py   # Server-side PDF generation (fpdf2)
+│   │   └── models.py          # Pydantic models for chat
+│   └── tests/
 │
-├── labos-mockup/              # React/Vite UI prototype
+├── labos-mockup/              # React frontend
 │   ├── src/
-│   │   ├── App.jsx
-│   │   ├── lib/
-│   │   │   ├── supabase.js    # Supabase client (anon key)
-│   │   │   └── api.js         # All Supabase data-fetching functions
-│   │   ├── context/
-│   │   │   └── SupabaseContext.jsx  # Auth session provider
+│   │   ├── App.jsx            # Router setup
+│   │   ├── App.css            # Component styles
+│   │   ├── index.css          # CSS variables, theme, utilities
+│   │   ├── pages/
+│   │   │   ├── SignIn.jsx           # Auth page
+│   │   │   ├── ProjectList.jsx      # Project grid
+│   │   │   ├── NewProject.jsx       # Abstract input form
+│   │   │   ├── ProjectDashboard.jsx # Main dashboard + SSE pipeline
+│   │   │   └── AnalysisView.jsx     # Pipeline status tracker
 │   │   ├── components/
-│   │   │   └── Auth/
-│   │   │       └── ProtectedRoute.jsx
-│   │   └── pages/
-│   │       ├── SignIn.jsx
-│   │       ├── ProjectList.jsx
-│   │       ├── ProjectDashboard.jsx  # Includes PDF export via browser print
-│   │       ├── NewProject.jsx
-│   │       └── AnalysisView.jsx
+│   │   │   ├── ChatPanel.jsx        # Document Q&A panel
+│   │   │   └── Layout/             # Sidebar + main content wrapper
+│   │   └── context/
+│   │       └── ThemeContext.jsx      # Dark/light theme toggle
 │   └── package.json
 │
-├── main.py                    # Standalone LangGraph prototype (Tavily search)
-├── run_pipeline.py            # Pipeline B runner (PubMed → Ragie)
-├── requirements_ragie.txt     # Dependencies for Pipeline B
-├── .env.example               # Environment variable template (root)
-└── .kiro/specs/               # Feature specs (requirements, design, tasks)
+├── render-build.sh            # Render deployment build script
+├── run_pipeline.py            # Standalone pipeline runner (CLI)
+├── requirements.txt           # Python dependencies
+├── .env.example               # Environment variable template
+└── .kiro/
+    ├── hooks/                 # Agent automation hooks
+    ├── specs/                 # Feature specs
+    └── steering/              # AI steering rules
 ```
 
 ---
@@ -113,186 +126,162 @@ Entry point: `run_pipeline.py`
 ### Prerequisites
 
 - Python 3.11+
-- Node.js 18+
-- An [Anthropic API key](https://console.anthropic.com/settings/keys)
+- Node.js 22+
+- A [Groq API key](https://console.groq.com) (free tier available)
+- A [Ragie API key](https://app.ragie.ai) (for RAG indexing)
 - A [Supabase project](https://supabase.com) (for persistence and auth)
 
-### 1. Clone and configure environment
+### 1. Clone and configure
 
 ```bash
+git clone https://github.com/SaiMurthy/ATSS.git
+cd ATSS
 cp .env.example .env
-# Fill in ANTHROPIC_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 ```
 
-### 2. Run the Streamlit dashboard (Pipeline A)
+Fill in your `.env`:
+```
+GROQ_API_KEY=your_groq_key
+RAGIE_API_KEY=your_ragie_key
+ENTREZ_EMAIL=your_email@example.com
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
+
+### 2. Install dependencies
 
 ```bash
-pip install -r research_lab/requirements.txt
-streamlit run research_lab/app.py
+pip install -r requirements.txt
+pip install fastapi uvicorn python-multipart fpdf2 certifi supabase pyjwt requests groq
 ```
 
-### 3. Run Pipeline B (PubMed + Ragie)
+### 3. Run the backend
 
 ```bash
-pip install -r requirements_ragie.txt
-# Fill in GROQ_API_KEY, RAGIE_API_KEY, ENTREZ_EMAIL in research_lab/.env
-python run_pipeline.py
+python3 research_lab/server.py
+# API starts on http://localhost:8000
 ```
 
-### 4. Run the React mockup
+### 4. Run the frontend (development)
 
 ```bash
 cd labos-mockup
-cp .env.example .env.local
-# Fill in VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
 npm install
 npm run dev
+# Dev server starts on http://localhost:5173, proxies /api to :8000
+```
+
+### 5. Production build (single server)
+
+```bash
+cd labos-mockup && npm run build && cd ..
+python3 research_lab/server.py
+# Serves both API and React app on http://localhost:8000
 ```
 
 ---
 
-## Streamlit Dashboard
+## Demo Abstract
 
-The production UI (`research_lab/app.py`) provides:
+Use this for testing:
 
-- **Abstract input** with character validation (20–4,000 chars)
-- **5-stage pipeline status bar** — Literature Review → Hypothesis Design → Procedure Design → Synthesis → Complete
-- **Tabbed results view** — Literature, Hypothesis, Procedure, Log
-- **Confidence badge** — High / Moderate / Low with colour coding
-- **Critic review history** — pass/fail per revision with expandable feedback
-- **Dark theme** — IBM Plex fonts, `#0a0e1a` background
-
-### Demo Abstract
-
-```
-We're investigating menin inhibitors for NPM1-mutant AML.
-Key question: Does HOX gene expression predict treatment response to
-menin inhibitors in NPM1-mutant acute myeloid leukemia patients?
-```
+> We're investigating menin inhibitors for NPM1-mutant AML. Key question: Does HOX gene expression predict treatment response to menin inhibitors in NPM1-mutant acute myeloid leukemia patients?
 
 ---
 
-## React Mockup — Project Dashboard
+## API Endpoints
 
-The `ProjectDashboard` page auto-generates a display title from the submitted abstract (first sentence or first ~60 characters, truncated at a word boundary). It also includes a client-side PDF export feature that parses the consolidated `final_recommendation` JSON from the pipeline state and renders a styled HTML document containing:
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/health` | Liveness check — returns `{"status": "ok"}` |
+| `POST` | `/api/analyze` | Runs the full pipeline, returns `ResearchState` as JSON |
+| `POST` | `/api/analyze/stream` | Streams pipeline progress as SSE events |
+| `GET` | `/api/chat/sessions` | List chat sessions |
+| `POST` | `/api/chat/{id}/message` | Send a message in a chat session |
+| `POST` | `/api/chat/upload` | Upload a PDF for document Q&A |
+| `POST` | `/api/chat/export-pdf` | Generate a PDF export of results |
+| `GET` | `/{path}` | Serves the React SPA (production builds only) |
 
-- Result summary
-- Hypothesis
-- Step-by-step procedure
-- Literature citations
-- Confidence level badge
-- Action items and caveats
+**Request body (analyze endpoints):**
+```json
+{ "abstract": "Your research abstract (20–4000 characters)" }
+```
 
-The exported HTML applies its own formatting for print:
+**SSE stream events:** `literature` → `hypothesis` → `procedure` → `done`
 
-- **Step blocks** — procedure steps are split at "Step N:" boundaries and rendered as individually bordered cards with an amber left accent, improving scanability in the printed document.
-- **Citation hyperlinks** — URLs within citation text are converted to clickable amber-coloured links so readers can navigate directly to sources from the PDF.
+---
 
-Clicking the export button opens the rendered report in a new browser tab and triggers the native print dialog, allowing the user to save it as a PDF. No additional dependencies are required.
+## Frontend Features
 
-### Rich Text Rendering
-
-The dashboard includes several rendering helpers for improved readability of pipeline output:
-
-- **URL linkification** — bare `http`/`https` URLs in agent text are automatically converted to clickable links.
-- **Step formatting** — procedure text containing "Step N:" patterns is split into visually distinct cards with accent-coloured left borders.
-- **Citation enrichment** — citation lines are cross-referenced against the literature agent's paper list; matching titles receive an inline PubMed link icon via the `ExternalLink` Lucide icon.
+- **Real-time pipeline tracking** — SSE-powered status updates with spinner animations for each agent phase
+- **Three agent cards** — Literature Review, Hypothesis Design, Protocol Design with live status indicators
+- **Slide-out detail panels** — click any completed agent card to see full results
+- **Final Research Plan** — consolidated output with confidence badge, action items, and caveats
+- **PDF export** — Standard, APA, and LaTeX formats via server-side generation
+- **Document Q&A chat** — upload PDFs or chat with pipeline results using Groq
+- **Dark/light theme** — toggle between warm off-white and deep charcoal themes
+- **Responsive design** — IBM Plex Mono/Sans typography, clay/terracotta accent palette
 
 ---
 
 ## Environment Variables
 
-| Variable | Used by | Description |
+| Variable | Required | Description |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | All agents (Pipeline A) | Claude API access |
-| `GROQ_API_KEY` | Pipeline B | Groq API access (term extraction + results extraction) |
-| `RAGIE_API_KEY` | Pipeline B (`rag.py`) | Ragie.ai RAG indexing |
-| `ENTREZ_EMAIL` | Pipeline B (`literature.py`) | PubMed/Entrez identification |
-| `SUPABASE_URL` | `supabase_client.py` | Supabase project URL |
-| `SUPABASE_SERVICE_ROLE_KEY` | `supabase_client.py` | Bypasses RLS — backend only, never expose in frontend |
-| `VITE_SUPABASE_URL` | `labos-mockup/` | Supabase project URL (Vite env) |
-| `VITE_SUPABASE_ANON_KEY` | `labos-mockup/` | Public anon key — safe for browser, RLS enforced |
+| `GROQ_API_KEY` | Yes | Groq API access for all agents and chat |
+| `RAGIE_API_KEY` | Yes | Ragie.ai RAG indexing for literature |
+| `ENTREZ_EMAIL` | Yes | PubMed/Entrez API identification |
+| `SUPABASE_URL` | Yes | Supabase project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Backend-only service role key (bypasses RLS) |
+| `SUPABASE_JWT_SECRET` | Optional | JWT verification for auth middleware |
+| `PORT` | Optional | Server port (default: 8000) |
 
 ---
 
-## Running the Pipeline (CLI)
+## Deployment
 
-`graph.py` doubles as a CLI entry point:
+Deployed as a single Render web service that serves both the FastAPI backend and the built React frontend.
 
 ```bash
-# Run with the built-in demo abstract
-python research_lab/graph.py
+# Build script (render-build.sh):
+pip install -r requirements.txt
+pip install fastapi uvicorn python-multipart fpdf2 certifi supabase pyjwt requests groq
+cd labos-mockup && npm install && npm run build
 
-# Run with a custom abstract
-python research_lab/graph.py "Your research abstract text here"
+# Start command:
+cd research_lab && uvicorn server:app --host 0.0.0.0 --port $PORT
 ```
 
----
-
-## HTTP API Server
-
-`research_lab/server.py` exposes the pipeline as a FastAPI HTTP server:
-
-```bash
-pip install fastapi uvicorn certifi
-python3 research_lab/server.py
-# Server starts on http://localhost:8000 by default
-# Set PORT env var to override: PORT=9000 python3 research_lab/server.py
-```
-
-> **macOS note:** The server automatically uses `certifi`'s CA bundle to fix Python SSL certificate verification issues common on macOS. `literature.py` (Pipeline B) applies the same fix independently so it works whether run via the server or standalone. If `certifi` is not installed both modules still start, but HTTPS calls from Biopython/Entrez may fail with certificate errors.
-
-### Endpoints
-
-| Method | Path | Description |
-|---|---|---|
-| `GET` | `/health` | Returns `{"status": "ok"}` — liveness check |
-| `POST` | `/api/analyze` | Runs the full pipeline; returns `ResearchState` as JSON |
-| `POST` | `/api/analyze/stream` | Streams pipeline progress as SSE events: `literature`, `hypothesis`, `procedure`, `done` |
-
-**Request body:**
-```json
-{ "abstract": "Your research abstract (20–4000 characters)" }
-```
-
-CORS is configured for `localhost:5173`, `localhost:5174`, and `localhost:3000`.
-
----
-
-## Running Tests
-
-```bash
-# Python unit tests
-python -m pytest research_lab/tests/
-
-# React build check
-cd labos-mockup && npm run build
-
-# ESLint
-cd labos-mockup && npm run lint
-```
-
----
-
-## Key Constants
-
-| Constant | Value | File |
-|---|---|---|
-| `MODEL` | `claude-sonnet-4-20250514` | each agent file |
-| `MAX_REVISIONS` | `2` | `graph.py` |
-| `MAX_ABSTRACT_LENGTH` | `4,000` | `app.py` |
-| `MIN_ABSTRACT_LENGTH` | `20` | `app.py` |
-| `MAX_PAPERS` | `10` | `agents/literature.py` |
-| `MIN_PAPERS` | `5` | `agents/literature.py` |
+Auto-deploy is enabled — every push to `main` triggers a new build.
 
 ---
 
 ## Architecture Notes
 
-- **All Python code is synchronous** — no `async/await`, no event loops
-- **`supabase_client.py` is the only file** that imports `supabase` in the Python codebase
-- **Service role key stays in the backend** — never referenced in any frontend file
-- **Supabase write failures do not abort the pipeline** — errors are logged and execution continues
-- **All frontend Supabase queries go through `api.js`** — no raw `supabase.from()` calls in component files
-- **RLS enforces user isolation** — users can only read and write their own research sessions
-- **SSL on macOS** — Both `server.py` and `literature.py` set `SSL_CERT_FILE` from the `certifi` package at startup so that Biopython's Entrez (urllib) can verify HTTPS connections without manual certificate configuration
+- **All backend code is synchronous** — no `async/await` in agents or graph logic
+- **File ownership boundaries** — each file has a single responsibility (see `.kiro/steering/structure.md`)
+- **Supabase write failures do not abort the pipeline** — errors are logged, execution continues
+- **Supabase is optional for the frontend** — if `VITE_SUPABASE_URL` or `VITE_SUPABASE_ANON_KEY` are missing, the app still renders; auth features are disabled (`supabase` exports as `null`), project creation skips the DB insert using a local timestamp ID, and the project dashboard skips fetching persisted results so the pipeline can still run without a database connection
+- **Service role key stays in the backend** — never referenced in frontend code
+- **SSL on macOS** — `server.py` and `literature.py` set `SSL_CERT_FILE` from `certifi` at startup
+- **Single-port deployment** — when `labos-mockup/dist/` exists, `server.py` serves both API and SPA on the same port
+
+---
+
+## Agent Hooks
+
+The project includes automated agent hooks (`.kiro/hooks/`) for development quality:
+
+- **Guard File Ownership** — blocks writes that violate module boundaries
+- **No Async in Agents** — catches `async/await` in backend files
+- **Validate Model Constant** — flags changes to the pinned model name
+- **Verify State Contract** — checks consumers when `state.py` changes
+- **Lint Python/Frontend on Save** — instant syntax and lint feedback
+- **CSS Consistency Check** — verifies design system compliance
+- **Post-Task Build Check** — runs full build after spec tasks complete
+
+---
+
+## License
+
+MIT

@@ -18,6 +18,13 @@ export default function NewProject() {
     setIsSubmitting(true);
     setError(null);
 
+    // If Supabase is not configured, skip DB insert and navigate directly
+    if (!supabase) {
+      const newProjectId = Date.now();
+      navigate(`/projects/${newProjectId}`, { state: { abstract } });
+      return;
+    }
+
     const { data, error: insertError } = await supabase
       .from('projects')
       .insert({

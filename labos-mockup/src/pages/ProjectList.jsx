@@ -54,10 +54,12 @@ export default function ProjectList() {
         setLoading(true);
         setError(null);
 
-        const { data, error: queryError } = await supabase
-          .from('projects')
-          .select('*')
-          .order('created_at', { ascending: false });
+        const { data, error: queryError } = supabase
+          ? await supabase
+            .from('projects')
+            .select('*')
+            .order('created_at', { ascending: false })
+          : { data: [], error: null };
 
         if (queryError) {
           throw queryError;

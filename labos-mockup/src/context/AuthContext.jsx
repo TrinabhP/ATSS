@@ -9,6 +9,12 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // If Supabase is not configured, skip auth entirely
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
     // Restore existing session on mount
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
       setSession(currentSession);
@@ -24,7 +30,6 @@ export function AuthProvider({ children }) {
       }
     );
 
-    // Clean up subscription on unmount
     return () => {
       subscription.unsubscribe();
     };

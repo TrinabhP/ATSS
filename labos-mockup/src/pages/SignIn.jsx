@@ -18,6 +18,11 @@ export default function SignIn() {
     setLoading(true);
 
     try {
+      if (!supabase) {
+        // No Supabase configured — skip auth, go straight to projects
+        navigate('/projects');
+        return;
+      }
       if (isSignUp) {
         const { error: signUpError } = await supabase.auth.signUp({
           email,

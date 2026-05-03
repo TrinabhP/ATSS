@@ -39,6 +39,10 @@ export default function ProjectDashboard() {
   // Fetch project name, abstract, and check for persisted results on mount
   useEffect(() => {
     const fetchProjectData = async () => {
+      if (!supabase) {
+        setLoadingResults(false);
+        return;
+      }
       // Fetch project name and abstract
       const { data: project, error: projectError } = await supabase
         .from('projects')
@@ -104,10 +108,12 @@ export default function ProjectDashboard() {
     setIsEditing(false);
     setRenameError(null);
 
-    const { error: updateError } = await supabase
-      .from('projects')
-      .update({ name: trimmed })
-      .eq('id', id);
+    const { error: updateError } = supabase
+      ? await supabase
+        .from('projects')
+        .update({ name: trimmed })
+        .eq('id', id)
+      : { error: null };
 
     if (updateError) {
       // Revert on failure
