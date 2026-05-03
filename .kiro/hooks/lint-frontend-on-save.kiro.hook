@@ -1,0 +1,14 @@
+{
+  "name": "Lint Frontend on Save",
+  "version": "1.0.0",
+  "description": "Runs ESLint on saved JSX/JS files in the React mockup to catch issues immediately.",
+  "enabled": true,
+  "when": {
+    "type": "fileEdited",
+    "patterns": ["labos-mockup/src/**/*.jsx", "labos-mockup/src/**/*.js"]
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "cd labos-mockup && npx eslint ${file} --no-error-on-unmatched-pattern"
+  }
+}

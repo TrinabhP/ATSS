@@ -1,0 +1,18 @@
+{
+  "name": "No Async in Agents",
+  "version": "1.0.0",
+  "description": "When agent or graph files are edited, checks that no async/await was introduced — the backend must stay synchronous per project rules.",
+  "enabled": true,
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "research_lab/agents/**/*.py",
+      "research_lab/graph.py",
+      "research_lab/literature.py"
+    ]
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "grep -n 'async def\\|await ' ${file} && echo 'ERROR: async/await found — backend must be synchronous' && exit 1 || echo 'OK: no async/await found'"
+  }
+}

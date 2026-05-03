@@ -1,0 +1,14 @@
+{
+  "name": "Check Env Keys",
+  "version": "1.0.0",
+  "description": "When .env.example is edited, reminds the agent to verify .env has matching keys and that no secrets are hardcoded in source.",
+  "enabled": true,
+  "when": {
+    "type": "fileEdited",
+    "patterns": [".env.example"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "The .env.example file was just updated. Do two things:\n1. Check that .env has all the same keys (don't read the values, just confirm the keys exist).\n2. Grep the codebase for any hardcoded API keys or secrets that should be using environment variables instead.\nReport findings but do NOT modify .env or any source files."
+  }
+}

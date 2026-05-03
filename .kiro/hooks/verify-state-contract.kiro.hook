@@ -1,0 +1,14 @@
+{
+  "name": "Verify State Contract",
+  "version": "1.0.0",
+  "description": "When state.py is edited, reminds the agent to check that all agent files and graph.py still conform to the updated TypedDict contract.",
+  "enabled": true,
+  "when": {
+    "type": "fileEdited",
+    "patterns": ["research_lab/state.py"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "The shared state contract (state.py) was just modified. Check that all files importing from state.py still conform: research_lab/graph.py, research_lab/agents/hypothesis.py, research_lab/agents/procedure.py, research_lab/agents/orchestrator.py, research_lab/literature.py, and research_lab/server.py. Flag any field name mismatches, missing fields, or type incompatibilities. Do NOT modify any files — only report issues."
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Build Check Frontend",
+  "version": "1.0.0",
+  "description": "When CSS files are edited, runs a production build of the React app to catch build errors early.",
+  "enabled": true,
+  "when": {
+    "type": "fileEdited",
+    "patterns": ["labos-mockup/src/**/*.css"]
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "cd labos-mockup && npm run build"
+  }
+}

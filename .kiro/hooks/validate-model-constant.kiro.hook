@@ -1,0 +1,17 @@
+{
+  "name": "Validate Model Constant",
+  "version": "1.0.0",
+  "description": "When agent files are edited, verifies the MODEL constant hasn't been changed from the pinned value.",
+  "enabled": true,
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "research_lab/agents/**/*.py",
+      "research_lab/literature.py"
+    ]
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "grep -n 'MODEL' ${file} | grep -v 'claude-sonnet-4-20250514' | grep -v '^#' | grep -v '\"\"\"' && echo 'WARNING: MODEL constant may have been changed from claude-sonnet-4-20250514' || echo 'OK: MODEL constant is correct'"
+  }
+}

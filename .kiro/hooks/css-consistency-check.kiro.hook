@@ -1,0 +1,14 @@
+{
+  "name": "CSS Consistency Check",
+  "version": "1.0.0",
+  "description": "When CSS files are edited, asks the agent to verify spacing, font, and color variable usage stays consistent with the design system.",
+  "enabled": true,
+  "when": {
+    "type": "fileEdited",
+    "patterns": ["labos-mockup/src/**/*.css"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A CSS file was just edited. Quickly verify:\n1. All colors use CSS variables (var(--...)) not hardcoded hex values\n2. All fonts use var(--font-mono) or var(--font-sans), not raw font names\n3. Spacing values use the established scale (0.25rem, 0.5rem, 0.75rem, 1rem, 1.25rem, 1.5rem, 2rem)\n4. Border-radius uses 4px, 6px, or 8px consistently\n5. No duplicate property declarations in the same rule\nOnly report issues found in the changed file. Do NOT modify any files."
+  }
+}

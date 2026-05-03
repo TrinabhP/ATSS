@@ -1,0 +1,14 @@
+{
+  "name": "Lint Python on Save",
+  "version": "1.0.0",
+  "description": "Runs Python syntax check when any backend Python file is saved, catching errors early without a full test run.",
+  "enabled": true,
+  "when": {
+    "type": "fileEdited",
+    "patterns": ["research_lab/**/*.py"]
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "python3 -m py_compile ${file}"
+  }
+}

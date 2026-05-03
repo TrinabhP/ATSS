@@ -1,0 +1,13 @@
+{
+  "name": "Post-Task Build Check",
+  "version": "1.0.0",
+  "description": "After a spec task completes, runs both the Python syntax check and the frontend build to verify nothing is broken.",
+  "enabled": true,
+  "when": {
+    "type": "postTaskExecution"
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "echo '=== Python syntax check ===' && python3 -m compileall research_lab/ -q 2>&1 && echo 'Python OK' && echo '=== Frontend build ===' && cd labos-mockup && npm run build 2>&1 && echo 'Frontend OK' || echo 'BUILD FAILED'"
+  }
+}

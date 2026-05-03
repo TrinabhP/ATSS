@@ -1,0 +1,14 @@
+{
+  "name": "Guard File Ownership",
+  "version": "1.0.0",
+  "description": "Before writing to agent or graph files, verifies the change respects the file ownership boundaries defined in the project structure rules.",
+  "enabled": true,
+  "when": {
+    "type": "preToolUse",
+    "toolTypes": ["write"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Before writing, verify this change respects file ownership rules:\n- state.py: TypedDict definitions ONLY — no agent logic, no LangGraph imports\n- agents/literature.py, agents/hypothesis.py, agents/procedure.py: Claude API calls ONLY — no LangGraph imports, no Streamlit\n- agents/orchestrator.py: Critic review + synthesize_final ONLY — no LangGraph imports, no Streamlit\n- graph.py: LangGraph wiring ONLY — no direct Claude API calls, no Streamlit\n- server.py: FastAPI routes ONLY — no Claude API calls, no LangGraph logic\nIf the file being written is not in this list, approve the write. If it IS in this list, check that the change does not introduce imports or logic that violates its boundary. If it violates, deny the write and explain why."
+  }
+}
