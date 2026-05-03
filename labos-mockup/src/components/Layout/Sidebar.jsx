@@ -1,25 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Plus, FolderKanban, Sun, Moon, LogOut, User, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
+import { supabase } from '../../lib/supabase';
 
 export default function Sidebar() {
   const { theme, toggleTheme } = useTheme();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [recentProjects, setRecentProjects] = useState([]);
 
-  // Active projects will be retrieved from global state here later
-  const recentProjects = [];
+  // Fetch user's projects from Supabase
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchProjects = async () => {
+      const { data } = await supabase
+        .from('projects')
+        .select('id, name')
+        .order('created_at', { ascending: false })
+        .limit(10);
+      if (data) setRecentProjects(data);
+    };
+
+    fetchProjects();
+  }, [user, location.pathname]);
 
   return (
     <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
       <div className="sidebar-header" style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', flex: 1, overflow: 'hidden' }} onClick={() => navigate('/projects')}>
           <div style={{ color: 'var(--accent-primary)', fontSize: '1.5rem', minWidth: '24px' }}>⬡</div>
-          {!isCollapsed && <span>LabOS</span>}
+          {!isCollapsed && <span>SynThesis</span>}
         </div>
         <button className="sidebar-header-collapse-btn" onClick={() => setIsCollapsed(!isCollapsed)}>
           {isCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
@@ -49,10 +66,10 @@ export default function Sidebar() {
               className={`history-item ${location.pathname === `/projects/${proj.id}` ? 'active' : ''}`}
               onClick={() => navigate(`/projects/${proj.id}`)}
               style={{ justifyContent: isCollapsed ? 'center' : 'flex-start' }}
-              title={proj.title}
+              title={proj.name}
             >
               <span className="text-muted" style={{ fontSize: '10px', minWidth: '10px' }}>•</span>
-              {!isCollapsed && <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{proj.title}</span>}
+              {!isCollapsed && <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{proj.name}</span>}
             </li>
           ))}
         </ul>
@@ -72,7 +89,11 @@ export default function Sidebar() {
               <button onClick={() => { setShowProfileMenu(false); /* navigate to profile */ }}>
                 <User size={16} /> Profile
               </button>
-              <button onClick={() => { setShowProfileMenu(false); navigate('/'); }}>
+              <button onClick={async () => {
+                setShowProfileMenu(false);
+                await supabase.auth.signOut();
+                navigate('/');
+              }}>
                 <LogOut size={16} /> Log Out
               </button>
             </div>

@@ -33,7 +33,7 @@ except ImportError:
     pass
 
 from typing import Any, Dict, Optional, List
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, field_validator
@@ -41,8 +41,10 @@ import uvicorn
 import json
 import asyncio
 
+from auth import get_current_user
 from graph import run_research, run_research_streaming
 from chat import chat_router
+from supabase_client import save_analysis_results, update_project_status
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -72,6 +74,8 @@ app.include_router(chat_router)
 
 class AnalyzeRequest(BaseModel):
     abstract: str
+    project_id: Optional[str] = None
+    user_id: Optional[str] = None
 
     @field_validator("abstract")
     @classmethod
@@ -92,29 +96,40 @@ def health() -> Dict[str, str]:
 
 
 @app.post("/api/analyze")
-def analyze(request: AnalyzeRequest) -> Dict[str, Any]:
+def analyze(request: AnalyzeRequest, current_user: str = Depends(get_current_user)) -> Dict[str, Any]:
     """
     Run the full research pipeline for the given abstract.
     Returns the complete ResearchState as a JSON object.
+    Requires a valid Supabase JWT in the Authorization header.
     """
     try:
         result = run_research(request.abstract)
     except Exception as e:
+        if request.project_id:
+            update_project_status(request.project_id, "error")
         raise HTTPException(status_code=500, detail=str(e))
+
+    # Persist results to Supabase if project context is provided
+    if request.project_id and request.user_id:
+        save_analysis_results(request.project_id, request.user_id, dict(result))
+        update_project_status(request.project_id, "completed")
 
     # TypedDicts are already plain dicts — return directly
     return dict(result)
 
 
 @app.post("/api/analyze/stream")
-async def analyze_stream(request: AnalyzeRequest):
+async def analyze_stream(request: AnalyzeRequest, current_user: str = Depends(get_current_user)):
     """
     Run the pipeline and stream each agent's result as an SSE event.
     Events: literature, hypothesis, procedure, done
+    Requires a valid Supabase JWT in the Authorization header.
     """
     async def event_generator():
+        final_state = {}
         try:
             for stage, state in run_research_streaming(request.abstract):
+                final_state = state
                 # Build a JSON-safe snapshot of the current state
                 payload = {
                     "stage": stage,
@@ -132,7 +147,15 @@ async def analyze_stream(request: AnalyzeRequest):
                 yield f"data: {data}\n\n"
                 # Small yield to let the event loop flush
                 await asyncio.sleep(0.01)
+
+            # Persist results to Supabase after streaming completes
+            if request.project_id and request.user_id:
+                save_analysis_results(request.project_id, request.user_id, dict(final_state))
+                update_project_status(request.project_id, "completed")
+
         except Exception as e:
+            if request.project_id:
+                update_project_status(request.project_id, "error")
             error_payload = json.dumps({"stage": "error", "error": str(e)})
             yield f"data: {error_payload}\n\n"
 
