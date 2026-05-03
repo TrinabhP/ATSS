@@ -51,6 +51,13 @@ def extract_search_terms(abstract: str, progress: ProgressTracker) -> List[str]:
     api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
         raise ValueError("GROQ_API_KEY not found in environment")
+
+    # Log what abstract we're actually working with
+    progress.log(f"Abstract length: {len(abstract)} chars, preview: {abstract[:80].strip()!r}", "info")
+
+    if not abstract or len(abstract.strip()) < 10:
+        progress.log("Abstract too short for LLM extraction, using fallback", "error")
+        return _fallback_search_terms(abstract)
     
     client = Groq(api_key=api_key)
     
@@ -71,18 +78,20 @@ Return ONLY a JSON array, no markdown, no explanation:
     
     try:
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",  # Chat model — better for structured JSON output
+            model="openai/gpt-oss-20b",
             messages=[{"role": "user", "content": prompt}],
-            temperature=0.3,
-            max_tokens=500
+            max_tokens=1000,
         )
         
-        text = response.choices[0].message.content.strip()
-        progress.log(f"Raw Groq response: {text[:200]}", "info")
-        
+        text = response.choices[0].message.content or ""
+        progress.log(f"Raw Groq response (full): {text!r}", "info")
+
+        # Strip <think>...</think> blocks from reasoning models
+        import re as _re
+        text = _re.sub(r'<think>.*?</think>', '', text, flags=_re.DOTALL).strip()
+
         # Strip markdown fences
         if "```" in text:
-            # Extract content between first ``` pair
             parts = text.split("```")
             for part in parts:
                 part = part.strip()
@@ -100,15 +109,17 @@ Return ONLY a JSON array, no markdown, no explanation:
         
         search_terms = json.loads(text)
         
-        # Validate it's a non-empty list of strings
-        if not isinstance(search_terms, list) or len(search_terms) == 0:
-            raise ValueError(f"Parsed empty or invalid list: {search_terms}")
+        # Validate it's a non-empty list of non-empty strings
+        if not isinstance(search_terms, list):
+            raise ValueError(f"Response is not a list: {search_terms}")
         
         search_terms = [str(t).strip() for t in search_terms if str(t).strip()]
+
+        if len(search_terms) == 0:
+            raise ValueError("All extracted terms were empty strings")
         
     except Exception as e:
         progress.log(f"Groq term extraction failed ({e}), using fallback terms", "error")
-        # Fallback: extract key noun phrases from the abstract directly
         search_terms = _fallback_search_terms(abstract)
     
     progress.log(f"Extracted {len(search_terms)} search terms: {', '.join(search_terms)}", "success")
@@ -158,7 +169,11 @@ def _fallback_search_terms(abstract: str) -> List[str]:
 
 
 def search_pubmed(search_terms: List[str], max_results: int, progress: ProgressTracker) -> List[str]:
-    """Search PubMed database using NCBI Entrez API"""
+    """Search PubMed database using NCBI Entrez API.
+    
+    max_results is the TOTAL cap across all search terms (not per-term).
+    Searches stop early once the cap is reached.
+    """
     
     if not ENTREZ_AVAILABLE:
         raise ImportError("Biopython required. Install: pip install biopython")
@@ -168,13 +183,20 @@ def search_pubmed(search_terms: List[str], max_results: int, progress: ProgressT
     all_pmids = set()
     
     for i, term in enumerate(search_terms, 1):
+        if len(all_pmids) >= max_results:
+            progress.log(f"Reached {max_results} paper cap — skipping remaining terms", "info")
+            break
+
         progress.log(f"Searching PubMed for: '{term}' ({i}/{len(search_terms)})", "search")
+        
+        # Only fetch as many as we still need
+        remaining = max_results - len(all_pmids)
         
         try:
             handle = Entrez.esearch(
                 db="pubmed",
                 term=term,
-                retmax=max_results,
+                retmax=remaining,
                 sort="relevance",
                 retmode="xml"
             )
@@ -191,8 +213,9 @@ def search_pubmed(search_terms: List[str], max_results: int, progress: ProgressT
             progress.log(f"  Error searching '{term}': {str(e)}", "error")
             continue
     
-    pmid_list = list(all_pmids)
-    progress.log(f"Total unique papers found: {len(pmid_list)}", "success")
+    # Hard cap — in case multiple terms returned overlapping results
+    pmid_list = list(all_pmids)[:max_results]
+    progress.log(f"Total unique papers found: {len(pmid_list)} (cap: {max_results})", "success")
     
     return pmid_list
 
@@ -321,11 +344,16 @@ def find_literature(abstract: str, max_papers: int = 8,
 def run_literature_agent(abstract: str, critic_feedback: str = ""):
     """
     Entry point called by graph.py.
-    Runs find_literature + extract_results_threaded and returns a LiteratureOutput.
-    Kept here so graph.py imports from a single canonical file.
+    Pipeline: PubMed search → upload to Ragie → query Ragie for insights →
+              extract results → synthesize → return LiteratureOutput.
     """
     from state import LiteratureOutput, Paper, PaperAnalysis
-    from rag import extract_results_threaded, ProgressTracker as RagProgressTracker
+    from rag import (
+        build_ragie_database_threaded,
+        extract_results_threaded,
+        ProgressTracker as RagProgressTracker,
+        RagieClient,
+    )
 
     _SYNTHESIS_MODEL = "openai/gpt-oss-20b"
 
@@ -333,7 +361,7 @@ def run_literature_agent(abstract: str, critic_feedback: str = ""):
     if critic_feedback:
         search_context = f"{abstract}\n\nPrior review feedback to address: {critic_feedback}"
 
-    # Step 1: PubMed search + term extraction
+    # Step 1: PubMed search + term extraction (max 3 papers total)
     lit_result = find_literature(search_context, max_papers=3)
     raw_papers = lit_result["papers"]
     search_terms = lit_result["search_terms"]
@@ -341,7 +369,28 @@ def run_literature_agent(abstract: str, critic_feedback: str = ""):
     if not raw_papers:
         raise ValueError("PubMed search returned no papers — check GROQ_API_KEY and ENTREZ_EMAIL")
 
-    # Step 2: Map to Paper TypedDicts
+    # Step 2: Upload papers to Ragie for RAG
+    rag_progress = RagProgressTracker()
+    ragie_client = None
+    ragie_insights: list[str] = []
+    try:
+        ragie_client = build_ragie_database_threaded(raw_papers, rag_progress)
+        rag_progress.log("Querying Ragie for research insights...", "process")
+
+        # Give Ragie a moment to index (it processes asynchronously)
+        import time as _time
+        _time.sleep(3)
+
+        chunks = ragie_client.query(abstract, top_k=5)
+        for chunk in chunks:
+            text = chunk.get("text", "")
+            if text:
+                ragie_insights.append(text[:300])
+        rag_progress.log(f"Retrieved {len(ragie_insights)} relevant chunks from Ragie", "success")
+    except Exception as e:
+        rag_progress.log(f"Ragie integration skipped: {e}", "error")
+
+    # Step 3: Map to Paper TypedDicts
     papers = [
         Paper(
             title=p["title"],
@@ -352,7 +401,7 @@ def run_literature_agent(abstract: str, critic_feedback: str = ""):
         for i, p in enumerate(raw_papers)
     ]
 
-    # Step 3: Parallel extraction — must use raw_papers (has pmid/authors/journal/year)
+    # Step 4: Parallel extraction — must use raw_papers (has pmid/authors/journal/year)
     progress = RagProgressTracker()
     extracted = extract_results_threaded(raw_papers, progress)
 
@@ -368,13 +417,21 @@ def run_literature_agent(abstract: str, critic_feedback: str = ""):
         for e in extracted
     ]
 
-    # Step 4: Synthesis
+    # Step 5: Synthesis (include Ragie context if available)
     all_findings = [f for e in extracted for f in e.get("key_findings", [])]
+    ragie_context = ""
+    if ragie_insights:
+        ragie_context = (
+            "\n\nAdditional context from RAG retrieval:\n"
+            + "\n".join(f"- {ins}" for ins in ragie_insights[:5])
+        )
+
     synthesis_prompt = (
         f"Research question: {abstract}\n\n"
         f"Search terms: {', '.join(search_terms)}\n\n"
         f"Key findings across {len(extracted)} papers:\n"
         + "\n".join(f"- {f}" for f in all_findings[:20])
+        + ragie_context
         + "\n\nWrite a concise 2-3 sentence synthesis of what this literature "
         "collectively shows about the research question."
     )

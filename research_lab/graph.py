@@ -24,6 +24,11 @@ from agents.peer_reviewer import run_peer_review_agent
 
 MAX_REVISIONS = 1
 
+# Per-agent revision caps (override MAX_REVISIONS for specific agents)
+LITERATURE_MAX_REVISIONS = 0   # Agent 1: no retries — 3 papers + Ragie is sufficient
+HYPOTHESIS_MAX_REVISIONS = MAX_REVISIONS
+PROCEDURE_MAX_REVISIONS = MAX_REVISIONS
+
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -46,6 +51,7 @@ def _now() -> str:
 # ── Nodes ──────────────────────────────────────────────────────────────────────
 
 def dispatch_literature(state: ResearchState) -> ResearchState:
+    print(f"\n🔬 [GRAPH] Starting literature agent...")
     state["current_stage"] = "literature_running"
     feedback = get_latest_feedback(state["reviews"], "literature")
 
@@ -84,6 +90,7 @@ def dispatch_literature(state: ResearchState) -> ResearchState:
 
 
 def review_literature_node(state: ResearchState) -> ResearchState:
+    print(f"📋 [GRAPH] Reviewing literature output...")
     state["current_stage"] = "literature_review"
     review = review_literature(state["literature"], state["abstract"])
     review["timestamp"] = _now()
@@ -102,6 +109,7 @@ def review_literature_node(state: ResearchState) -> ResearchState:
 
 
 def dispatch_hypothesis(state: ResearchState) -> ResearchState:
+    print(f"\n🧪 [GRAPH] Starting hypothesis agent...")
     state["current_stage"] = "hypothesis_running"
     feedback = get_latest_feedback(state["reviews"], "hypothesis")
 
@@ -127,6 +135,7 @@ def dispatch_hypothesis(state: ResearchState) -> ResearchState:
 
 
 def review_hypothesis_node(state: ResearchState) -> ResearchState:
+    print(f"📋 [GRAPH] Reviewing hypothesis output...")
     state["current_stage"] = "hypothesis_review"
 
     if not state.get("hypothesis"):
@@ -159,6 +168,7 @@ def review_hypothesis_node(state: ResearchState) -> ResearchState:
 
 
 def dispatch_procedure(state: ResearchState) -> ResearchState:
+    print(f"\n📝 [GRAPH] Starting procedure agent...")
     state["current_stage"] = "procedure_running"
     feedback = get_latest_feedback(state["reviews"], "procedure")
 
@@ -185,6 +195,7 @@ def dispatch_procedure(state: ResearchState) -> ResearchState:
 
 
 def review_procedure_node(state: ResearchState) -> ResearchState:
+    print(f"📋 [GRAPH] Reviewing procedure output...")
     state["current_stage"] = "procedure_review"
 
     if not state.get("procedure"):
@@ -216,6 +227,7 @@ def review_procedure_node(state: ResearchState) -> ResearchState:
 
 
 def synthesize_node(state: ResearchState) -> ResearchState:
+    print(f"\n🔮 [GRAPH] Running final synthesis...")
     state["current_stage"] = "synthesizing"
     try:
         rec, conf, actions, caveats = synthesize_final(state)
@@ -233,6 +245,7 @@ def synthesize_node(state: ResearchState) -> ResearchState:
 
 
 def peer_review_node(state: ResearchState) -> ResearchState:
+    print(f"\n🔍 [GRAPH] Running peer review...")
     state["current_stage"] = "peer_review"
     try:
         result = run_peer_review_agent(
@@ -258,7 +271,7 @@ def peer_review_node(state: ResearchState) -> ResearchState:
 def should_retry_literature(state: ResearchState) -> str:
     latest = _get_latest_review(state["reviews"], "literature")
     lit_revisions = state["literature"]["revision_count"] if state["literature"] else 0
-    if latest and not latest["passed"] and lit_revisions < MAX_REVISIONS:
+    if latest and not latest["passed"] and lit_revisions < LITERATURE_MAX_REVISIONS:
         return "retry_literature"
     return "run_hypothesis"
 
@@ -266,7 +279,7 @@ def should_retry_literature(state: ResearchState) -> str:
 def should_retry_hypothesis(state: ResearchState) -> str:
     latest = _get_latest_review(state["reviews"], "hypothesis")
     hyp_revisions = state["hypothesis"]["revision_count"] if state["hypothesis"] else 0
-    if latest and not latest["passed"] and hyp_revisions < MAX_REVISIONS:
+    if latest and not latest["passed"] and hyp_revisions < HYPOTHESIS_MAX_REVISIONS:
         return "retry_hypothesis"
     return "run_procedure"
 
@@ -274,7 +287,7 @@ def should_retry_hypothesis(state: ResearchState) -> str:
 def should_retry_procedure(state: ResearchState) -> str:
     latest = _get_latest_review(state["reviews"], "procedure")
     proc_revisions = state["procedure"]["revision_count"] if state["procedure"] else 0
-    if latest and not latest["passed"] and proc_revisions < MAX_REVISIONS:
+    if latest and not latest["passed"] and proc_revisions < PROCEDURE_MAX_REVISIONS:
         return "retry_procedure"
     return "synthesize"
 
