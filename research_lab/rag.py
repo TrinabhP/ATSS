@@ -13,6 +13,8 @@ from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from groq import Groq
 from dotenv import load_dotenv
+import json
+from io import BytesIO
 
 load_dotenv()
 
@@ -60,33 +62,36 @@ class RagieClient:
         }
     
     def upload_document(self, content: str, metadata: dict) -> str:
-        """Upload a document to Ragie with correct headers"""
-        url = f"{self.base_url}/documents"
+        """Upload a document to Ragie - CORRECT FORMAT"""
         
-        # Ensure all metadata values are strings (Ragie requirement)
-        clean_metadata = {k: str(v) for k, v in metadata.items()}
+        # Create file-like object from text content
+        from io import BytesIO
         
-        payload = {
-            "name": metadata.get("title", "Untitled")[:200],
-            "data": content, # Some Ragie versions use 'data', others use 'content'
-            "metadata": clean_metadata
+        # Prepare file
+        file_content = BytesIO(content.encode('utf-8'))
+        file_name = metadata.get("title", "document")[:200] + ".txt"
+        
+        # Prepare metadata as JSON string
+        metadata_json = json.dumps({k: str(v) for k, v in metadata.items()})
+        
+        # Use multipart/form-data (file upload format)
+        files = {
+            'file': (file_name, file_content, 'text/plain')
+        }
+        
+        data = {
+            'metadata': metadata_json,
+            'mode': 'hi_res'  # Optional: use 'fast' for speed or 'hi_res' for quality
         }
         
         response = requests.post(
-            url,
-            headers={
-                "Authorization": f"Bearer {self.api_key}",
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            json=payload
+            f"{self.base_url}/documents",
+            headers={"Authorization": f"Bearer {self.api_key}"},  # Remove Content-Type, let requests set it
+            files=files,
+            data=data,
+            timeout=60
         )
         
-        if response.status_code == 415:
-            # Fallback for different API versions
-            payload["content"] = payload.pop("data")
-            response = requests.post(url, headers=self.headers, json=payload)
-            
         response.raise_for_status()
         return response.json()["id"]
     
@@ -164,7 +169,7 @@ def build_ragie_database_threaded(papers: List[Dict], progress: ProgressTracker)
         else:
             return (paper, paper['abstract'], False)
     
-    progress.log("Fetching full-texts in parallel (3 workers)...", "download")
+    progress.log("Fetching full-texts in parallel (1 workers)...", "download")
     
     with ThreadPoolExecutor(max_workers=1) as executor:
         futures = [executor.submit(fetch_text_for_paper, paper) for paper in papers]
@@ -196,9 +201,9 @@ def build_ragie_database_threaded(papers: List[Dict], progress: ProgressTracker)
         doc_id = ragie.upload_document(text, metadata)
         return doc_id
     
-    progress.log("Uploading to Ragie in parallel (5 workers)...", "upload")
+    progress.log("Uploading to Ragie in parallel (1 workers)...", "upload")
     
-    with ThreadPoolExecutor(max_workers=2) as executor:
+    with ThreadPoolExecutor(max_workers=1) as executor:
         futures = [executor.submit(upload_to_ragie, pt) for pt in papers_with_text]
         
         for future in as_completed(futures):
@@ -218,7 +223,7 @@ def build_ragie_database_threaded(papers: List[Dict], progress: ProgressTracker)
 def extract_results_threaded(papers: List[Dict], progress: ProgressTracker) -> List[Dict]:
     """Extract structured results with THREADING using Groq"""
     
-    progress.log("Extracting results in parallel (Groq, 5 workers)...", "extract")
+    progress.log("Extracting results in parallel (Groq, 1 workers)...", "extract")
     
     api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
@@ -290,7 +295,7 @@ Extract and return ONLY valid JSON (no markdown, no explanation):
     
     extracted_results = []
     
-    with ThreadPoolExecutor(max_workers=2) as executor:
+    with ThreadPoolExecutor(max_workers=1) as executor:
         futures = [executor.submit(extract_single_paper, paper) for paper in papers]
         
         for future in as_completed(futures):

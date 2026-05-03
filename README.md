@@ -35,15 +35,15 @@ Abstract Input
 
 ### Pipeline B — PubMed + Ragie RAG (alternative)
 
-An alternative pipeline that uses PubMed (via Biopython/Entrez) for literature search and Ragie.ai for RAG indexing. Uses Gemini for extraction.
+An alternative pipeline that uses PubMed (via Biopython/Entrez) for literature search and Ragie.ai for RAG indexing. Uses Groq (`llama-3.3-70b-versatile`) for term extraction and results extraction.
 
 ```
 Abstract Input
     ↓
-[Agent 1: PubMed Finder]       — Gemini term extraction + Entrez API → papers + PMIDs
+[Agent 1: PubMed Finder]       — Groq term extraction + Entrez API → papers + PMIDs
     ↓
-[Agent 2: Ragie RAG Builder]   — PMC full-text fetch + Ragie.ai upload (threaded, 3 workers)
-    + Results Extractor        — Gemini parallel extraction → structured findings (2 workers)
+[Agent 2: Ragie RAG Builder]   — PMC full-text fetch + Ragie.ai upload (threaded, 1 worker)
+    + Results Extractor        — Groq extraction → structured findings (1 worker)
 ```
 
 Entry point: `run_pipeline.py`
@@ -138,7 +138,7 @@ streamlit run research_lab/app.py
 
 ```bash
 pip install -r requirements_ragie.txt
-# Fill in GOOGLE_API_KEY, RAGIE_API_KEY, ENTREZ_EMAIL in .env
+# Fill in GROQ_API_KEY, RAGIE_API_KEY, ENTREZ_EMAIL in research_lab/.env
 python run_pipeline.py
 ```
 
@@ -180,7 +180,7 @@ menin inhibitors in NPM1-mutant acute myeloid leukemia patients?
 | Variable | Used by | Description |
 |---|---|---|
 | `ANTHROPIC_API_KEY` | All agents (Pipeline A) | Claude API access |
-| `GOOGLE_API_KEY` | Pipeline B | Gemini API access |
+| `GROQ_API_KEY` | Pipeline B | Groq API access (term extraction + results extraction) |
 | `RAGIE_API_KEY` | Pipeline B (`rag.py`) | Ragie.ai RAG indexing |
 | `ENTREZ_EMAIL` | Pipeline B (`literature.py`) | PubMed/Entrez identification |
 | `SUPABASE_URL` | `supabase_client.py` | Supabase project URL |
