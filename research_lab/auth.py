@@ -25,20 +25,19 @@ from fastapi import HTTPException, Request
 logger = logging.getLogger(__name__)
 
 
-def get_current_user(request: Request) -> str:
+def get_current_user(request: Request) -> str | None:
     """FastAPI dependency that verifies the Supabase JWT and returns the user_id.
 
-    First tries local HS256 verification if SUPABASE_JWT_SECRET is set.
-    Otherwise, calls Supabase's auth.getUser() API to validate the token.
+    If no Authorization header is present, returns None (anonymous access).
+    This allows the pipeline to work without Supabase auth configured.
 
     Raises:
-        HTTPException(401): If the Authorization header is missing, malformed,
-            or the token is invalid / expired.
+        HTTPException(401): If a token IS provided but is invalid / expired.
     """
     auth_header: str | None = request.headers.get("Authorization")
 
     if not auth_header:
-        raise HTTPException(status_code=401, detail="Missing Authorization header")
+        return None
 
     parts = auth_header.split()
     if len(parts) != 2 or parts[0].lower() != "bearer":

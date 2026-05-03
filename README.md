@@ -76,7 +76,7 @@ Abstract Input (20–4,000 characters)
 │   ├── state.py               # Shared TypedDict schema (ResearchState)
 │   ├── literature.py          # Agent 1 — PubMed paper discovery + Ragie RAG
 │   ├── rag.py                 # Ragie RAG builder + results extractor
-│   ├── auth.py                # Supabase JWT auth middleware
+│   ├── auth.py                # Supabase JWT auth (optional — anonymous access allowed)
 │   ├── supabase_client.py     # Supabase write integration (service role key)
 │   ├── agents/
 │   │   ├── hypothesis.py      # Agent 2 — hypothesis design
@@ -260,8 +260,9 @@ Auto-deploy is enabled — every push to `main` triggers a new build.
 
 - **All backend code is synchronous** — no `async/await` in agents or graph logic
 - **File ownership boundaries** — each file has a single responsibility (see `.kiro/steering/structure.md`)
+- **Auth is optional** — if no `Authorization` header is sent, `auth.py` returns `None` (anonymous access) instead of rejecting the request; a token is only validated when one is actually provided
 - **Supabase write failures do not abort the pipeline** — errors are logged, execution continues
-- **Supabase is optional for the frontend** — if `VITE_SUPABASE_URL` or `VITE_SUPABASE_ANON_KEY` are missing, the app still renders; auth features are disabled (`supabase` exports as `null`), project creation skips the DB insert using a local timestamp ID, and the project dashboard skips fetching persisted results so the pipeline can still run without a database connection
+- **Supabase is optional for the frontend** — if `VITE_SUPABASE_URL` or `VITE_SUPABASE_ANON_KEY` are missing, the app still renders; auth features are disabled (`supabase` exports as `null`), protected routes skip authentication entirely (all routes are accessible without sign-in), project creation skips the DB insert using a local timestamp ID, and the project dashboard skips fetching persisted results so the pipeline can still run without a database connection
 - **Service role key stays in the backend** — never referenced in frontend code
 - **SSL on macOS** — `server.py` and `literature.py` set `SSL_CERT_FILE` from `certifi` at startup
 - **Single-port deployment** — when `labos-mockup/dist/` exists, `server.py` serves both API and SPA on the same port

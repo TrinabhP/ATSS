@@ -172,11 +172,6 @@ export default function ProjectDashboard() {
           }),
         });
         if (!res.ok) {
-          // Handle 401 — redirect to sign-in
-          if (res.status === 401) {
-            navigate('/');
-            return;
-          }
           const detail = await res.json().catch(() => ({}));
           throw new Error(detail?.detail || `Server error ${res.status}`);
         }
