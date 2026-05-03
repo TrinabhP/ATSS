@@ -278,36 +278,50 @@ def review_procedure(
 
 # ── Final Synthesis ────────────────────────────────────────────────────────────
 
-_SYNTHESIS_SYSTEM = """You are a research director producing a final synthesis after three specialized agents have completed their work and passed expert review.
+_SYNTHESIS_SYSTEM = """You are a research director producing a final consolidated research plan after three specialized agents have completed their work.
+
+Your output must have four clearly labeled sections in this exact order:
+
+1. RESULT — A concise 2-3 paragraph executive summary of the overall research recommendation. State whether the study is feasible, what the expected impact is, and your confidence assessment.
+
+2. HYPOTHESIS — Restate the approved hypothesis (H1 and H0), the rationale grounded in the literature, the design approach, and expected outcomes.
+
+3. STEPS — A numbered step-by-step research execution plan (8-12 steps) that a researcher could follow from start to finish. Each step must be a concrete imperative instruction grounded in the procedure agent's output (population criteria, sample size, design, data collection, statistical tests, timeline).
+
+4. LITERATURE REVIEW — A formatted citation list of all papers reviewed, with a one-sentence summary of each paper's relevance to the research question.
 
 Return valid JSON only (no markdown, no extra text):
 {
-  "final_recommendation": "2-3 paragraph recommendation integrating literature evidence, the research hypothesis, and the proposed study procedure. Be concrete and actionable.",
+  "result": "2-3 paragraph executive summary with feasibility assessment and confidence rationale.",
+  "hypothesis": "Full hypothesis section: H1, H0, rationale, design approach, expected outcomes.",
+  "steps": "Step 1: [Title]\\n[1-3 sentences]\\n\\nStep 2: [Title]\\n[1-3 sentences]\\n\\n... (8-12 steps covering setup, recruitment, data collection, intervention, analysis, reporting)",
+  "literature_citations": "Formatted citation list. For each paper: [Author(s), Title, Journal/URL] — one-sentence relevance summary.",
   "confidence_level": "High",
-  "action_items": [
-    "Specific action item 1",
-    "Specific action item 2"
-  ],
-  "caveats": [
-    "Important caveat 1"
-  ]
+  "action_items": ["Immediate action 1", "Immediate action 2"],
+  "caveats": ["Important caveat 1"]
 }
 
 Confidence level rules:
-- "High": Strong literature base (5+ papers), specific testable hypothesis, rigorous procedure design
-- "Moderate": Adequate literature but gaps exist, OR hypothesis needs refinement, OR procedure has limitations
-- "Low": Weak literature, vague hypothesis, or methodological concerns remain
+- "High": Strong literature base, specific testable hypothesis, rigorous procedure
+- "Moderate": Adequate literature but gaps, OR hypothesis needs refinement, OR procedure has limitations
+- "Low": Weak literature, vague hypothesis, or methodological concerns
 
 Requirements:
+- All four sections (result, hypothesis, steps, literature_citations) are REQUIRED
+- Steps must reference specific details from the procedure (exact sample size, named statistical tests, etc.)
+- Literature citations must list every paper provided, with title and relevance
 - confidence_level must be exactly "High", "Moderate", or "Low"
-- action_items: 3-5 specific next steps for the research team
-- caveats: 2-4 important limitations or risks to flag"""
+- action_items: 3-5 immediate next steps
+- caveats: 2-4 limitations or risks"""
 
 
 def synthesize_final(state: ResearchState) -> tuple:
     """
     Called only after all 3 agents have passed review.
     Returns: (final_recommendation, confidence_level, action_items, caveats)
+
+    final_recommendation is a JSON string with keys:
+      result, hypothesis, steps, literature_citations
     """
     client = _get_client()
 
@@ -323,27 +337,50 @@ def synthesize_final(state: ResearchState) -> tuple:
         for r in reviews
     )
 
+    # Build paper citation context for the LLM
+    papers = literature.get("papers") or []
+    analyses = literature.get("analyses") or []
+    paper_details = []
+    for i, p in enumerate(papers):
+        title = p.get("title", "Untitled")
+        url = p.get("url", "")
+        # Find matching analysis if available
+        relevance = ""
+        for a in analyses:
+            if a.get("paper_title", "") == title:
+                relevance = a.get("relevance_to_question", "")
+                break
+        paper_details.append(f"  {i+1}. {title} — {url}" + (f"\n     Relevance: {relevance}" if relevance else ""))
+
+    papers_block = "\n".join(paper_details) if paper_details else "  No papers available."
+
     user_content = (
         f"Research question:\n{abstract}\n\n"
-        f"Literature synthesis:\n{literature.get('synthesis', 'N/A')}\n"
-        f"Papers reviewed: {len(literature.get('papers') or [])}\n\n"
-        f"Approved hypothesis:\n{hypothesis.get('hypothesis', 'N/A')}\n"
+        f"=== LITERATURE CONTEXT ===\n"
+        f"Synthesis:\n{literature.get('synthesis', 'N/A')}\n"
+        f"Papers ({len(papers)}):\n{papers_block}\n\n"
+        f"=== APPROVED HYPOTHESIS ===\n"
+        f"Primary hypothesis: {hypothesis.get('hypothesis', 'N/A')}\n"
         f"Null hypothesis: {hypothesis.get('null_hypothesis', 'N/A')}\n"
         f"Rationale: {hypothesis.get('rationale', 'N/A')}\n"
-        f"Design approach: {hypothesis.get('design_approach', 'N/A')}\n\n"
-        f"Approved procedure:\n"
-        f"Sample size: {procedure.get('population_size', 'N/A')}\n"
-        f"Design: {procedure.get('research_design', 'N/A')}\n"
-        f"Statistics: {procedure.get('statistical_approach', 'N/A')}\n"
+        f"Design approach: {hypothesis.get('design_approach', 'N/A')}\n"
+        f"Expected outcomes: {hypothesis.get('expected_outcomes', [])}\n\n"
+        f"=== APPROVED STUDY PROCEDURE (primary guide for steps) ===\n"
+        f"Population size: {procedure.get('population_size', 'N/A')}\n"
+        f"Population criteria: {procedure.get('population_criteria', 'N/A')}\n"
+        f"Research design: {procedure.get('research_design', 'N/A')}\n"
+        f"Data collection: {procedure.get('data_collection', 'N/A')}\n"
+        f"Statistical approach: {procedure.get('statistical_approach', 'N/A')}\n"
         f"Timeline: {procedure.get('timeline_estimate', 'N/A')}\n\n"
-        f"Review history:\n{review_summary}"
+        f"=== REVIEW HISTORY ===\n{review_summary}\n\n"
+        f"Produce the consolidated output with all four sections: result, hypothesis, steps, literature_citations."
     )
 
     raw: dict = {}
     try:
         response = client.chat.completions.create(
             model=MODEL,
-            max_tokens=3000,
+            max_tokens=4000,
             messages=[
                 {"role": "system", "content": _SYNTHESIS_SYSTEM},
                 {"role": "user", "content": user_content},
@@ -353,8 +390,14 @@ def synthesize_final(state: ResearchState) -> tuple:
         parsed = _safe_json(text, {})
         raw = parsed if isinstance(parsed, dict) else {}
     except Exception as e:
+        fallback = json.dumps({
+            "result": f"[Synthesis error: {e}]",
+            "hypothesis": "",
+            "steps": "",
+            "literature_citations": "",
+        })
         return (
-            f"[Synthesis error: {e}]",
+            fallback,
             "Low",
             ["Review pipeline error and retry"],
             ["Synthesis failed — results unreliable"],
@@ -364,8 +407,16 @@ def synthesize_final(state: ResearchState) -> tuple:
     if confidence not in ("High", "Moderate", "Low"):
         confidence = "Low"
 
+    # Pack the four sections into a JSON string for final_recommendation
+    consolidated = json.dumps({
+        "result": str(raw.get("result", "")),
+        "hypothesis": str(raw.get("hypothesis", "")),
+        "steps": str(raw.get("steps", "")),
+        "literature_citations": str(raw.get("literature_citations", "")),
+    })
+
     return (
-        str(raw.get("final_recommendation", "")),
+        consolidated,
         confidence,
         [str(a) for a in (raw.get("action_items") or [])],
         [str(c) for c in (raw.get("caveats") or [])],

@@ -27,10 +27,8 @@ Abstract Input
   Reviews each agent — up to 2 revision cycles per agent
     ↓
 [Final Synthesis]
-  Confidence level (High / Moderate / Low) + action items + caveats
-    ↓
-[Peer Review]
-  Reproducibility score, strengths, issues, replication checklist
+  Consolidated output: executive summary, hypothesis, step-by-step plan,
+  literature citations + confidence level + action items + caveats
 ```
 
 ### Pipeline B — PubMed + Ragie RAG (alternative)
@@ -80,8 +78,7 @@ Entry point: `run_pipeline.py`
 │       ├── literature.py      # Agent 1 — paper discovery + synthesis
 │       ├── hypothesis.py      # Agent 2 — hypothesis design
 │       ├── procedure.py       # Agent 3 — study procedure design
-│       ├── orchestrator.py    # Critic review + final synthesis
-│       └── peer_reviewer.py   # Agent 4 — independent reproducibility review
+│       └── orchestrator.py    # Critic review + final synthesis
 │
 ├── labos-mockup/              # React/Vite UI prototype
 │   ├── src/
@@ -97,7 +94,7 @@ Entry point: `run_pipeline.py`
 │   │   └── pages/
 │   │       ├── SignIn.jsx
 │   │       ├── ProjectList.jsx
-│   │       ├── ProjectDashboard.jsx
+│   │       ├── ProjectDashboard.jsx  # Includes PDF export via browser print
 │   │       ├── NewProject.jsx
 │   │       └── AnalysisView.jsx
 │   └── package.json
@@ -159,8 +156,8 @@ npm run dev
 The production UI (`research_lab/app.py`) provides:
 
 - **Abstract input** with character validation (20–4,000 chars)
-- **6-stage pipeline status bar** — Literature Review → Hypothesis Design → Procedure Design → Synthesis → Peer Review → Complete
-- **Tabbed results view** — Literature, Hypothesis, Procedure, Peer Review, Log
+- **5-stage pipeline status bar** — Literature Review → Hypothesis Design → Procedure Design → Synthesis → Complete
+- **Tabbed results view** — Literature, Hypothesis, Procedure, Log
 - **Confidence badge** — High / Moderate / Low with colour coding
 - **Critic review history** — pass/fail per revision with expandable feedback
 - **Dark theme** — IBM Plex fonts, `#0a0e1a` background
@@ -172,6 +169,21 @@ We're investigating menin inhibitors for NPM1-mutant AML.
 Key question: Does HOX gene expression predict treatment response to
 menin inhibitors in NPM1-mutant acute myeloid leukemia patients?
 ```
+
+---
+
+## React Mockup — PDF Export
+
+The `ProjectDashboard` page includes a client-side PDF export feature. It parses the consolidated `final_recommendation` JSON from the pipeline state and renders a styled HTML document containing:
+
+- Result summary
+- Hypothesis
+- Step-by-step procedure
+- Literature citations
+- Confidence level badge
+- Action items and caveats
+
+Clicking the export button opens the rendered report in a new browser tab and triggers the native print dialog, allowing the user to save it as a PDF. No additional dependencies are required.
 
 ---
 
@@ -209,11 +221,13 @@ python research_lab/graph.py "Your research abstract text here"
 `research_lab/server.py` exposes the pipeline as a FastAPI HTTP server:
 
 ```bash
-pip install fastapi uvicorn
+pip install fastapi uvicorn certifi
 python3 research_lab/server.py
 # Server starts on http://localhost:8000 by default
 # Set PORT env var to override: PORT=9000 python3 research_lab/server.py
 ```
+
+> **macOS note:** The server automatically uses `certifi`'s CA bundle to fix Python SSL certificate verification issues common on macOS. `literature.py` (Pipeline B) applies the same fix independently so it works whether run via the server or standalone. If `certifi` is not installed both modules still start, but HTTPS calls from Biopython/Entrez may fail with certificate errors.
 
 ### Endpoints
 
@@ -221,6 +235,7 @@ python3 research_lab/server.py
 |---|---|---|
 | `GET` | `/health` | Returns `{"status": "ok"}` — liveness check |
 | `POST` | `/api/analyze` | Runs the full pipeline; returns `ResearchState` as JSON |
+| `POST` | `/api/analyze/stream` | Streams pipeline progress as SSE events: `literature`, `hypothesis`, `procedure`, `done` |
 
 **Request body:**
 ```json
@@ -267,3 +282,4 @@ cd labos-mockup && npm run lint
 - **Supabase write failures do not abort the pipeline** — errors are logged and execution continues
 - **All frontend Supabase queries go through `api.js`** — no raw `supabase.from()` calls in component files
 - **RLS enforces user isolation** — users can only read and write their own research sessions
+- **SSL on macOS** — Both `server.py` and `literature.py` set `SSL_CERT_FILE` from the `certifi` package at startup so that Biopython's Entrez (urllib) can verify HTTPS connections without manual certificate configuration

@@ -65,24 +65,6 @@ class ProcedureOutput(TypedDict):
     revision_count: int
 
 
-class ReproducibilityIssue(TypedDict):
-    section: str       # Which part of the procedure has the issue
-    severity: str      # "Critical" | "Major" | "Minor"
-    description: str   # What the issue is
-    suggestion: str    # Concrete fix
-
-
-class PeerReviewOutput(TypedDict):
-    overall_verdict: str        # "Accept" | "Major Revision" | "Minor Revision" | "Reject"
-    reproducibility_score: int  # 1-10
-    summary: str                # 2-3 paragraph narrative summary of the review
-    strengths: List[str]        # What the procedure does well
-    issues: List[ReproducibilityIssue]  # Categorized problems
-    missing_details: List[str]  # Information absent that would be needed to replicate
-    suggested_changes: List[str]  # Prioritized list of changes to make
-    replication_checklist: List[str]  # Yes/no items for whether replication is currently possible
-
-
 # ── Top-level graph state ──────────────────────────────────────────────────────
 
 class ResearchState(TypedDict):
@@ -97,7 +79,6 @@ class ResearchState(TypedDict):
     literature: Optional[LiteratureOutput]
     hypothesis: Optional[HypothesisOutput]
     procedure: Optional[ProcedureOutput]
-    peer_review: Optional[PeerReviewOutput]
 
     # Critic review history (all reviews, all agents)
     reviews: List[CriticReview]

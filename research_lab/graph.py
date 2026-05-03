@@ -18,7 +18,6 @@ from agents.orchestrator import (
     review_procedure,
     synthesize_final,
 )
-from agents.peer_reviewer import run_peer_review_agent
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -241,27 +240,6 @@ def synthesize_node(state: ResearchState) -> ResearchState:
     except Exception as e:
         state["error"] = f"Synthesis error: {e}"
         state["orchestrator_messages"].append(f"[{_now()}] Synthesis failed: {e}")
-    return state
-
-
-def peer_review_node(state: ResearchState) -> ResearchState:
-    print(f"\n🔍 [GRAPH] Running peer review...")
-    state["current_stage"] = "peer_review"
-    try:
-        result = run_peer_review_agent(
-            state["literature"],
-            state["hypothesis"],
-            state["procedure"],
-            state["abstract"],
-        )
-        state["peer_review"] = result
-        state["orchestrator_messages"].append(
-            f"[{_now()}] Peer review complete — verdict: {result['overall_verdict']} "
-            f"(reproducibility score: {result['reproducibility_score']}/10)"
-        )
-    except Exception as e:
-        state["error"] = f"Peer review error: {e}"
-        state["orchestrator_messages"].append(f"[{_now()}] Peer review failed: {e}")
     state["current_stage"] = "complete"
     return state
 
@@ -304,7 +282,6 @@ def _build_graph():
     graph.add_node("dispatch_procedure", dispatch_procedure)
     graph.add_node("review_procedure_node", review_procedure_node)
     graph.add_node("synthesize_node", synthesize_node)
-    graph.add_node("peer_review_node", peer_review_node)
 
     graph.set_entry_point("dispatch_literature")
 
@@ -338,8 +315,7 @@ def _build_graph():
         },
     )
 
-    graph.add_edge("synthesize_node", "peer_review_node")
-    graph.add_edge("peer_review_node", END)
+    graph.add_edge("synthesize_node", END)
 
     return graph.compile()
 
@@ -367,7 +343,6 @@ def run_research_streaming(abstract: str):
         "literature": None,
         "hypothesis": None,
         "procedure": None,
-        "peer_review": None,
         "reviews": [],
         "final_recommendation": None,
         "confidence_level": None,
@@ -411,10 +386,6 @@ def run_research_streaming(abstract: str):
 
     # Step 4: Synthesis
     state = synthesize_node(state)
-    yield ("synthesis", state)
-
-    # Step 5: Peer review
-    state = peer_review_node(state)
     yield ("done", state)
 
 
@@ -493,26 +464,6 @@ def print_results(result: ResearchState) -> None:
         _print_field("Design", proc.get("research_design", ""))
         _print_field("Statistics", proc.get("statistical_approach", ""))
         _print_field("Timeline", proc.get("timeline_estimate", ""))
-
-    # Peer review
-    peer = result.get("peer_review")
-    if peer:
-        _print_section("PEER REVIEW")
-        print(f"  Verdict:               {peer.get('overall_verdict', 'N/A')}")
-        print(f"  Reproducibility score: {peer.get('reproducibility_score', 'N/A')}/10")
-        print(f"  Summary:\n")
-        for line in (peer.get("summary") or "").splitlines():
-            print(f"    {line}")
-        issues = peer.get("issues") or []
-        if issues:
-            print(f"\n  Issues ({len(issues)}):")
-            for issue in issues:
-                print(f"    [{issue.get('severity', '?'):8s}] {issue.get('section', '')}: {issue.get('description', '')[:100]}")
-        changes = peer.get("suggested_changes") or []
-        if changes:
-            print(f"\n  Suggested changes:")
-            for c in changes:
-                print(f"    - {c}")
 
     # Final recommendation
     _print_section("FINAL RECOMMENDATION")

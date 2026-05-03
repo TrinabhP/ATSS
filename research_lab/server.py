@@ -24,6 +24,14 @@ if os.path.exists(_env_path):
                 _key, _, _val = _line.partition("=")
                 os.environ.setdefault(_key.strip(), _val.strip())
 
+# Fix macOS Python SSL certificate issue — use certifi's CA bundle
+# so that urllib (used by Biopython Entrez) can verify HTTPS connections.
+try:
+    import certifi
+    os.environ.setdefault("SSL_CERT_FILE", certifi.where())
+except ImportError:
+    pass
+
 from typing import Any, Dict, Optional, List
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -98,7 +106,7 @@ def analyze(request: AnalyzeRequest) -> Dict[str, Any]:
 async def analyze_stream(request: AnalyzeRequest):
     """
     Run the pipeline and stream each agent's result as an SSE event.
-    Events: literature, hypothesis, procedure, synthesis, peer_review, done
+    Events: literature, hypothesis, procedure, done
     """
     async def event_generator():
         try:
@@ -109,7 +117,6 @@ async def analyze_stream(request: AnalyzeRequest):
                     "literature": state.get("literature"),
                     "hypothesis": state.get("hypothesis"),
                     "procedure": state.get("procedure"),
-                    "peer_review": state.get("peer_review"),
                     "final_recommendation": state.get("final_recommendation"),
                     "confidence_level": state.get("confidence_level"),
                     "action_items": state.get("action_items", []),
