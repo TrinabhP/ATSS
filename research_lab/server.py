@@ -36,6 +36,7 @@ from typing import Any, Dict, Optional, List
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, field_validator
 import uvicorn
 import json
@@ -168,6 +169,25 @@ async def analyze_stream(request: AnalyzeRequest, current_user: str = Depends(ge
             "X-Accel-Buffering": "no",
         },
     )
+
+
+# ── Serve React frontend (production) ──────────────────────────────────────────
+
+_static_dir = os.path.join(_repo_root, "labos-mockup", "dist")
+if os.path.isdir(_static_dir):
+    from fastapi.responses import FileResponse
+
+    # Serve static assets (JS, CSS, images)
+    app.mount("/assets", StaticFiles(directory=os.path.join(_static_dir, "assets")), name="static-assets")
+
+    # Serve other static files at root level (favicon, icons, etc.)
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        """Serve the React SPA — any non-API route returns index.html."""
+        file_path = os.path.join(_static_dir, full_path)
+        if full_path and os.path.isfile(file_path):
+            return FileResponse(file_path)
+        return FileResponse(os.path.join(_static_dir, "index.html"))
 
 
 # ── Entry point ────────────────────────────────────────────────────────────────
