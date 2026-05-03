@@ -12,13 +12,9 @@ export default function NewProject() {
     if (!abstract.trim()) return;
 
     setIsSubmitting(true);
-    
-    // Simulate API delay for creating a project bucket
-    setTimeout(() => {
-      // In a real app, you'd get a new ID back from the backend
-      const newProjectId = Math.floor(Math.random() * 1000) + 100;
-      navigate(`/projects/${newProjectId}`, { state: { abstract } });
-    }, 800);
+    // In a production app, we would await a real API call here to create the project
+    const newProjectId = Date.now(); // Generate a unique ID based on timestamp
+    navigate(`/projects/${newProjectId}`, { state: { abstract } });
   };
 
   return (

@@ -40,12 +40,12 @@ function Accordion({ title, children, defaultOpen = true }) {
 
 export default function AnalysisView() {
   const location = useLocation();
-  const abstract = location.state?.abstract || 'No abstract provided. This is a mock analysis.';
+  const abstract = location.state?.abstract || '';
 
   const [currentStageIndex, setCurrentStageIndex] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
 
-  // Mock Data
+  // Data State
   const [papers, setPapers] = useState([]);
   const [extractedResults, setExtractedResults] = useState([]);
   const [initialSynthesis, setInitialSynthesis] = useState(null);
@@ -53,30 +53,8 @@ export default function AnalysisView() {
   const [finalRec, setFinalRec] = useState(null);
 
   useEffect(() => {
-    if (isFinished) return;
-
-    if (currentStageIndex < STAGES.length) {
-      const timer = setTimeout(() => {
-        const stageId = STAGES[currentStageIndex].id;
-        
-        if (stageId === 'agent1') {
-          setPapers([{ title: 'Multi-Agent Debate Improves Reasoning', url: '#', abstract: 'We show that...', relevance_score: 0.95 }]);
-        } else if (stageId === 'agent2') {
-          setExtractedResults([{ paper_title: 'Multi-Agent Debate Improves Reasoning', key_findings: ['Debate improves accuracy by 15%'], methods: 'Empirical evaluation' }]);
-        } else if (stageId === 'agent3') {
-          setInitialSynthesis({ text: 'Initial evidence suggests multi-agent systems outperform single agents.', gaps: ['Sample sizes are limited'] });
-        } else if (stageId.startsWith('debate')) {
-          setDebateRounds(prev => [...prev, { round_number: prev.length + 1, critic_feedback: 'Sample size concerns.', results_refinement: 'Re-evaluating data.', analysis_update: 'Updated synthesis.' }]);
-        } else if (stageId === 'final') {
-          setFinalRec({ recommendation: 'We recommend utilizing multi-agent debate.', confidence_level: 'Moderate', action_items: ['Implement loop'], caveats: ['High cost'] });
-          setIsFinished(true);
-        }
-
-        setCurrentStageIndex(prev => prev + 1);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [currentStageIndex, isFinished]);
+    // Pipeline integration goes here
+  }, []);
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="analysis-view">
@@ -112,7 +90,7 @@ export default function AnalysisView() {
                     {isCompleted ? (
                       <CheckCircle2 size={20} className="text-success" color="var(--success)" />
                     ) : isActive ? (
-                      <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 2, ease: "linear" }}>
+                      <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 2, ease: "linear" }} style={{ display: 'inline-flex' }}>
                         <CircleDashed size={20} color="var(--accent-primary)" />
                       </motion.div>
                     ) : (

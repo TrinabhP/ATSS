@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Plus, FolderKanban, Sun, Moon, LogOut } from 'lucide-react';
+import { Plus, FolderKanban, Sun, Moon, LogOut, User, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 
 export default function Sidebar() {
@@ -7,54 +8,76 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const recentProjects = [
-    { id: 1, title: 'Multi-Agent Debate Frameworks' },
-    { id: 2, title: 'CRISPR Off-target Effects' },
-    { id: 3, title: 'Quantum Error Correction' }
-  ];
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  // Active projects will be retrieved from global state here later
+  const recentProjects = [];
 
   return (
-    <div className="sidebar">
-      <div className="sidebar-header" style={{ cursor: 'pointer' }} onClick={() => navigate('/projects')}>
-        <div style={{ color: 'var(--accent-primary)', fontSize: '1.5rem' }}>⬡</div>
-        <span>LabOS</span>
+    <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+      <div className="sidebar-header" style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', flex: 1, overflow: 'hidden' }} onClick={() => navigate('/projects')}>
+          <div style={{ color: 'var(--accent-primary)', fontSize: '1.5rem', minWidth: '24px' }}>⬡</div>
+          {!isCollapsed && <span>LabOS</span>}
+        </div>
+        <button className="sidebar-header-collapse-btn" onClick={() => setIsCollapsed(!isCollapsed)}>
+          {isCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+        </button>
       </div>
 
-      <button className="new-analysis-btn" onClick={() => navigate('/projects/new')}>
-        <Plus size={18} />
-        New Project
+      <button className="new-analysis-btn" onClick={() => navigate('/projects/new')} style={{ justifyContent: isCollapsed ? 'center' : 'flex-start' }}>
+        <Plus size={18} style={{ minWidth: '18px' }} />
+        {!isCollapsed && "New Project"}
       </button>
 
       <div className="sidebar-section">
-        <div className="sidebar-label">Your Projects</div>
+        {!isCollapsed && <div className="sidebar-label">Your Projects</div>}
         <ul className="history-list">
           <li 
             className={`history-item ${location.pathname === '/projects' ? 'active' : ''}`}
             onClick={() => navigate('/projects')}
+            style={{ justifyContent: isCollapsed ? 'center' : 'flex-start' }}
+            title="All Projects"
           >
-            <FolderKanban size={14} />
-            <span>All Projects</span>
+            <FolderKanban size={14} style={{ minWidth: '14px' }} />
+            {!isCollapsed && <span>All Projects</span>}
           </li>
           {recentProjects.map(proj => (
             <li 
               key={proj.id} 
               className={`history-item ${location.pathname === `/projects/${proj.id}` ? 'active' : ''}`}
               onClick={() => navigate(`/projects/${proj.id}`)}
+              style={{ justifyContent: isCollapsed ? 'center' : 'flex-start' }}
+              title={proj.title}
             >
-              <span className="text-muted" style={{ fontSize: '10px' }}>•</span>
-              <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{proj.title}</span>
+              <span className="text-muted" style={{ fontSize: '10px', minWidth: '10px' }}>•</span>
+              {!isCollapsed && <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{proj.title}</span>}
             </li>
           ))}
         </ul>
       </div>
 
-      <div className="sidebar-footer">
+      <div className="sidebar-footer" style={{ position: 'relative', flexDirection: isCollapsed ? 'column' : 'row', gap: isCollapsed ? '1rem' : '0' }}>
         <button className="theme-toggle" onClick={toggleTheme}>
           {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
         </button>
-        <button className="theme-toggle" onClick={() => navigate('/')}>
-          <LogOut size={20} />
-        </button>
+        <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
+          <button className="theme-toggle" onClick={() => setShowProfileMenu(!showProfileMenu)}>
+            <User size={20} />
+          </button>
+          
+          {showProfileMenu && (
+            <div className="profile-menu">
+              <button onClick={() => { setShowProfileMenu(false); /* navigate to profile */ }}>
+                <User size={16} /> Profile
+              </button>
+              <button onClick={() => { setShowProfileMenu(false); navigate('/'); }}>
+                <LogOut size={16} /> Log Out
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

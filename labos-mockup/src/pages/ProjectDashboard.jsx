@@ -101,7 +101,7 @@ export default function ProjectDashboard() {
   const renderStatus = (status) => {
     if (status === 'done') return <CheckCircle2 size={20} color="var(--success)" />;
     if (status === 'running') return (
-      <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}>
+      <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 2, ease: 'linear' }} style={{ display: 'inline-flex' }}>
         <CircleDashed size={20} color="var(--accent-primary)" />
       </motion.div>
     );
@@ -123,7 +123,7 @@ export default function ProjectDashboard() {
 
       <div className="card p-6 mb-6">
         <h3 className="font-mono mb-2 text-sm text-muted uppercase">Input Abstract</h3>
-        <p className="text-sm">{abstract || 'No abstract provided.'}</p>
+        <p className="text-sm" style={{ maxHeight: '150px', overflowY: 'auto', whiteSpace: 'pre-wrap' }}>{abstract || 'No abstract provided.'}</p>
       </div>
 
       {loading && (

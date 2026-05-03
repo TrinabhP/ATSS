@@ -5,11 +5,7 @@ import { Plus, Folder, ArrowRight } from 'lucide-react';
 export default function ProjectList() {
   const navigate = useNavigate();
 
-  const projects = [
-    { id: 1, title: 'Multi-Agent Debate Frameworks', date: 'Oct 24, 2026', status: 'Completed', agents: 3 },
-    { id: 2, title: 'CRISPR Off-target Effects', date: 'Sep 12, 2026', status: 'Completed', agents: 3 },
-    { id: 3, title: 'Quantum Error Correction', date: 'Aug 05, 2026', status: 'In Progress', agents: 2 }
-  ];
+  const projects = [];
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="project-list">
