@@ -27,11 +27,19 @@ def _extract_text(response) -> str:
 
 
 def _safe_json(text: str, fallback: object) -> object:
+    import re
     stripped = text.strip()
+    # Strip <think>...</think> blocks from reasoning models
+    stripped = re.sub(r'<think>.*?</think>', '', stripped, flags=re.DOTALL).strip()
     if stripped.startswith("```"):
         lines = stripped.splitlines()
         inner = lines[1:-1] if lines[-1].strip().startswith("```") else lines[1:]
         stripped = "\n".join(inner)
+    # Try to find a JSON object anywhere in the response
+    start = stripped.find("{")
+    end = stripped.rfind("}")
+    if start != -1 and end != -1 and end > start:
+        stripped = stripped[start:end+1]
     try:
         return json.loads(stripped)
     except (json.JSONDecodeError, ValueError):
@@ -180,6 +188,10 @@ def run_hypothesis_agent(
                 ],
             )
             review_text = _extract_text(review_resp).strip()
+
+            # Strip <think>...</think> blocks from reasoning models
+            import re as _re
+            review_text = _re.sub(r'<think>.*?</think>', '', review_text, flags=_re.DOTALL).strip()
 
             if review_text.startswith("ISSUES_FOUND:"):
                 issues = review_text[len("ISSUES_FOUND:"):].strip()

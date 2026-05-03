@@ -260,6 +260,10 @@ Extract and return ONLY valid JSON (no markdown, no explanation):
             
             text = response.choices[0].message.content.strip()
             
+            # Strip <think>...</think> blocks from reasoning models
+            import re as _re
+            text = _re.sub(r'<think>.*?</think>', '', text, flags=_re.DOTALL).strip()
+
             # Clean markdown
             if text.startswith("```"):
                 text = text.split("```")[1]

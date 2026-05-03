@@ -29,7 +29,7 @@ export default function ProjectDashboard() {
 
     const run = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/analyze`, {
+        const res = await fetch(`${API_BASE}/api/analyze/stream`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ abstract }),
@@ -38,11 +38,43 @@ export default function ProjectDashboard() {
           const detail = await res.json().catch(() => ({}));
           throw new Error(detail?.detail || `Server error ${res.status}`);
         }
-        const data = await res.json();
-        setPipelineState(data);
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          // Keep the last incomplete line in the buffer
+          buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(line.slice(6));
+                setPipelineState(prev => ({ ...prev, ...data }));
+
+                if (data.stage === 'done' || data.stage === 'error') {
+                  setLoading(false);
+                }
+                if (data.error && data.stage === 'error') {
+                  setError(data.error);
+                  setLoading(false);
+                }
+              } catch {
+                // Skip malformed JSON lines
+              }
+            }
+          }
+        }
+
+        setLoading(false);
       } catch (err) {
         setError(err.message);
-      } finally {
         setLoading(false);
       }
     };
@@ -51,10 +83,19 @@ export default function ProjectDashboard() {
   }, [abstract]);
 
   const agentStatus = (key) => {
-    if (loading) return key === 'literature' ? 'running' : 'waiting';
     if (error) return 'error';
-    if (!pipelineState) return 'waiting';
-    return pipelineState[key] ? 'done' : 'waiting';
+    if (!pipelineState) return loading ? (key === 'literature' ? 'running' : 'waiting') : 'waiting';
+
+    // If this agent's data exists, it's done
+    if (pipelineState[key]) return 'done';
+
+    // Determine what's currently running based on the stage
+    const stage = pipelineState.stage || pipelineState.current_stage || '';
+    if (key === 'literature' && (stage.startsWith('literature') || !stage)) return loading ? 'running' : 'waiting';
+    if (key === 'hypothesis' && stage.startsWith('hypothesis')) return 'running';
+    if (key === 'procedure' && (stage.startsWith('procedure') || stage === 'synthesis' || stage === 'done')) return stage === 'procedure' ? 'running' : 'waiting';
+
+    return loading ? 'waiting' : 'waiting';
   };
 
   const renderStatus = (status) => {

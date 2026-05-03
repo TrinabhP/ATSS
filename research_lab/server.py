@@ -25,12 +25,15 @@ if os.path.exists(_env_path):
                 os.environ.setdefault(_key.strip(), _val.strip())
 
 from typing import Any, Dict, Optional, List
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, field_validator
 import uvicorn
+import json
+import asyncio
 
-from graph import run_research
+from graph import run_research, run_research_streaming
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -89,6 +92,48 @@ def analyze(request: AnalyzeRequest) -> Dict[str, Any]:
 
     # TypedDicts are already plain dicts — return directly
     return dict(result)
+
+
+@app.post("/api/analyze/stream")
+async def analyze_stream(request: AnalyzeRequest):
+    """
+    Run the pipeline and stream each agent's result as an SSE event.
+    Events: literature, hypothesis, procedure, synthesis, peer_review, done
+    """
+    async def event_generator():
+        try:
+            for stage, state in run_research_streaming(request.abstract):
+                # Build a JSON-safe snapshot of the current state
+                payload = {
+                    "stage": stage,
+                    "literature": state.get("literature"),
+                    "hypothesis": state.get("hypothesis"),
+                    "procedure": state.get("procedure"),
+                    "peer_review": state.get("peer_review"),
+                    "final_recommendation": state.get("final_recommendation"),
+                    "confidence_level": state.get("confidence_level"),
+                    "action_items": state.get("action_items", []),
+                    "caveats": state.get("caveats", []),
+                    "error": state.get("error"),
+                    "current_stage": state.get("current_stage", ""),
+                }
+                data = json.dumps(payload, default=str)
+                yield f"data: {data}\n\n"
+                # Small yield to let the event loop flush
+                await asyncio.sleep(0.01)
+        except Exception as e:
+            error_payload = json.dumps({"stage": "error", "error": str(e)})
+            yield f"data: {error_payload}\n\n"
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 # ── Entry point ────────────────────────────────────────────────────────────────

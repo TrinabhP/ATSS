@@ -26,8 +26,8 @@ MAX_REVISIONS = 1
 
 # Per-agent revision caps (override MAX_REVISIONS for specific agents)
 LITERATURE_MAX_REVISIONS = 0   # Agent 1: no retries — 3 papers + Ragie is sufficient
-HYPOTHESIS_MAX_REVISIONS = MAX_REVISIONS
-PROCEDURE_MAX_REVISIONS = MAX_REVISIONS
+HYPOTHESIS_MAX_REVISIONS = 0   # Agent 2: no retries — self-review handles quality internally
+PROCEDURE_MAX_REVISIONS = 0    # Agent 3: no retries — single pass
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
@@ -348,9 +348,19 @@ def _build_graph():
 
 def run_research(abstract: str) -> ResearchState:
     """Run the full research pipeline and return the final state."""
-    compiled = _build_graph()
+    # Use the streaming version and just return the last state
+    state = None
+    for _stage, state in run_research_streaming(abstract):
+        pass
+    return state
 
-    initial: ResearchState = {
+
+def run_research_streaming(abstract: str):
+    """
+    Generator that runs the pipeline step-by-step, yielding (stage_name, state)
+    after each major step completes. Used by the SSE endpoint.
+    """
+    state: ResearchState = {
         "abstract": abstract[:4000],
         "current_stage": "",
         "orchestrator_messages": [],
@@ -366,8 +376,46 @@ def run_research(abstract: str) -> ResearchState:
         "error": None,
     }
 
-    final_state: ResearchState = compiled.invoke(initial)
-    return final_state
+    # Step 1: Literature
+    state = dispatch_literature(state)
+    state = review_literature_node(state)
+    yield ("literature", state)
+
+    # Retry literature if needed
+    if should_retry_literature(state) == "retry_literature":
+        state = dispatch_literature(state)
+        state = review_literature_node(state)
+        yield ("literature_retry", state)
+
+    # Step 2: Hypothesis
+    state = dispatch_hypothesis(state)
+    state = review_hypothesis_node(state)
+    yield ("hypothesis", state)
+
+    # Retry hypothesis if needed
+    if should_retry_hypothesis(state) == "retry_hypothesis":
+        state = dispatch_hypothesis(state)
+        state = review_hypothesis_node(state)
+        yield ("hypothesis_retry", state)
+
+    # Step 3: Procedure
+    state = dispatch_procedure(state)
+    state = review_procedure_node(state)
+    yield ("procedure", state)
+
+    # Retry procedure if needed
+    if should_retry_procedure(state) == "retry_procedure":
+        state = dispatch_procedure(state)
+        state = review_procedure_node(state)
+        yield ("procedure_retry", state)
+
+    # Step 4: Synthesis
+    state = synthesize_node(state)
+    yield ("synthesis", state)
+
+    # Step 5: Peer review
+    state = peer_review_node(state)
+    yield ("done", state)
 
 
 # ── CLI entry point ────────────────────────────────────────────────────────────
