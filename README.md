@@ -6,6 +6,15 @@ A hierarchical multi-agent research analysis system built for **KiroHacks Cal Po
 
 **Live:** [https://labos-research-engine.onrender.com](https://labos-research-engine.onrender.com)
 
+### Test Login
+
+Use these credentials to try the app:
+
+| Field | Value |
+|---|---|
+| Email | `test@gmail.com` |
+| Password | `test123` |
+
 ---
 
 ## How It Works
